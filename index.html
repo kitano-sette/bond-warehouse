@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Bond Daily Highlight</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&family=Anton&family=Kanit:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --brown:#4A3A34;
+    --amber1:#F6A93B;
+    --amber2:#E8862A;
+    --maroon:#6E2E32;
+    --cream:#FBF6EC;
+    --paper:#FFFFFF;
+    --ink:#332621;
+    --ink-soft:#7A6B62;
+    --line:#EAE0CF;
+    --gold:#C98A12;
+    --green:#4C8B3B;
+    --red:#B4432E;
+    --radius:16px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  body{
+    margin:0;
+    font-family:'Noto Sans Thai', sans-serif;
+    background:var(--cream);
+    color:var(--ink);
+    padding-bottom:40px;
+  }
+
+  /* ---------- Header ---------- */
+  .hero{
+    position:relative;
+    overflow:hidden;
+    background:
+      radial-gradient(600px 300px at 15% 10%, rgba(255,255,255,0.25), transparent 60%),
+      linear-gradient(120deg,#F2A63C 0%,#E8862A 45%, #D9691F 100%);
+    padding:18px 16px 46px;
+  }
+  .coin{
+    position:absolute; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #FFE9B0, #D89A2D 60%, #A8700F 100%);
+    box-shadow:inset -4px -6px 10px rgba(0,0,0,0.25), 0 6px 14px rgba(0,0,0,0.2);
+    opacity:0.9;
+  }
+  .coin.c1{width:44px; height:44px; top:14px; right:16px;}
+  .coin.c2{width:24px; height:24px; top:70px; right:70px;}
+  .coin.c3{width:30px; height:30px; bottom:2px; left:4%;}
+
+  .title-block{
+    text-align:center;
+    margin-top:14px;
+    position:relative; z-index:2;
+  }
+  .title-main{
+    font-family:'Anton', 'Kanit', sans-serif;
+    font-size:clamp(30px,10vw,40px);
+    color:#fff;
+    letter-spacing:2px;
+    -webkit-text-stroke:1.5px rgba(110,46,50,0.55);
+    text-shadow:0 4px 0 rgba(110,46,50,0.35);
+    margin:0;
+  }
+  .title-byline{
+    text-align:center;
+    margin-top:4px;
+    font-family:'Noto Sans Thai', sans-serif;
+    font-weight:600;
+    font-size:11px;
+    color:rgba(255,255,255,0.85);
+    letter-spacing:.3px;
+  }
+  .title-sub{
+    display:inline-block;
+    margin-top:6px;
+    font-family:'Kanit', sans-serif;
+    font-weight:700;
+    font-size:clamp(16px,5vw,20px);
+    color:var(--maroon);
+    background:linear-gradient(100deg,#F7C9CE,#F3E3B0);
+    padding:4px 20px;
+    border-radius:6px;
+    transform:rotate(-2deg);
+    box-shadow:0 4px 10px rgba(0,0,0,0.15);
+  }
+
+  /* ---------- Panel ---------- */
+  .panel{
+    max-width:600px;
+    margin:-26px auto 0;
+    background:var(--paper);
+    border-radius:18px;
+    box-shadow:0 20px 40px -24px rgba(74,58,52,0.45);
+    padding:18px 14px 24px;
+    position:relative;
+    z-index:3;
+  }
+  .panel-top{
+    display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:8px;
+    margin-bottom:16px;
+  }
+  .flag{
+    background:linear-gradient(100deg,#FBE28A,#F5C542);
+    color:var(--maroon);
+    font-weight:700; font-size:14px;
+    padding:9px 14px;
+    border-radius:8px;
+    transform:rotate(-1.5deg);
+    box-shadow:0 6px 12px rgba(0,0,0,0.12);
+  }
+  .date-pill{
+    background:#EFEAE0;
+    color:var(--brown);
+    font-weight:700; font-size:13px;
+    padding:9px 16px;
+    border-radius:999px;
+  }
+
+  /* ---------- Filters ---------- */
+  .filters{
+    display:grid; grid-template-columns:1fr 1fr; gap:8px;
+    padding:12px; background:#FBF8F1;
+    border:1px solid var(--line); border-radius:12px;
+    margin-bottom:16px;
+  }
+  .filters select{
+    appearance:none; -webkit-appearance:none;
+    font-family:inherit;
+    background:#fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="8"><path d="M1 1l5 5 5-5" stroke="%237A6B62" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>') no-repeat right 10px center;
+    border:1px solid var(--line);
+    border-radius:9px;
+    padding:9px 26px 9px 10px;
+    font-size:12.5px;
+    color:var(--ink);
+    cursor:pointer;
+    width:100%;
+  }
+  .filters select:focus-visible{outline:2px solid var(--amber2); outline-offset:1px;}
+  .reset-btn{
+    grid-column:1 / -1;
+    background:var(--maroon); color:#fff; border:none;
+    padding:9px; border-radius:9px; font-size:12.5px;
+    cursor:pointer; font-family:inherit; font-weight:600;
+  }
+  .reset-btn:hover{background:#5a2529;}
+
+  .count-line{
+    font-size:12.5px; color:var(--ink-soft); margin-bottom:10px; padding:0 2px;
+  }
+  .count-line b{color:var(--brown);}
+  .disclaimer-line{
+    font-size:11px; color:#c0392b; margin:2px 2px 10px 2px;
+  }
+
+  /* ---------- Bond cards ---------- */
+  .cards{display:flex; flex-direction:column; gap:12px;}
+  .card{
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px;
+    background:var(--paper);
+  }
+  .card-head{display:flex; justify-content:space-between; gap:8px; align-items:flex-start;}
+  .bond-name{font-weight:700; color:var(--brown); font-size:16px;}
+  .bond-issuer{font-size:12px; color:var(--ink-soft); margin-top:2px; line-height:1.4;}
+  .feature{
+    display:inline-block; font-size:11px; font-weight:700;
+    margin-top:5px; margin-right:5px;
+  }
+  .feature.call{color:var(--red);}
+  .feature.perp{color:var(--red);}
+  .feature.sll{color:var(--green);}
+  .ytm-box{
+    text-align:right; flex:none;
+  }
+  .ytm-box .lbl{font-size:10px; color:var(--ink-soft); margin-bottom:2px;}
+  .ytm{
+    background:#F6D746; font-weight:800; color:var(--ink);
+    padding:5px 11px; border-radius:6px; display:inline-block;
+    font-size:16px; white-space:nowrap;
+  }
+
+  .metrics-grid{
+    display:grid; grid-template-columns:repeat(3,1fr);
+    gap:8px; margin-top:12px;
+    border-top:1px dashed var(--line); padding-top:12px;
+  }
+  .metric .m-lbl{font-size:10px; color:var(--ink-soft); margin-bottom:3px;}
+  .metric .m-val{font-size:13.5px; font-weight:700; color:var(--ink);}
+  .rating{font-size:12.5px; line-height:1.3;}
+  .risk-dots{display:flex; gap:2.5px; margin-top:3px;}
+  .dot{width:7px; height:7px; border-radius:50%; background:#E7DFCB; flex:none;}
+  .dot.on{background:var(--amber2);}
+
+  .card-foot{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:10px; margin-top:12px;
+  }
+  .foot-left{display:flex; flex-direction:column; gap:2px;}
+  .investor-badge{
+    font-size:11px; font-weight:700; padding:4px 9px; border-radius:999px;
+    background:#EFEAE0; color:var(--brown); white-space:nowrap; width:fit-content;
+  }
+  .amount-line{font-size:11px; color:var(--ink-soft);}
+  .amount-line b{color:var(--ink);}
+
+  .buy-btn{
+    flex:none;
+    background:linear-gradient(120deg,var(--amber1),var(--amber2));
+    color:#fff; border:none;
+    padding:11px 20px; border-radius:999px;
+    font-family:inherit; font-weight:700; font-size:13.5px;
+    cursor:pointer;
+    box-shadow:0 8px 16px -6px rgba(232,134,42,0.6);
+    white-space:nowrap;
+    transition:transform .12s;
+  }
+  .buy-btn:active{transform:scale(0.96);}
+
+  .empty-state{
+    text-align:center; padding:40px 16px; color:var(--ink-soft); font-size:13.5px;
+  }
+
+  /* ---------- Buy expand panel ---------- */
+  .buy-expand{
+    margin-top:12px;
+    padding-top:12px;
+    border-top:1px dashed var(--line);
+    display:none;
+  }
+  .buy-expand.open{display:block;}
+  .type-select{
+    display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;
+  }
+  .type-btn{
+    flex:1 1 auto;
+    font-family:inherit; font-weight:700; font-size:12.5px;
+    padding:10px 12px; border-radius:9px;
+    border:1px solid var(--line);
+    background:#FBF8F1; color:var(--brown);
+    cursor:pointer;
+  }
+  .type-btn.active{
+    background:linear-gradient(120deg,var(--amber1),var(--amber2));
+    color:#fff; border-color:transparent;
+  }
+  .login-box, .email-box{
+    display:none;
+    flex-direction:column; gap:8px;
+    margin-bottom:12px;
+  }
+  .login-box.show, .email-box.show{display:flex;}
+  .buy-input{
+    width:100%;
+    font-family:inherit; font-size:13px; color:var(--ink);
+    border:1px solid var(--line); border-radius:9px;
+    padding:10px 12px;
+    background:#fff;
+  }
+  .buy-input:focus-visible{outline:2px solid var(--amber2); outline-offset:1px;}
+  .buy-input:disabled{background:#F1ECE0; color:var(--ink-soft); cursor:not-allowed;}
+  .login-btn{
+    width:100%;
+    background:linear-gradient(120deg,var(--amber1),var(--amber2));
+    color:#fff; border:none;
+    padding:11px; border-radius:9px;
+    font-family:inherit; font-weight:700; font-size:13.5px;
+    cursor:pointer;
+  }
+  .login-btn:active{transform:scale(0.98);}
+  .amount-fields{
+    display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;
+  }
+  .amount-wrap{position:relative;}
+  .amount-wrap .buy-input{padding-right:42px;}
+  .amount-suffix{
+    position:absolute; right:12px; top:50%; transform:translateY(-50%);
+    font-size:12px; font-weight:600; color:var(--ink-soft);
+    pointer-events:none; opacity:0; transition:opacity .15s;
+  }
+  .amount-suffix.show{opacity:1;}
+  .comment-box{
+    resize:vertical; min-height:56px; margin-bottom:12px;
+  }
+  .submit-btn{
+    width:100%;
+    background:var(--maroon); color:#fff; border:none;
+    padding:11px; border-radius:9px;
+    font-family:inherit; font-weight:700; font-size:13.5px;
+    cursor:pointer;
+  }
+  .submit-btn:hover{background:#5a2529;}
+  .thank-you-msg{
+    display:none;
+    text-align:center; font-size:13px; font-weight:600;
+    color:var(--maroon);
+    background:#FBF0DC;
+    border-radius:9px; padding:14px;
+    line-height:1.6;
+  }
+  .thank-you-msg.show{display:block;}
+
+  /* ---------- Warning ---------- */
+  .warning{
+    max-width:600px; margin:22px auto 0; padding:0 16px;
+    font-size:11.5px; color:var(--ink-soft); line-height:1.8;
+  }
+  .warning b{color:var(--brown); display:block; margin-bottom:4px; font-size:12.5px;}
+  .warning ul{margin:0; padding-left:16px;}
+
+  .contact-bar{
+    max-width:600px; margin:18px auto 0; padding:14px 16px;
+    background:var(--brown); border-radius:12px;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    color:#F3E7C9; font-weight:600; font-size:12px; text-align:center;
+  }
+
+  /* ---------- Toast ---------- */
+  .toast{
+    position:fixed; left:50%; bottom:24px; transform:translate(-50%,20px);
+    background:var(--brown); color:#F6E9C9;
+    padding:12px 20px; border-radius:999px;
+    font-size:13px; font-weight:600;
+    box-shadow:0 10px 24px rgba(0,0,0,0.25);
+    opacity:0; pointer-events:none;
+    transition:opacity .25s, transform .25s;
+    z-index:50;
+    max-width:88vw; text-align:center;
+  }
+  .toast.show{opacity:1; transform:translate(-50%,0);}
+
+  @media (min-width:420px){
+    .filters{grid-template-columns:1fr 1fr;}
+  }
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <div class="coin c1"></div>
+    <div class="coin c2"></div>
+    <div class="coin c3"></div>
+    <div class="title-block">
+      <h1 class="title-main">BOND SCREENER</h1>
+      <div class="title-byline">By Kitthanabhumi</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-top">
+      <div class="flag">เสนอขาย (หุ้นกู้ตลาดรอง)</div>
+      <div class="date-pill" id="datePill">5 สิงหาคม 2569</div>
+    </div>
+
+    <div class="filters">
+      <select id="fInvestor">
+        <option value="">นักลงทุน: ทั้งหมด</option>
+        <option value="PO">ประชาชนทั่วไป (PO)</option>
+        <option value="II/HNW">รายใหญ่/สถาบัน</option>
+        <option value="PG">ตราสารหนี้ภาครัฐ (PG)</option>
+      </select>
+      <select id="fRating">
+        <option value="">เครดิต: ทั้งหมด</option>
+        <option value="AAA">AAA</option>
+        <option value="AA">AA</option>
+        <option value="A">A</option>
+        <option value="BBB">BBB</option>
+      </select>
+      <select id="fRisk">
+        <option value="">ความเสี่ยง: ทั้งหมด</option>
+        <option value="1">ระดับ 1</option>
+        <option value="2">ระดับ 2</option>
+        <option value="3">ระดับ 3</option>
+        <option value="4">ระดับ 4</option>
+        <option value="5">ระดับ 5</option>
+        <option value="6">ระดับ 6</option>
+        <option value="7">ระดับ 7</option>
+        <option value="8">ระดับ 8</option>
+      </select>
+      <select id="fFeature">
+        <option value="">คุณลักษณะ: ทั้งหมด</option>
+        <option value="normal">หุ้นกู้ปกติ</option>
+        <option value="call">Call Option</option>
+        <option value="perp">Perpetual Bond</option>
+        <option value="sll">Sustainability-Linked</option>
+      </select>
+      <select id="fYtm">
+        <option value="">YTM: ทั้งหมด</option>
+        <option value="gt5">มากกว่า 5%</option>
+        <option value="4-5">4-5%</option>
+        <option value="3-4">3-4%</option>
+        <option value="2-3">2-3%</option>
+        <option value="lt2">น้อยกว่า 2%</option>
+      </select>
+      <select id="fLife">
+        <option value="">อายุคงเหลือ (ปี): ทั้งหมด</option>
+        <option value="lt1">น้อยกว่า 1 ปี</option>
+        <option value="2-3">2-3 ปี</option>
+        <option value="3-4">3-4 ปี</option>
+        <option value="4-5">4-5 ปี</option>
+        <option value="gt5">มากกว่า 5 ปี</option>
+      </select>
+      <button class="reset-btn" id="resetBtn">ล้างตัวกรองทั้งหมด</button>
+    </div>
+
+    <div class="count-line">พบ <b id="countNum">0</b> หุ้นกู้ที่เสนอขาย</div>
+    <div class="disclaimer-line">ข้อมูลการเสนอขายนี้ ขอสงวนสิทธิ์ในการเปลี่ยนแปลงโดยมิได้ต้องแจ้งให้ทราบล่วงหน้า</div>
+
+    <div class="cards" id="cards"></div>
+  </div>
+
+  <div class="warning">
+    <b>คำเตือน</b>
+    <ul>
+      <li>การลงทุนมีความเสี่ยง ผู้ลงทุนโปรดศึกษาลักษณะของหุ้นกู้ เงื่อนไขผลตอบแทนและความเสี่ยงจากหนังสือชี้ชวนก่อนการตัดสินใจลงทุน</li>
+      <li>ผลตอบแทนที่เสนอขายดังระบุข้างต้น เป็นอัตราผลตอบแทนอ้างอิง สำหรับใช้เป็นข้อมูลในการตัดสินใจของนักลงทุนเท่านั้น</li>
+      <li>กรณีเสนอขายนักลงทุนรายใหญ่ (HNW) จะต้องเป็นไปตามคุณสมบัติที่ ก.ล.ต. กำหนด</li>
+      <li>ข้อมูลข้างต้นบริษัทขอสงวนสิทธิ์ในการเปลี่ยนแปลงโดยมิได้ต้องแจ้งให้ทราบล่วงหน้า</li>
+      <li>YTM = Yield To Maturity หรืออัตราผลตอบแทนที่ผู้ลงทุนจะได้รับในกรณีที่ผู้ลงทุนถือหุ้นกู้ตัวนั้น จนครบกำหนดอายุตราสาร</li>
+    </ul>
+  </div>
+
+  <div class="contact-bar">Krungsri Securities &nbsp;·&nbsp; 0 2638 5500, 0 2659 7777</div>
+
+  <div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ---------- Bond dataset: live-synced from Bond Warehouse (bond-warehouse.html) ----------
+// Both files read/write the SAME Supabase table ("bonds"), so any bond
+// added, edited, or closed in Bond Warehouse appears here automatically —
+// on any device, for any visitor, no shared browser/localStorage needed.
+// ⚠️ ใส่ค่า URL และ anon key ของโปรเจกต์ Supabase ตัวเอง (ค่าเดียวกับใน bond-warehouse.html)
+const SUPABASE_URL = "https://aljiavhlrtctvevxqmzw.supabase.co/rest/v1/";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsamlhdmhscnRjdHZldnhxbXp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MjYyMzMsImV4cCI6MjEwMjIwMjIzM30.KhhAiFiz6vUYZLhlAZMvGE-VzKZRLQf9qE53Tc-aSWg";
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const BONDS_TABLE = "bonds";
+let BONDS = [];
+
+const cardsEl = document.getElementById('cards');
+const countEl = document.getElementById('countNum');
+const toastEl = document.getElementById('toast');
+const ids = ['fInvestor','fRating','fRisk','fFeature','fYtm','fLife'];
+const els = Object.fromEntries(ids.map(id=>[id, document.getElementById(id)]));
+
+/* ---------- Bond Warehouse -> Bond Screener field mapping ----------
+   Field names between the two files don't always match, e.g.:
+     ytm (index)         <- ytmSell         "YTM ขาย (%)"          (warehouse)
+     ratingLabel (index)  <- ratingCompany    "อันดับความน่าเชื่อถือ (บริษัท)" (warehouse)
+   Only bonds with status "open" are shown here; closing/reopening a bond in
+   Bond Warehouse removes/restores it from this list automatically.
+------------------------------------------------------------------- */
+function whRemainingYears(maturityDate){
+  if(!maturityDate) return null;
+  const m = new Date(maturityDate + "T00:00:00");
+  if(isNaN(m.getTime())) return null;
+  return (m.getTime() - Date.now()) / (1000*60*60*24*365.25);
+}
+function whLifeDisplay(w){
+  if(w.perpetual) return 'PERP';
+  const y = whRemainingYears(w.maturityDate);
+  if(y === null || y < 0) return '0';
+  return y.toFixed(2);
+}
+function whRiskNumber(riskLevelStr){
+  const m = String(riskLevelStr || '').match(/\d+/);
+  return m ? parseInt(m[0], 10) : 0;
+}
+function whAmountMillions(offerAmount){
+  const n = Number(offerAmount);
+  if(!offerAmount || isNaN(n)) return '0.00';
+  return (n/1000000).toLocaleString('en-US', { minimumFractionDigits:2, maximumFractionDigits:2 });
+}
+function whMinPurchaseDisplay(minPurchase){
+  const n = Number(minPurchase);
+  if(minPurchase === '' || minPurchase === undefined || minPurchase === null || isNaN(n)) return '100,000';
+  return n.toLocaleString('en-US');
+}
+function mapWarehouseBond(w){
+  return {
+    code: w.code || '',
+    issuer: w.issuerName || '',
+    investor: w.investorType || '',
+    ytm: Number(w.ytmSell) || 0,               // YTM = "YTM ขาย (%)"
+    ratingLabel: w.ratingCompany || '',          // อันดับเครดิต = "อันดับความน่าเชื่อถือ (บริษัท)"
+    risk: whRiskNumber(w.riskLevel),
+    coupon: Number(w.couponRate) || 0,
+    life: whLifeDisplay(w),
+    amount: whAmountMillions(w.offerAmount),
+    minPurchase: whMinPurchaseDisplay(w.minPurchase),
+    // Bond Warehouse doesn't model "call option" / "sustainability-linked" yet,
+    // so only the perpetual flag can be reconciled to a feature tag here.
+    feature: w.perpetual ? 'perp' : 'normal',
+    highlight: !!w.highlight,
+    _updatedAt: w.updatedAt || '',
+  };
+}
+// Convert a Supabase row (snake_case, same "bonds" table Bond Warehouse
+// writes to) into the camelCase shape mapWarehouseBond() expects.
+function rowToWarehouseShape(r){
+  return {
+    code: r.code,
+    issuerName: r.issuer_name,
+    investorType: r.investor_type,
+    ytmSell: r.ytm_sell,
+    ratingCompany: r.rating_company,
+    riskLevel: r.risk_level,
+    couponRate: r.coupon_rate,
+    perpetual: r.perpetual,
+    maturityDate: r.maturity_date,
+    offerAmount: r.offer_amount,
+    minPurchase: r.min_purchase,
+    highlight: r.highlight,
+    updatedAt: r.updated_at,
+    status: r.status,
+  };
+}
+async function loadBondsFromWarehouse(){
+  try{
+    const { data, error } = await supabase
+      .from(BONDS_TABLE)
+      .select('*')
+      .eq('status', 'open');
+    if(error) throw error;
+    return (data || [])
+      .map(rowToWarehouseShape)
+      .map(mapWarehouseBond)
+      .sort((a,b) => (b.highlight - a.highlight) || (b._updatedAt||'').localeCompare(a._updatedAt||''));
+  }catch(e){
+    console.error(e);
+    return [];
+  }
+}
+async function refreshBonds(){
+  BONDS = await loadBondsFromWarehouse();
+  render();
+}
+
+function riskDots(n){
+  let html='';
+  for(let i=1;i<=8;i++) html += `<span class="dot${i<=n?' on':''}"></span>`;
+  return `<div class="risk-dots">${html}</div>`;
+}
+function ratingBase(label){
+  let s = String(label).split('/')[0].trim();
+  s = s.replace(/\(tha\)/gi, '').trim();
+  s = s.replace(/[+\-]\s*$/, '').trim();
+  return s;
+}
+function lifeNum(b){
+  return b.life === 'PERP' ? Infinity : parseFloat(b.life);
+}
+function ytmMatch(range, ytm){
+  if(range==='gt5') return ytm>5;
+  if(range==='4-5') return ytm>=4 && ytm<=5;
+  if(range==='3-4') return ytm>=3 && ytm<4;
+  if(range==='2-3') return ytm>=2 && ytm<3;
+  if(range==='lt2') return ytm<2;
+  return true;
+}
+function lifeMatch(range, life){
+  if(range==='lt1') return life<1;
+  if(range==='2-3') return life>=2 && life<=3;
+  if(range==='3-4') return life>=3 && life<4;
+  if(range==='4-5') return life>=4 && life<5;
+  if(range==='gt5') return life>5;
+  return true;
+}
+function featureTag(f){
+  if(f==='call') return '<span class="feature call">Call Option</span>';
+  if(f==='perp') return '<span class="feature perp">Perpetual Bond</span>';
+  if(f==='sll') return '<span class="feature sll">Sustainability-Linked</span>';
+  return '';
+}
+
+function render(){
+  const inv = els.fInvestor.value;
+  const rat = els.fRating.value;
+  const risk = els.fRisk.value;
+  const feat = els.fFeature.value;
+  const ytmRange = els.fYtm.value;
+  const lifeRange = els.fLife.value;
+
+  const filtered = BONDS.filter(b=>{
+    if(inv && b.investor!==inv) return false;
+    if(rat && ratingBase(b.ratingLabel)!==rat) return false;
+    if(risk && b.risk!==parseInt(risk)) return false;
+    if(feat && b.feature!==feat) return false;
+    if(ytmRange && !ytmMatch(ytmRange, b.ytm)) return false;
+    if(lifeRange && !lifeMatch(lifeRange, lifeNum(b))) return false;
+    return true;
+  });
+
+  countEl.textContent = filtered.length;
+
+  if(filtered.length===0){
+    cardsEl.innerHTML = `<div class="empty-state">ไม่พบหุ้นกู้ที่ตรงกับเงื่อนไขที่เลือก</div>`;
+    return;
+  }
+
+  cardsEl.innerHTML = filtered.map(b=>`
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="bond-name">${b.code}</div>
+          <div class="bond-issuer">${b.issuer}</div>
+          ${featureTag(b.feature)}
+        </div>
+        <div class="ytm-box">
+          <div class="lbl">YTM</div>
+          <span class="ytm">${b.ytm.toFixed(2)}%</span>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="m-lbl">อัตราดอกเบี้ย</div>
+          <div class="m-val">${b.coupon.toFixed(2)}%</div>
+        </div>
+        <div class="metric">
+          <div class="m-lbl">อันดับเครดิต</div>
+          <div class="m-val rating">${b.ratingLabel}</div>
+        </div>
+        <div class="metric">
+          <div class="m-lbl">อายุคงเหลือ (ปี)</div>
+          <div class="m-val">${b.life}</div>
+        </div>
+      </div>
+      <div class="metrics-grid" style="grid-template-columns:1fr;margin-top:8px;padding-top:0;border-top:none;">
+        <div class="metric">
+          <div class="m-lbl">ระดับความเสี่ยงของตราสาร (${b.risk}/8)</div>
+          ${riskDots(b.risk)}
+        </div>
+      </div>
+
+      <div class="card-foot">
+        <div class="foot-left">
+          <span class="investor-badge">${b.investor}</span>
+          <span class="amount-line">เสนอขาย <b>${b.amount}</b> ล้านบาท</span>
+          <span class="amount-line">ซื้อขั้นต่ำ <b>${b.minPurchase}</b> บาท</span>
+        </div>
+        <button class="buy-btn" data-code="${b.code}">สนใจซื้อ</button>
+      </div>
+
+      <div class="buy-expand" id="expand-${b.code}">
+        <div class="type-select">
+          <button type="button" class="type-btn" data-type="existing" data-code="${b.code}">ลูกค้า บล. กรุงศรี</button>
+          <button type="button" class="type-btn" data-type="new" data-code="${b.code}">ลูกค้าใหม่</button>
+        </div>
+
+        <div class="login-box" id="login-${b.code}">
+          <input type="text" class="buy-input" placeholder="ชื่อผู้ใช้งาน (Username)">
+          <input type="password" class="buy-input" placeholder="รหัสผ่าน (Password)">
+          <button type="button" class="login-btn" data-code="${b.code}">Log in</button>
+        </div>
+
+        <div class="email-box" id="email-${b.code}">
+          <input type="email" class="buy-input" placeholder="กรอกอีเมลของท่าน">
+        </div>
+
+        <div class="amount-fields">
+          <div class="amount-wrap">
+            <input type="text" inputmode="numeric" class="buy-input amount-money" id="money-${b.code}" data-code="${b.code}" placeholder="จำนวนเงิน">
+            <span class="amount-suffix" id="moneySuffix-${b.code}">บาท</span>
+          </div>
+          <div class="amount-wrap">
+            <input type="text" inputmode="numeric" class="buy-input amount-unit" id="unit-${b.code}" data-code="${b.code}" placeholder="จำนวนหน่วย">
+            <span class="amount-suffix" id="unitSuffix-${b.code}">หน่วย</span>
+          </div>
+        </div>
+
+        <textarea class="buy-input comment-box" placeholder="Comment"></textarea>
+
+        <button type="button" class="submit-btn" data-code="${b.code}">ส่ง</button>
+
+        <div class="thank-you-msg" id="thankyou-${b.code}">ขอบคุณที่สนใจลงทุน เราได้รับความต้องการจากท่านแล้ว จะรีบติดต่อท่านกลับโดยเร็วที่สุด</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateDatePill(){
+  const thaiMonths = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+  const now = new Date();
+  const day = now.getDate();
+  const month = thaiMonths[now.getMonth()];
+  const buddhistYear = now.getFullYear() + 543;
+  document.getElementById('datePill').textContent = `${day} ${month} ${buddhistYear}`;
+}
+
+let toastTimer;
+function showToast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> toastEl.classList.remove('show'), 2200);
+}
+
+cardsEl.addEventListener('click', (e)=>{
+  // Toggle "สนใจซื้อ" expand panel
+  const buyBtn = e.target.closest('.buy-btn');
+  if(buyBtn){
+    const panel = document.getElementById(`expand-${buyBtn.dataset.code}`);
+    if(panel) panel.classList.toggle('open');
+    return;
+  }
+
+  // Choose customer type: existing (login) vs new (email)
+  const typeBtn = e.target.closest('.type-btn');
+  if(typeBtn){
+    const code = typeBtn.dataset.code;
+    const type = typeBtn.dataset.type;
+    const parent = typeBtn.closest('.type-select');
+    parent.querySelectorAll('.type-btn').forEach(b=> b.classList.toggle('active', b===typeBtn));
+
+    const loginBox = document.getElementById(`login-${code}`);
+    const emailBox = document.getElementById(`email-${code}`);
+    if(type === 'existing'){
+      loginBox.classList.add('show');
+      emailBox.classList.remove('show');
+    } else {
+      emailBox.classList.add('show');
+      loginBox.classList.remove('show');
+    }
+    return;
+  }
+
+  // Submit the interest form
+  const submitBtn = e.target.closest('.submit-btn');
+  if(submitBtn){
+    const code = submitBtn.dataset.code;
+    const panel = document.getElementById(`expand-${code}`);
+    const thankYou = document.getElementById(`thankyou-${code}`);
+    if(panel){
+      panel.querySelectorAll('.type-select, .login-box, .email-box, .amount-fields, .comment-box, .submit-btn').forEach(el=>{
+        el.style.display = 'none';
+      });
+    }
+    if(thankYou) thankYou.classList.add('show');
+    return;
+  }
+});
+
+// Format a numeric text input with thousands separators as the user types.
+// Returns the raw (unformatted) digit string.
+function formatNumberInput(el){
+  const cursorFromEnd = el.value.length - el.selectionEnd;
+  let raw = el.value.replace(/[^\d]/g, '');
+  raw = raw.replace(/^0+(?=\d)/, '');
+  if(raw === ''){
+    el.value = '';
+    return '';
+  }
+  el.value = Number(raw).toLocaleString('en-US');
+  const pos = Math.max(0, el.value.length - cursorFromEnd);
+  el.setSelectionRange(pos, pos);
+  return raw;
+}
+
+// Mutually exclusive "จำนวนเงิน" / "จำนวนหน่วย" fields
+cardsEl.addEventListener('input', (e)=>{
+  if(e.target.classList.contains('amount-money')){
+    const code = e.target.dataset.code;
+    const raw = formatNumberInput(e.target);
+    const suffix = document.getElementById(`moneySuffix-${code}`);
+    if(suffix) suffix.classList.toggle('show', raw !== '');
+    const unitField = document.getElementById(`unit-${code}`);
+    if(unitField) unitField.disabled = raw !== '';
+  }
+  if(e.target.classList.contains('amount-unit')){
+    const code = e.target.dataset.code;
+    const raw = formatNumberInput(e.target);
+    const suffix = document.getElementById(`unitSuffix-${code}`);
+    if(suffix) suffix.classList.toggle('show', raw !== '');
+    const moneyField = document.getElementById(`money-${code}`);
+    if(moneyField) moneyField.disabled = raw !== '';
+  }
+});
+
+ids.forEach(id=> els[id].addEventListener('change', render));
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  ids.forEach(id=> els[id].value = "");
+  render();
+});
+
+updateDatePill();
+refreshBonds(); // initial load from Supabase
+
+// ---------- Keep in sync with Bond Warehouse in real time ----------
+// Fires immediately (on ANY device/browser) when Bond Warehouse adds, edits,
+// deletes, closes, or reopens a bond in the shared Supabase "bonds" table.
+supabase
+  .channel('bonds-changes-screener')
+  .on('postgres_changes', { event: '*', schema: 'public', table: BONDS_TABLE }, () => {
+    refreshBonds();
+  })
+  .subscribe();
+// Also refresh when the tab regains focus/visibility.
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) refreshBonds(); });
+</script>
+</body>
+</html>

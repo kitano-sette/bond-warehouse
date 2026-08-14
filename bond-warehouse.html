@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bond Warehouse | ระบบคลังสินค้าหุ้นกู้ตลาดรอง</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@600;700&family=Sarabun:wght@400;500;600;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: 'Sarabun', sans-serif; }
+  table { border-spacing: 0; }
+  ::selection { background: #E9D9AE; }
+  .spin { animation: spin 0.9s linear infinite; }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: #B8862E !important; box-shadow: 0 0 0 3px rgba(184,134,46,0.15); }
+  button { font-family: 'Sarabun', sans-serif; border: none; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useCallback, useMemo } = React;
+
+/* ---------------------------------------------------------------
+   Design tokens
+---------------------------------------------------------------- */
+const C = {
+  bg: "#FFFFFF",
+  bgSoft: "#FBF9F4",
+  gold: "#B8862E",
+  goldDeep: "#8F6A1F",
+  goldSoft: "#E9D9AE",
+  goldFaint: "#F6EFDC",
+  brown: "#332723",
+  brownSoft: "#5B4A42",
+  rose: "#B85C6E",
+  text: "#2A211D",
+  textMute: "#8A7A6C",
+  border: "#E7DFCE",
+  danger: "#B23B3B",
+  ok: "#3E7A52",
+  accentFrom: "#FF6B4A",
+  accentTo: "#FFB300",
+};
+
+/* ---------------------------------------------------------------
+   Supabase config
+   ⚠️ ใส่ค่า URL และ anon key ของโปรเจกต์ Supabase ตัวเองตรงนี้
+   (ดูวิธีหาค่านี้ได้ในคู่มือที่แนบมาให้)
+---------------------------------------------------------------- */
+const SUPABASE_URL = "https://aljiavhlrtctvevxqmzw.supabase.co/rest/v1/";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsamlhdmhscnRjdHZldnhxbXp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MjYyMzMsImV4cCI6MjEwMjIwMjIzM30.KhhAiFiz6vUYZLhlAZMvGE-VzKZRLQf9qE53Tc-aSWg";
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const BONDS_TABLE = "bonds";
+
+/* Convert a bond object (camelCase, used inside this app) into a row
+   shape that matches the Postgres table columns (snake_case). */
+function bondToRow(b) {
+  return {
+    id: b.id,
+    code: b.code || "",
+    ytm_sell: b.ytmSell === "" || b.ytmSell === undefined ? null : Number(b.ytmSell),
+    ytm_buy: b.ytmBuy === "" || b.ytmBuy === undefined ? null : Number(b.ytmBuy),
+    rating_company: b.ratingCompany || "",
+    rating_instrument: b.ratingInstrument || "",
+    risk_level: b.riskLevel || "",
+    coupon_rate: b.couponRate === "" || b.couponRate === undefined ? null : Number(b.couponRate),
+    issue_date: b.issueDate || null,
+    maturity_date: b.maturityDate || null,
+    perpetual: !!b.perpetual,
+    offer_amount: b.offerAmount === "" || b.offerAmount === undefined ? null : Number(b.offerAmount),
+    min_purchase: b.minPurchase === "" || b.minPurchase === undefined ? null : Number(b.minPurchase),
+    rights: b.rights || "",
+    investor_type: b.investorType || "PO",
+    instrument_name: b.instrumentName || "",
+    issuer_name: b.issuerName || "",
+    highlight: !!b.highlight,
+    status: b.status || "open",
+    purchased_from: b.purchasedFrom || [],
+    comment: b.comment || "",
+    updated_at: b.updatedAt || new Date().toISOString(),
+  };
+}
+
+/* Convert a Postgres row (snake_case) back into the bond shape
+   (camelCase) that the rest of this app expects. */
+function rowToBond(r) {
+  return {
+    id: r.id,
+    code: r.code || "",
+    ytmSell: r.ytm_sell === null || r.ytm_sell === undefined ? "" : String(r.ytm_sell),
+    ytmBuy: r.ytm_buy === null || r.ytm_buy === undefined ? "" : String(r.ytm_buy),
+    ratingCompany: r.rating_company || "",
+    ratingInstrument: r.rating_instrument || "",
+    riskLevel: r.risk_level || "",
+    couponRate: r.coupon_rate === null || r.coupon_rate === undefined ? "" : String(r.coupon_rate),
+    issueDate: r.issue_date || "",
+    maturityDate: r.maturity_date || "",
+    perpetual: !!r.perpetual,
+    offerAmount: r.offer_amount === null || r.offer_amount === undefined ? "" : String(r.offer_amount),
+    minPurchase: r.min_purchase === null || r.min_purchase === undefined ? "" : String(r.min_purchase),
+    rights: r.rights || "",
+    investorType: r.investor_type || "PO",
+    instrumentName: r.instrument_name || "",
+    issuerName: r.issuer_name || "",
+    highlight: !!r.highlight,
+    status: r.status || "open",
+    purchasedFrom: Array.isArray(r.purchased_from) && r.purchased_from.length ? r.purchased_from : [emptyPurchaseRow()],
+    comment: r.comment || "",
+    updatedAt: r.updated_at || new Date().toISOString(),
+  };
+}
+
+const RISK_LEVELS = [
+  "ระดับ 1 (เสี่ยงต่ำที่สุด)",
+  "ระดับ 2 (เสี่ยงต่ำ)",
+  "ระดับ 3 (เสี่ยงค่อนข้างต่ำ)",
+  "ระดับ 4 (เสี่ยงปานกลางค่อนข้างต่ำ)",
+  "ระดับ 5 (เสี่ยงปานกลาง)",
+  "ระดับ 6 (เสี่ยงปานกลางค่อนข้างสูง)",
+  "ระดับ 7 (เสี่ยงสูง)",
+  "ระดับ 8 (เสี่ยงสูงที่สุด)",
+];
+
+/* ---------------------------------------------------------------
+   Minimal inline icon set (no external icon package needed)
+---------------------------------------------------------------- */
+const Svg = ({ children, size = 16, color = "currentColor", style, className }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color}
+    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style} className={className}>
+    {children}
+  </svg>
+);
+const IconPlus = (p) => <Svg {...p}><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></Svg>;
+const IconTrash = (p) => <Svg {...p}><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" /></Svg>;
+const IconSearch = (p) => <Svg {...p}><circle cx="11" cy="11" r="7" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></Svg>;
+const IconDownload = (p) => <Svg {...p}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></Svg>;
+const IconStar = ({ filled, style, ...p }) => <Svg {...p} style={{ fill: filled ? (p.color || C.gold) : "none", ...style }}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></Svg>;
+const IconPencil = (p) => <Svg {...p}><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></Svg>;
+const IconChevron = ({ open, ...p }) => <Svg {...p} style={{ transform: open ? "rotate(90deg)" : "rotate(0deg)", transition: "transform .15s" }}><polyline points="9 18 15 12 9 6" /></Svg>;
+const IconLoader = (p) => <Svg {...p} className="spin"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></Svg>;
+const IconAlert = (p) => <Svg {...p}><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></Svg>;
+const IconSparkles = (p) => <Svg {...p}><path d="M12 3l1.6 4.9L18.5 9l-4.9 1.6L12 15.5l-1.6-4.9L5.5 9l4.9-1.6L12 3z" /><path d="M19 15l.7 2.1L22 18l-2.3.9L19 21l-.7-2.1L16 18l2.3-.9L19 15z" /></Svg>;
+const IconSave = (p) => <Svg {...p}><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" /><polyline points="17 21 17 13 7 13 7 21" /><polyline points="7 3 7 8 15 8" /></Svg>;
+const IconArrowLeft = (p) => <Svg {...p}><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></Svg>;
+const IconLock = (p) => <Svg {...p}><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></Svg>;
+
+/* ---------------------------------------------------------------
+   Helpers
+---------------------------------------------------------------- */
+const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+const emptyPurchaseRow = () => ({ id: uid(), name: "", units: "" });
+
+const emptyBond = () => ({
+  id: uid(),
+  code: "",
+  ytmSell: "",
+  ytmBuy: "",
+  ratingCompany: "",
+  ratingInstrument: "",
+  riskLevel: "",
+  couponRate: "",
+  issueDate: "",
+  maturityDate: "",
+  perpetual: false,
+  offerAmount: "",
+  minPurchase: "",
+  rights: "",
+  investorType: "PO",
+  instrumentName: "",
+  issuerName: "",
+  highlight: false,
+  status: "open", // open | closed
+  purchasedFrom: [emptyPurchaseRow()],
+  comment: "",
+  updatedAt: new Date().toISOString(),
+});
+
+function remainingYearsRaw(maturityDate) {
+  if (!maturityDate) return null;
+  const m = new Date(maturityDate + "T00:00:00");
+  if (isNaN(m.getTime())) return null;
+  const now = new Date();
+  return (m.getTime() - now.getTime()) / (1000 * 60 * 60 * 24 * 365.25);
+}
+
+function remainingYearsDisplay(bond) {
+  if (bond.perpetual) return "PERP";
+  const y = remainingYearsRaw(bond.maturityDate);
+  if (y === null) return "—";
+  if (y < 0) return "ครบกำหนดแล้ว";
+  return y.toFixed(2);
+}
+
+function fmtDateTH(d) {
+  if (!d) return "—";
+  const dt = new Date(d + "T00:00:00");
+  if (isNaN(dt.getTime())) return d;
+  return dt.toLocaleDateString("th-TH", { year: "numeric", month: "short", day: "2-digit" });
+}
+
+/* ----- comma-formatted number input (live, while typing & after) ----- */
+function sanitizeRaw(input, allowDecimal) {
+  let v = input.replace(/,/g, "");
+  if (allowDecimal) {
+    v = v.replace(/[^0-9.]/g, "");
+    const parts = v.split(".");
+    if (parts.length > 2) v = parts[0] + "." + parts.slice(1).join("");
+    const [ip, dp] = v.split(".");
+    if (dp !== undefined) v = ip + "." + dp.slice(0, 2);
+  } else {
+    v = v.replace(/[^0-9]/g, "");
+  }
+  return v;
+}
+function formatDisplay(raw) {
+  if (raw === "" || raw === undefined || raw === null) return "";
+  let [intPart, decPart] = String(raw).split(".");
+  intPart = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return decPart !== undefined ? intPart + "." + decPart : intPart;
+}
+function formatMillions(raw) {
+  if (raw === "" || raw === undefined || raw === null || isNaN(Number(raw))) return "—";
+  const millions = Number(raw) / 1000000;
+  const [intPart, decPart] = millions.toFixed(2).split(".");
+  return intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "." + decPart;
+}
+function formatPct(v) {
+  if (v === "" || v === undefined || v === null || isNaN(Number(v))) return "—";
+  return `${Number(v).toFixed(2)}%`;
+}
+
+/* ---------------------------------------------------------------
+   UI primitives
+---------------------------------------------------------------- */
+function Field({ label, children, hint, required }) {
+  return (
+    <label className="block mb-4" style={{ display: "block", marginBottom: 16 }}>
+      <span style={{ display: "block", fontSize: 12, fontWeight: 600, marginBottom: 6, color: C.brownSoft, letterSpacing: 0.2 }}>
+        {label} {required && <span style={{ color: C.rose }}>*</span>}
+      </span>
+      {children}
+      {hint && <span style={{ display: "block", fontSize: 11, marginTop: 4, color: C.textMute }}>{hint}</span>}
+    </label>
+  );
+}
+
+const inputBase = {
+  width: "100%",
+  padding: "9px 12px",
+  borderRadius: "8px",
+  border: `1px solid ${C.border}`,
+  fontFamily: "Sarabun, sans-serif",
+  fontSize: "14px",
+  color: C.text,
+  background: "#fff",
+};
+
+function TInput(props) { return <input {...props} style={{ ...inputBase, ...(props.style || {}) }} />; }
+function TSelect(props) { return <select {...props} style={{ ...inputBase, ...(props.style || {}) }} />; }
+function TTextarea(props) { return <textarea {...props} style={{ ...inputBase, resize: "vertical", ...(props.style || {}) }} />; }
+
+function NumberField({ value, onChange, allowDecimal = true, placeholder, style }) {
+  const handle = (e) => onChange(sanitizeRaw(e.target.value, allowDecimal));
+  return (
+    <TInput
+      inputMode="decimal"
+      value={formatDisplay(value)}
+      onChange={handle}
+      placeholder={placeholder}
+      style={style}
+    />
+  );
+}
+
+function PercentField({ value, onChange }) {
+  const handleBlur = (e) => {
+    if (e.target.value === "") return;
+    const num = Number(e.target.value);
+    if (!isNaN(num)) onChange(num.toFixed(2));
+  };
+  return (
+    <TInput type="number" step="0.01" value={value} onChange={(e) => onChange(e.target.value)} onBlur={handleBlur} />
+  );
+}
+
+function UnitField({ value, onChange, placeholder }) {
+  return (
+    <div style={{ position: "relative" }}>
+      <NumberField value={value} onChange={onChange} allowDecimal={false} placeholder={placeholder} style={{ paddingRight: 52 }} />
+      <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", fontSize: 12, color: C.textMute, pointerEvents: "none" }}>
+        หน่วย
+      </span>
+    </div>
+  );
+}
+
+function Button({ variant = "outline", children, style, ...rest }) {
+  const base = {
+    display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 16px",
+    borderRadius: 9, fontWeight: 600, fontSize: 14, cursor: "pointer",
+    border: "1px solid transparent", transition: "opacity .15s ease, transform .1s ease",
+  };
+  const variants = {
+    primary: { background: `linear-gradient(135deg, ${C.gold}, ${C.goldDeep})`, color: "#fff" },
+    accent: { background: `linear-gradient(135deg, ${C.accentFrom}, ${C.accentTo})`, color: "#fff", boxShadow: "0 4px 14px rgba(255,107,74,0.35)" },
+    dark: { background: C.brown, color: "#fff" },
+    outline: { background: "#fff", color: C.brown, border: `1px solid ${C.border}` },
+    danger: { background: "#fff", color: C.danger, border: `1px solid ${C.danger}55` },
+    ghost: { background: "transparent", color: C.brownSoft },
+  };
+  return (
+    <button {...rest} style={{ ...base, ...variants[variant], ...style }}
+      onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.98)")}
+      onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}>
+      {children}
+    </button>
+  );
+}
+
+function ConfirmDialog({ open, title, body, confirmLabel = "ยืนยัน", onCancel, onConfirm }) {
+  if (!open) return null;
+  return (
+    <div style={{ position: "fixed", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50, padding: 16, background: "rgba(42,33,29,0.45)" }}>
+      <div style={{ width: "100%", maxWidth: 384, borderRadius: 16, padding: 24, background: "#fff" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+          <IconAlert size={20} color={C.danger} />
+          <h3 style={{ margin: 0, fontFamily: "Prompt, sans-serif", color: C.text, fontSize: 16 }}>{title}</h3>
+        </div>
+        <p style={{ fontSize: 14, marginBottom: 20, color: C.textMute }}>{body}</p>
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+          <Button variant="ghost" onClick={onCancel}>ยกเลิก</Button>
+          <Button variant="danger" onClick={onConfirm}>{confirmLabel}</Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------
+   Header
+---------------------------------------------------------------- */
+function Header({ view, onAdd, onBack }) {
+  return (
+    <div style={{ padding: "20px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", background: `linear-gradient(120deg, ${C.brown} 0%, #4a3a33 55%, ${C.goldDeep} 130%)` }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        {view === "form" && (
+          <button onClick={onBack} style={{ marginRight: 4, padding: 8, borderRadius: 999, background: "rgba(255,255,255,0.12)" }}>
+            <IconArrowLeft size={18} color="#fff" />
+          </button>
+        )}
+        <div style={{ width: 40, height: 40, borderRadius: 999, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, background: `radial-gradient(circle at 35% 30%, ${C.goldSoft}, ${C.gold} 60%, ${C.goldDeep} 100%)`, boxShadow: "0 0 0 3px rgba(255,255,255,0.15)" }}>
+          <IconSparkles size={18} color={C.brown} />
+        </div>
+        <div>
+          <div style={{ color: "#fff", fontFamily: "Prompt, sans-serif", fontWeight: 700, fontSize: 17, letterSpacing: 0.3 }}>BOND WAREHOUSE</div>
+          <div style={{ fontSize: 12, color: C.goldSoft }}>ระบบคลังสินค้าหุ้นกู้ตลาดรอง · Back Office</div>
+        </div>
+      </div>
+      {view === "list" && (
+        <Button variant="accent" onClick={onAdd}><IconPlus size={16} /> เพิ่มหุ้นกู้</Button>
+      )}
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------
+   Detail panel (expanded row)
+---------------------------------------------------------------- */
+function DetailRow({ label, value }) {
+  return (
+    <div style={{ marginBottom: 10 }}>
+      <div style={{ fontSize: 11, fontWeight: 600, color: C.textMute, marginBottom: 2 }}>{label}</div>
+      <div style={{ fontSize: 14, color: C.text }}>{value || "—"}</div>
+    </div>
+  );
+}
+
+function ExpandedDetail({ bond, onEdit, onDeleteReq, onToggleStatus }) {
+  const closed = bond.status === "closed";
+  return (
+    <div style={{ padding: "18px 22px 22px", background: C.bgSoft, borderTop: `1px dashed ${C.border}` }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center", marginBottom: 16 }}>
+        <span style={{
+          padding: "4px 12px", borderRadius: 999, fontSize: 12, fontWeight: 700,
+          background: closed ? "#EDE7E2" : "#E7F4EA", color: closed ? C.brownSoft : C.ok,
+        }}>
+          {closed ? "ปิดการขายแล้ว" : "กำลังเสนอขาย"}
+        </span>
+        {bond.highlight && (
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 12, fontWeight: 700, color: C.goldDeep }}>
+            <IconStar size={13} filled color={C.gold} /> Highlight
+          </span>
+        )}
+        <span style={{
+          padding: "4px 12px", borderRadius: 999, fontSize: 12, fontWeight: 700, background: C.goldSoft, color: C.brown,
+        }}>
+          {bond.investorType}
+        </span>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "4px 24px" }}>
+        <DetailRow label="ชื่อตราสาร" value={bond.instrumentName} />
+        <DetailRow label="ชื่อบริษัทผู้ออก" value={bond.issuerName} />
+        <DetailRow label="อันดับความน่าเชื่อถือ (บริษัท)" value={bond.ratingCompany} />
+        <DetailRow label="อันดับความน่าเชื่อถือ (ตราสาร)" value={bond.ratingInstrument} />
+        <DetailRow label="ระดับความเสี่ยงของตราสาร" value={bond.riskLevel} />
+        <DetailRow label="วันที่ออกตราสาร" value={fmtDateTH(bond.issueDate)} />
+        <DetailRow label="วันครบกำหนด" value={bond.perpetual ? "Perpetual Bond (ไม่มีกำหนด)" : fmtDateTH(bond.maturityDate)} />
+        <DetailRow label="จำนวนซื้อขั้นต่ำ (บาท)" value={bond.minPurchase !== "" ? formatDisplay(bond.minPurchase) : "—"} />
+        <DetailRow label="สิทธิ" value={bond.rights} />
+      </div>
+
+      <div style={{ marginTop: 8, marginBottom: 6, fontSize: 12, fontWeight: 700, color: C.brown }}>รับซื้อจาก</div>
+      {(bond.purchasedFrom || []).filter((r) => r.name).length === 0 ? (
+        <div style={{ fontSize: 13, color: C.textMute, marginBottom: 10 }}>— ไม่มีข้อมูล —</div>
+      ) : (
+        <div style={{ marginBottom: 10 }}>
+          {bond.purchasedFrom.filter((r) => r.name).map((r) => (
+            <div key={r.id} style={{ fontSize: 13, color: C.text, padding: "4px 0", borderBottom: `1px solid ${C.border}` }}>
+              {r.name} — {formatDisplay(r.units || "0")} หน่วย
+            </div>
+          ))}
+        </div>
+      )}
+
+      {bond.comment && (
+        <>
+          <div style={{ marginTop: 8, marginBottom: 4, fontSize: 12, fontWeight: 700, color: C.brown }}>Comment</div>
+          <div style={{ fontSize: 13, color: C.text, whiteSpace: "pre-wrap", marginBottom: 10 }}>{bond.comment}</div>
+        </>
+      )}
+
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 14 }}>
+        <Button variant="outline" onClick={() => onEdit(bond)}><IconPencil size={14} /> แก้ไข</Button>
+        <Button variant="danger" onClick={() => onDeleteReq(bond)}><IconTrash size={14} /> ลบ</Button>
+        {!closed ? (
+          <Button variant="dark" onClick={() => onToggleStatus(bond, "closed")}><IconLock size={14} /> ปิดการขาย</Button>
+        ) : (
+          <Button variant="ghost" onClick={() => onToggleStatus(bond, "open")}>เปิดขายอีกครั้ง</Button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------
+   List view
+---------------------------------------------------------------- */
+function ListView({ bonds, onEdit, onDeleteReq, onExport, exporting, onToggleStatus }) {
+  const [q, setQ] = useState("");
+  const [expandedId, setExpandedId] = useState(null);
+
+  const filtered = useMemo(() => {
+    const s = q.trim().toLowerCase();
+    if (!s) return bonds;
+    return bonds.filter((b) => [b.code, b.instrumentName, b.issuerName].some((v) => (v || "").toLowerCase().includes(s)));
+  }, [bonds, q]);
+
+  const cols = ["", "รหัสหุ้นกู้", "YTM ขาย (%)", "YTM รับซื้อ (%)", "ดอกเบี้ย (%)", "อายุคงเหลือ (ปี)", "เสนอขาย (ลบ.)"];
+
+  const sorted = useMemo(() => {
+    return [...filtered].sort((a, b) => {
+      const aClosed = a.status === "closed" ? 1 : 0;
+      const bClosed = b.status === "closed" ? 1 : 0;
+      return aClosed - bClosed;
+    });
+  }, [filtered]);
+
+  return (
+    <div style={{ padding: 24 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 20 }}>
+        <div style={{ position: "relative", width: 320, maxWidth: "100%" }}>
+          <IconSearch size={16} style={{ position: "absolute", left: 12, top: 11, color: C.textMute }} />
+          <TInput placeholder="ค้นหา รหัส / ชื่อตราสาร / ผู้ออก" value={q} onChange={(e) => setQ(e.target.value)} style={{ paddingLeft: 34 }} />
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <span style={{ fontSize: 12, color: C.textMute }}>ทั้งหมด {bonds.length} รายการ</span>
+          <Button variant="dark" onClick={onExport} disabled={exporting}>
+            {exporting ? <IconLoader size={16} /> : <IconDownload size={16} />} Export Excel
+          </Button>
+        </div>
+      </div>
+
+      {filtered.length === 0 ? (
+        <div style={{ borderRadius: 16, padding: "64px 0", textAlign: "center", border: `1px dashed ${C.border}`, background: C.bgSoft }}>
+          <div style={{ width: 56, height: 56, borderRadius: 999, margin: "0 auto 12px", display: "flex", alignItems: "center", justifyContent: "center", background: C.goldFaint }}>
+            <IconSparkles size={22} color={C.gold} />
+          </div>
+          <p style={{ fontFamily: "Prompt, sans-serif", color: C.text, fontWeight: 600, margin: 0 }}>
+            {bonds.length === 0 ? "ยังไม่มีหุ้นกู้ในคลังสินค้า" : "ไม่พบรายการที่ค้นหา"}
+          </p>
+          <p style={{ fontSize: 14, color: C.textMute, marginTop: 4 }}>
+            {bonds.length === 0 ? "กดปุ่ม “เพิ่มหุ้นกู้” ที่มุมขวาบนเพื่อเริ่มกรอกข้อมูล" : "ลองค้นหาด้วยคำอื่น"}
+          </p>
+        </div>
+      ) : (
+        <div style={{ overflowX: "auto", borderRadius: 16, border: `1px solid ${C.border}` }}>
+          <table style={{ width: "100%", fontSize: 14, borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ background: C.goldFaint, color: C.brown }}>
+                {cols.map((h, i) => (
+                  <th key={i} style={{ textAlign: "left", padding: "12px 16px", fontWeight: 600, fontSize: 12, whiteSpace: "nowrap" }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {sorted.map((b, idx) => {
+                const open = expandedId === b.id;
+                const closed = b.status === "closed";
+                return (
+                  <React.Fragment key={b.id}>
+                    <tr
+                      onClick={() => setExpandedId(open ? null : b.id)}
+                      style={{
+                        borderTop: `1px solid ${C.border}`,
+                        background: closed ? "#fff" : b.highlight ? C.goldFaint : idx % 2 ? C.bgSoft : "#fff",
+                        cursor: "pointer",
+                        opacity: closed ? 0.45 : 1,
+                      }}
+                    >
+                      <td style={{ padding: "0 4px 0 12px", width: 20 }}><IconChevron open={open} size={14} color={C.textMute} /></td>
+                      <td style={{ padding: "12px 16px", fontWeight: 700, color: C.brown, whiteSpace: "nowrap" }}>
+                        <span style={{
+                          display: "inline-block", width: 7, height: 7, borderRadius: 999, marginRight: 6,
+                          background: closed ? C.textMute : C.ok,
+                        }} title={closed ? "ปิดการขายแล้ว" : "กำลังเสนอขาย"} />
+                        {b.highlight && <IconStar filled size={12} color={C.gold} style={{ marginRight: 6, verticalAlign: "-1px" }} />}
+                        {b.code || "—"}
+                      </td>
+                      <td style={{ padding: "12px 16px", whiteSpace: "nowrap" }}>{formatPct(b.ytmSell)}</td>
+                      <td style={{ padding: "12px 16px", whiteSpace: "nowrap" }}>{formatPct(b.ytmBuy)}</td>
+                      <td style={{ padding: "12px 16px", whiteSpace: "nowrap" }}>{formatPct(b.couponRate)}</td>
+                      <td style={{ padding: "12px 16px", whiteSpace: "nowrap" }}>{remainingYearsDisplay(b)}</td>
+                      <td style={{ padding: "12px 16px", whiteSpace: "nowrap" }}>{formatMillions(b.offerAmount)}</td>
+                    </tr>
+                    {open && (
+                      <tr>
+                        <td colSpan={cols.length} style={{ padding: 0 }}>
+                          <ExpandedDetail bond={b} onEdit={onEdit} onDeleteReq={onDeleteReq} onToggleStatus={onToggleStatus} />
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------
+   Form view
+---------------------------------------------------------------- */
+function SectionTitle({ children }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, marginTop: 8 }}>
+      <div style={{ width: 6, height: 16, borderRadius: 999, background: C.gold }} />
+      <h3 style={{ fontFamily: "Prompt, sans-serif", fontWeight: 600, fontSize: 14, color: C.brown, letterSpacing: 0.2, margin: 0 }}>{children}</h3>
+    </div>
+  );
+}
+
+function FormView({ initial, onSave, onCancel }) {
+  const [bond, setBond] = useState(initial);
+  const set = (k, v) => setBond((b) => ({ ...b, [k]: v }));
+
+  const togglePerpetual = (checked) => {
+    setBond((b) => ({ ...b, perpetual: checked, maturityDate: checked ? "" : b.maturityDate }));
+  };
+
+  const updatePurchaseRow = (id, key, value) =>
+    setBond((b) => ({ ...b, purchasedFrom: b.purchasedFrom.map((r) => (r.id === id ? { ...r, [key]: value } : r)) }));
+  const addPurchaseRow = () => setBond((b) => ({ ...b, purchasedFrom: [...b.purchasedFrom, emptyPurchaseRow()] }));
+  const removePurchaseRow = (id) => setBond((b) => ({ ...b, purchasedFrom: b.purchasedFrom.filter((r) => r.id !== id) }));
+
+  const totalUnits = useMemo(
+    () => (bond.purchasedFrom || []).reduce((sum, r) => sum + (Number(r.units) || 0), 0),
+    [bond.purchasedFrom]
+  );
+  const computedOfferAmount = totalUnits * 1000;
+
+  const canSave = bond.code.trim() && bond.instrumentName.trim();
+
+  return (
+    <div style={{ padding: 24, maxWidth: 720, margin: "0 auto" }}>
+      <SectionTitle>ข้อมูลตราสาร</SectionTitle>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 24px" }} className="grid-form">
+        <Field label="รหัสหุ้นกู้ (Code)" required>
+          <TInput value={bond.code} onChange={(e) => set("code", e.target.value)} placeholder="เช่น SIRIN2809A" />
+        </Field>
+        <Field label="ชื่อตราสาร" required>
+          <TInput value={bond.instrumentName} onChange={(e) => set("instrumentName", e.target.value)} />
+        </Field>
+        <Field label="ชื่อบริษัทผู้ออก">
+          <TInput value={bond.issuerName} onChange={(e) => set("issuerName", e.target.value)} />
+        </Field>
+        <Field label="YTM ขาย (%)">
+          <PercentField value={bond.ytmSell} onChange={(v) => set("ytmSell", v)} />
+        </Field>
+        <Field label="YTM รับซื้อ (%)">
+          <PercentField value={bond.ytmBuy} onChange={(v) => set("ytmBuy", v)} />
+        </Field>
+        <Field label="อันดับความน่าเชื่อถือ (บริษัท)">
+          <TInput value={bond.ratingCompany} onChange={(e) => set("ratingCompany", e.target.value)} />
+        </Field>
+        <Field label="อันดับความน่าเชื่อถือ (ตราสาร)">
+          <TInput value={bond.ratingInstrument} onChange={(e) => set("ratingInstrument", e.target.value)} />
+        </Field>
+        <Field label="ระดับความเสี่ยงของตราสาร">
+          <TSelect value={bond.riskLevel} onChange={(e) => set("riskLevel", e.target.value)}>
+            <option value="">— เลือก —</option>
+            {RISK_LEVELS.map((r) => <option key={r} value={r}>{r}</option>)}
+          </TSelect>
+        </Field>
+        <Field label="อัตราดอกเบี้ยหน้าตั๋ว (%)">
+          <PercentField value={bond.couponRate} onChange={(v) => set("couponRate", v)} />
+        </Field>
+        <Field label="วันที่ออกตราสาร">
+          <TInput type="date" value={bond.issueDate} onChange={(e) => set("issueDate", e.target.value)} />
+        </Field>
+        <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", userSelect: "none", gridColumn: "1 / -1", marginBottom: 12 }}>
+          <input type="checkbox" checked={bond.perpetual} onChange={(e) => togglePerpetual(e.target.checked)}
+            style={{ width: 16, height: 16, accentColor: C.gold }} />
+          <span style={{ fontSize: 14, fontWeight: 600, color: C.brown }}>Perpetual Bond</span>
+        </label>
+        <Field label="วันครบกำหนด" hint={bond.perpetual ? "ปิดการเลือกเนื่องจากเป็น Perpetual Bond" : undefined}>
+          <TInput type="date" value={bond.maturityDate} disabled={bond.perpetual}
+            onChange={(e) => set("maturityDate", e.target.value)}
+            style={bond.perpetual ? { background: C.bgSoft, color: C.textMute } : {}} />
+        </Field>
+        <Field label="อายุคงเหลือ (ปี)" hint="คำนวณอัตโนมัติจากวันปัจจุบันถึงวันครบกำหนด">
+          <TInput value={remainingYearsDisplay(bond)} disabled style={{ background: C.bgSoft, color: C.textMute }} />
+        </Field>
+      </div>
+
+      <SectionTitle>เงื่อนไขการเสนอขาย</SectionTitle>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 24px" }} className="grid-form">
+        <Field label="สิทธิ">
+          <TInput value={bond.rights} onChange={(e) => set("rights", e.target.value)} placeholder="เช่น ไถ่ถอนก่อนกำหนด" />
+        </Field>
+        <Field label="ประเภทนักลงทุน">
+          <TSelect value={bond.investorType} onChange={(e) => set("investorType", e.target.value)}>
+            <option value="PO">PO</option>
+            <option value="II/HNW">II/HNW</option>
+            <option value="PG">PG</option>
+          </TSelect>
+        </Field>
+      </div>
+
+      <label style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20, cursor: "pointer", userSelect: "none" }}>
+        <input type="checkbox" checked={bond.highlight} onChange={(e) => set("highlight", e.target.checked)}
+          style={{ width: 16, height: 16, accentColor: C.gold }} />
+        <span style={{ fontSize: 14, fontWeight: 600, color: C.brown }}>Highlight ตราสารหนี้</span>
+        <IconStar size={14} color={C.gold} filled={bond.highlight} />
+      </label>
+
+      <SectionTitle>รับซื้อจาก</SectionTitle>
+      <div style={{ borderRadius: 12, overflow: "hidden", marginBottom: 8, border: `1px solid ${C.border}` }}>
+        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 32px", fontSize: 12, fontWeight: 600, padding: "8px 12px", background: C.goldFaint, color: C.brown }}>
+          <span>ชื่อ</span><span>จำนวน(หน่วย)</span><span />
+        </div>
+        {bond.purchasedFrom.map((row) => (
+          <div key={row.id} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 32px", gap: 8, padding: "8px 12px", alignItems: "center", borderTop: `1px solid ${C.border}` }}>
+            <TInput value={row.name} onChange={(e) => updatePurchaseRow(row.id, "name", e.target.value)} placeholder="ชื่อคู่ค้า" />
+            <UnitField value={row.units} onChange={(v) => updatePurchaseRow(row.id, "units", v)} placeholder="0" />
+            <button onClick={() => removePurchaseRow(row.id)} style={{ padding: 6, borderRadius: 8, margin: "0 auto", background: "#fff" }}>
+              <IconTrash size={14} color={C.danger} />
+            </button>
+          </div>
+        ))}
+      </div>
+      <button onClick={addPurchaseRow} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 14, fontWeight: 600, marginBottom: 24, background: "transparent", color: C.goldDeep }}>
+        <span style={{ width: 24, height: 24, borderRadius: 999, display: "flex", alignItems: "center", justifyContent: "center", background: C.goldFaint, border: `1px solid ${C.goldSoft}` }}>
+          <IconPlus size={14} />
+        </span>
+        เพิ่มแถว
+      </button>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 24px" }} className="grid-form">
+        <Field label="จำนวนที่เสนอขาย (บาท)" hint="คำนวณอัตโนมัติจากผลรวมจำนวน(หน่วย) × 1,000">
+          <TInput value={formatDisplay(String(computedOfferAmount))} disabled style={{ background: C.bgSoft, color: C.textMute }} />
+        </Field>
+        <Field label="จำนวนซื้อขั้นต่ำ (บาท)">
+          <NumberField value={bond.minPurchase} onChange={(v) => set("minPurchase", v)} placeholder="0" />
+        </Field>
+      </div>
+
+      <SectionTitle>Comment</SectionTitle>
+      <TTextarea rows={3} value={bond.comment} onChange={(e) => set("comment", e.target.value)} style={{ marginBottom: 24 }} />
+
+      <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, paddingBottom: 24 }}>
+        <Button variant="ghost" onClick={onCancel}>ยกเลิก</Button>
+        <Button variant="accent" onClick={() => canSave && onSave({ ...bond, offerAmount: String(computedOfferAmount), updatedAt: new Date().toISOString() })}
+          style={{ opacity: canSave ? 1 : 0.5, cursor: canSave ? "pointer" : "not-allowed" }}>
+          <IconSave size={16} /> บันทึกข้อมูล
+        </Button>
+
+      </div>
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------
+   Root App
+---------------------------------------------------------------- */
+function BondWarehouseApp() {
+  const [bonds, setBonds] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [view, setView] = useState("list");
+  const [editing, setEditing] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [exporting, setExporting] = useState(false);
+  const [saveError, setSaveError] = useState(false);
+
+  const loadFromSupabase = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from(BONDS_TABLE)
+        .select("*")
+        .order("updated_at", { ascending: false });
+      if (error) throw error;
+      setBonds((data || []).map(rowToBond));
+      setSaveError(false);
+    } catch (e) {
+      console.error(e);
+      setSaveError(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadFromSupabase().finally(() => setLoading(false));
+
+    // Realtime: any insert/update/delete on the bonds table (from this
+    // browser, a teammate's browser, or the Bond Screener page) refreshes
+    // the list automatically — this is what keeps both files "in sync".
+    const channel = supabase
+      .channel("bonds-changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: BONDS_TABLE }, () => {
+        loadFromSupabase();
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [loadFromSupabase]);
+
+  const handleSave = async (bond) => {
+    try {
+      const row = bondToRow(bond);
+      const { error } = await supabase.from(BONDS_TABLE).upsert(row, { onConflict: "id" });
+      if (error) throw error;
+      setSaveError(false);
+      await loadFromSupabase();
+      setView("list");
+      setEditing(null);
+    } catch (e) {
+      console.error(e);
+      setSaveError(true);
+    }
+  };
+
+  const handleDeleteConfirmed = async () => {
+    if (!deleteTarget) return;
+    try {
+      const { error } = await supabase.from(BONDS_TABLE).delete().eq("id", deleteTarget.id);
+      if (error) throw error;
+      setSaveError(false);
+      await loadFromSupabase();
+    } catch (e) {
+      console.error(e);
+      setSaveError(true);
+    }
+    setDeleteTarget(null);
+  };
+
+  const handleToggleStatus = async (bond, status) => {
+    try {
+      const { error } = await supabase
+        .from(BONDS_TABLE)
+        .update({ status, updated_at: new Date().toISOString() })
+        .eq("id", bond.id);
+      if (error) throw error;
+      setSaveError(false);
+      await loadFromSupabase();
+    } catch (e) {
+      console.error(e);
+      setSaveError(true);
+    }
+  };
+
+  const handleExport = () => {
+    setExporting(true);
+    setTimeout(() => {
+      const rows = bonds.map((b) => ({
+        "รหัสหุ้นกู้ (Code)": b.code,
+        "ชื่อตราสาร": b.instrumentName,
+        "ชื่อบริษัทผู้ออก": b.issuerName,
+        "YTM ขาย (%)": b.ytmSell,
+        "YTM รับซื้อ (%)": b.ytmBuy,
+        "อันดับความน่าเชื่อถือ (บริษัท)": b.ratingCompany,
+        "อันดับความน่าเชื่อถือ (ตราสาร)": b.ratingInstrument,
+        "ระดับความเสี่ยงของตราสาร": b.riskLevel,
+        "อัตราดอกเบี้ยหน้าตั๋ว (%)": b.couponRate,
+        "วันที่ออกตราสาร": b.issueDate,
+        "วันครบกำหนด": b.perpetual ? "PERP" : b.maturityDate,
+        "อายุคงเหลือ (ปี)": remainingYearsDisplay(b),
+        "จำนวนที่เสนอขาย (บาท)": b.offerAmount ? Number(b.offerAmount) : "",
+        "จำนวนซื้อขั้นต่ำ (บาท)": b.minPurchase ? Number(b.minPurchase) : "",
+        "สิทธิ": b.rights,
+        "ประเภทนักลงทุน": b.investorType,
+        "Highlight": b.highlight ? "TRUE" : "FALSE",
+        "สถานะ": b.status === "closed" ? "ปิดการขายแล้ว" : "กำลังเสนอขาย",
+        "รับซื้อจาก": (b.purchasedFrom || []).filter((r) => r.name).map((r) => `${r.name} (${r.units || 0} หน่วย)`).join("; "),
+        "Comment": b.comment,
+      }));
+      const ws = XLSX.utils.json_to_sheet(rows.length ? rows : [{ "รหัสหุ้นกู้ (Code)": "" }]);
+      ws["!cols"] = Object.keys(rows[0] || { a: 1 }).map(() => ({ wch: 22 }));
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "คลังสินค้าหุ้นกู้");
+      const stamp = new Date().toISOString().slice(0, 10);
+      XLSX.writeFile(wb, `คลังสินค้าหุ้นกู้_${stamp}.xlsx`);
+      setExporting(false);
+    }, 150);
+  };
+
+  return (
+    <div style={{ width: "100%", minHeight: "100vh", background: C.bg }}>
+      <Header view={view} onAdd={() => { setEditing(emptyBond()); setView("form"); }} onBack={() => setView("list")} />
+
+      {saveError && (
+        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 24px", fontSize: 12, background: "#FCEFEF", color: C.danger }}>
+          <IconAlert size={14} /> เชื่อมต่อฐานข้อมูล Supabase ไม่สำเร็จ กรุณาตรวจสอบ SUPABASE_URL / SUPABASE_ANON_KEY หรือการเชื่อมต่ออินเทอร์เน็ต
+        </div>
+      )}
+
+      {loading ? (
+        <div style={{ display: "flex", justifyContent: "center", padding: "96px 0" }}>
+          <IconLoader size={22} color={C.gold} />
+        </div>
+      ) : view === "list" ? (
+        <ListView bonds={bonds} onEdit={(b) => { setEditing(b); setView("form"); }} onDeleteReq={setDeleteTarget}
+          onExport={handleExport} exporting={exporting} onToggleStatus={handleToggleStatus} />
+      ) : (
+        <FormView initial={editing} onSave={handleSave} onCancel={() => { setView("list"); setEditing(null); }} />
+      )}
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="ลบหุ้นกู้นี้ออกจากคลัง?"
+        body={deleteTarget ? `รหัส "${deleteTarget.code}" — ${deleteTarget.instrumentName || ""}` : ""}
+        confirmLabel="ลบข้อมูล"
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={handleDeleteConfirmed}
+      />
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<BondWarehouseApp />);
+</script>
+</body>
+</html>
