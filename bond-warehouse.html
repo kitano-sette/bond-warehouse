@@ -55,12 +55,13 @@ const C = {
    ⚠️ ใส่ค่า URL และ anon key ของโปรเจกต์ Supabase ตัวเองตรงนี้
    (ดูวิธีหาค่านี้ได้ในคู่มือที่แนบมาให้)
 ---------------------------------------------------------------- */
-const SUPABASE_URL = "https://aljiavhlrtctvevxqmzw.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsamlhdmhscnRjdHZldnhxbXp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MjYyMzMsImV4cCI6MjEwMjIwMjIzM30.KhhAiFiz6vUYZLhlAZMvGE-VzKZRLQf9qE53Tc-aSWg";
+const SUPABASE_URL = "https://tenxmodzwveejywfkfoi.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRlbnhtb2R6d3ZlZWp5d2ZrZm9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2NzUwMTQsImV4cCI6MjEwMjI1MTAxNH0.7F1GZxsDgdRb2NfVXjOUs3OVxEXcvc3HHy4OgWIGhcc";
+// Validated by shape (not by comparing to placeholder text) so that find-and-replace
+// edits to the values above can never accidentally break this check.
 const SUPABASE_CONFIGURED =
-  SUPABASE_URL !== "https://aljiavhlrtctvevxqmzw.supabase.co" &&
-  SUPABASE_ANON_KEY !== "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsamlhdmhscnRjdHZldnhxbXp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MjYyMzMsImV4cCI6MjEwMjIwMjIzM30.KhhAiFiz6vUYZLhlAZMvGE-VzKZRLQf9qE53Tc-aSWg" &&
-  /^https?:\/\//.test(SUPABASE_URL);
+  /^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test(SUPABASE_URL) &&
+  SUPABASE_ANON_KEY.length > 50;
 let supabase = null;
 if (SUPABASE_CONFIGURED) {
   try {
