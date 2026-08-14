@@ -437,7 +437,19 @@
 // ⚠️ ใส่ค่า URL และ anon key ของโปรเจกต์ Supabase ตัวเอง (ค่าเดียวกับใน bond-warehouse.html)
 const SUPABASE_URL = "https://tenxmodzwveejywfkfoi.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRlbnhtb2R6d3ZlZWp5d2ZrZm9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2NzUwMTQsImV4cCI6MjEwMjI1MTAxNH0.7F1GZxsDgdRb2NfVXjOUs3OVxEXcvc3HHy4OgWIGhcc";
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Validated by shape (not by comparing to placeholder text) so that find-and-replace
+// edits to the values above can never accidentally break this check.
+const SUPABASE_CONFIGURED =
+  /^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test(SUPABASE_URL) &&
+  SUPABASE_ANON_KEY.length > 50;
+let sb = null;
+if (SUPABASE_CONFIGURED) {
+  try {
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  } catch (e) {
+    console.error("Supabase init failed:", e);
+  }
+}
 const BONDS_TABLE = "bonds";
 let BONDS = [];
 
@@ -520,8 +532,9 @@ function rowToWarehouseShape(r){
   };
 }
 async function loadBondsFromWarehouse(){
+  if (!SUPABASE_CONFIGURED || !sb) return [];
   try{
-    const { data, error } = await supabase
+    const { data, error } = await sb
       .from(BONDS_TABLE)
       .select('*')
       .eq('status', 'open');
@@ -793,12 +806,16 @@ refreshBonds(); // initial load from Supabase
 // ---------- Keep in sync with Bond Warehouse in real time ----------
 // Fires immediately (on ANY device/browser) when Bond Warehouse adds, edits,
 // deletes, closes, or reopens a bond in the shared Supabase "bonds" table.
-supabase
-  .channel('bonds-changes-screener')
-  .on('postgres_changes', { event: '*', schema: 'public', table: BONDS_TABLE }, () => {
-    refreshBonds();
-  })
-  .subscribe();
+if (SUPABASE_CONFIGURED && sb) {
+  sb
+    .channel('bonds-changes-screener')
+    .on('postgres_changes', { event: '*', schema: 'public', table: BONDS_TABLE }, () => {
+      refreshBonds();
+    })
+    .subscribe();
+} else if (cardsEl) {
+  cardsEl.innerHTML = '<div style="padding:24px;text-align:center;color:#B4432E;font-size:14px;">ยังไม่ได้ตั้งค่า Supabase — กรุณาใส่ SUPABASE_URL และ SUPABASE_ANON_KEY ในไฟล์นี้ (ดูคู่มือที่แนบมาให้)</div>';
+}
 // Also refresh when the tab regains focus/visibility.
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) refreshBonds(); });
 </script>

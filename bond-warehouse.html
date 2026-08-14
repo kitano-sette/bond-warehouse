@@ -62,10 +62,10 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const SUPABASE_CONFIGURED =
   /^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test(SUPABASE_URL) &&
   SUPABASE_ANON_KEY.length > 50;
-let supabase = null;
+let sb = null;
 if (SUPABASE_CONFIGURED) {
   try {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   } catch (e) {
     console.error("Supabase init failed:", e);
   }
@@ -737,7 +737,7 @@ function BondWarehouseApp() {
 
   const loadFromSupabase = useCallback(async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await sb
         .from(BONDS_TABLE)
         .select("*")
         .order("updated_at", { ascending: false });
@@ -751,27 +751,27 @@ function BondWarehouseApp() {
   }, []);
 
   useEffect(() => {
-    if (!SUPABASE_CONFIGURED || !supabase) { setLoading(false); return; }
+    if (!SUPABASE_CONFIGURED || !sb) { setLoading(false); return; }
 
     loadFromSupabase().finally(() => setLoading(false));
 
     // Realtime: any insert/update/delete on the bonds table (from this
     // browser, a teammate's browser, or the Bond Screener page) refreshes
     // the list automatically — this is what keeps both files "in sync".
-    const channel = supabase
+    const channel = sb
       .channel("bonds-changes")
       .on("postgres_changes", { event: "*", schema: "public", table: BONDS_TABLE }, () => {
         loadFromSupabase();
       })
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    return () => { sb.removeChannel(channel); };
   }, [loadFromSupabase]);
 
   const handleSave = async (bond) => {
     try {
       const row = bondToRow(bond);
-      const { error } = await supabase.from(BONDS_TABLE).upsert(row, { onConflict: "id" });
+      const { error } = await sb.from(BONDS_TABLE).upsert(row, { onConflict: "id" });
       if (error) throw error;
       setSaveError(false);
       await loadFromSupabase();
@@ -786,7 +786,7 @@ function BondWarehouseApp() {
   const handleDeleteConfirmed = async () => {
     if (!deleteTarget) return;
     try {
-      const { error } = await supabase.from(BONDS_TABLE).delete().eq("id", deleteTarget.id);
+      const { error } = await sb.from(BONDS_TABLE).delete().eq("id", deleteTarget.id);
       if (error) throw error;
       setSaveError(false);
       await loadFromSupabase();
@@ -799,7 +799,7 @@ function BondWarehouseApp() {
 
   const handleToggleStatus = async (bond, status) => {
     try {
-      const { error } = await supabase
+      const { error } = await sb
         .from(BONDS_TABLE)
         .update({ status, updated_at: new Date().toISOString() })
         .eq("id", bond.id);
