@@ -120,6 +120,25 @@
     border-radius:999px;
   }
 
+  /* ---------- Search box ---------- */
+  .search-box{
+    position:relative;
+    margin-bottom:10px;
+  }
+  .search-box input{
+    width:100%;
+    font-family:inherit; font-size:13px; color:var(--ink);
+    border:1px solid var(--line); border-radius:9px;
+    padding:10px 12px 10px 34px;
+    background:#fff;
+  }
+  .search-box input:focus-visible{outline:2px solid var(--amber2); outline-offset:1px;}
+  .search-box .search-icon{
+    position:absolute; left:11px; top:50%; transform:translateY(-50%);
+    width:15px; height:15px; pointer-events:none;
+  }
+  .search-box .search-icon svg{width:100%; height:100%; display:block;}
+
   /* ---------- Filters ---------- */
   .filters{
     display:grid; grid-template-columns:1fr 1fr; gap:8px;
@@ -166,6 +185,7 @@
   }
   .card-head{display:flex; justify-content:space-between; gap:8px; align-items:flex-start;}
   .bond-name{font-weight:700; color:var(--brown); font-size:16px;}
+  .bond-name .star{color:var(--gold); margin-right:4px;}
   .bond-issuer{font-size:12px; color:var(--ink-soft); margin-top:2px; line-height:1.4;}
   .feature{
     display:inline-block; font-size:11px; font-weight:700;
@@ -356,6 +376,13 @@
       <div class="date-pill" id="datePill">5 สิงหาคม 2569</div>
     </div>
 
+    <div class="search-box">
+      <span class="search-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#7A6B62" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      </span>
+      <input type="text" id="fSearch" placeholder="ค้นหารหัสหุ้นกู้ หรือชื่อผู้ออก">
+    </div>
+
     <div class="filters">
       <select id="fInvestor">
         <option value="">นักลงทุน: ทั้งหมด</option>
@@ -364,7 +391,14 @@
         <option value="PG">ตราสารหนี้ภาครัฐ (PG)</option>
       </select>
       <select id="fRating">
-        <option value="">เครดิต: ทั้งหมด</option>
+        <option value="">เครดิต(ตราสาร): ทั้งหมด</option>
+        <option value="AAA">AAA</option>
+        <option value="AA">AA</option>
+        <option value="A">A</option>
+        <option value="BBB">BBB</option>
+      </select>
+      <select id="fRatingCompany">
+        <option value="">เครดิต(บริษัท): ทั้งหมด</option>
         <option value="AAA">AAA</option>
         <option value="AA">AA</option>
         <option value="A">A</option>
@@ -415,6 +449,7 @@
 
   <div class="warning">
     <b>คำเตือน</b>
+    <p style="color:var(--red); font-weight:600; margin:0 0 8px;">ราคาที่แสดงเป็นเพียง Indicative Quotation (ราคาชี้นำ) เท่านั้น ซึ่งราคาดังกล่าวอาจมีการเปลี่ยนแปลงโดยขึ้นอยู่กับความผันผวนของราคาตลาด (Market Fluctuation), วันที่ทำรายการซื้อขาย (Trade) และวันที่ชำระราคา (Settlement)</p>
     <ul>
       <li>การลงทุนมีความเสี่ยง ผู้ลงทุนโปรดศึกษาลักษณะของหุ้นกู้ เงื่อนไขผลตอบแทนและความเสี่ยงจากหนังสือชี้ชวนก่อนการตัดสินใจลงทุน</li>
       <li>ผลตอบแทนที่เสนอขายดังระบุข้างต้น เป็นอัตราผลตอบแทนอ้างอิง สำหรับใช้เป็นข้อมูลในการตัดสินใจของนักลงทุนเท่านั้น</li>
@@ -456,13 +491,15 @@ let BONDS = [];
 const cardsEl = document.getElementById('cards');
 const countEl = document.getElementById('countNum');
 const toastEl = document.getElementById('toast');
-const ids = ['fInvestor','fRating','fRisk','fFeature','fYtm','fLife'];
+const ids = ['fInvestor','fRating','fRatingCompany','fRisk','fFeature','fYtm','fLife'];
 const els = Object.fromEntries(ids.map(id=>[id, document.getElementById(id)]));
+const searchEl = document.getElementById('fSearch');
 
 /* ---------- Bond Warehouse -> Bond Screener field mapping ----------
    Field names between the two files don't always match, e.g.:
-     ytm (index)         <- ytmSell         "YTM ขาย (%)"          (warehouse)
-     ratingLabel (index)  <- ratingCompany    "อันดับความน่าเชื่อถือ (บริษัท)" (warehouse)
+     ytm (index)                <- ytmSell           "YTM ขาย (%)"                    (warehouse)
+     ratingLabel (index)        <- ratingInstrument   "อันดับความน่าเชื่อถือ (ตราสาร)"   (warehouse) -> เครดิต(ตราสาร)
+     ratingCompanyLabel (index) <- ratingCompany      "อันดับความน่าเชื่อถือ (บริษัท)"   (warehouse) -> เครดิต(บริษัท)
    Only bonds with status "open" are shown here; closing/reopening a bond in
    Bond Warehouse removes/restores it from this list automatically.
 ------------------------------------------------------------------- */
@@ -498,7 +535,8 @@ function mapWarehouseBond(w){
     issuer: w.issuerName || '',
     investor: w.investorType || '',
     ytm: Number(w.ytmSell) || 0,               // YTM = "YTM ขาย (%)"
-    ratingLabel: w.ratingCompany || '',          // อันดับเครดิต = "อันดับความน่าเชื่อถือ (บริษัท)"
+    ratingLabel: w.ratingInstrument || '',       // เครดิต(ตราสาร) = "อันดับความน่าเชื่อถือ (ตราสาร)"
+    ratingCompanyLabel: w.ratingCompany || '',   // เครดิต(บริษัท) = "อันดับความน่าเชื่อถือ (บริษัท)"
     risk: whRiskNumber(w.riskLevel),
     coupon: Number(w.couponRate) || 0,
     life: whLifeDisplay(w),
@@ -520,6 +558,7 @@ function rowToWarehouseShape(r){
     investorType: r.investor_type,
     ytmSell: r.ytm_sell,
     ratingCompany: r.rating_company,
+    ratingInstrument: r.rating_instrument,
     riskLevel: r.risk_level,
     couponRate: r.coupon_rate,
     perpetual: r.perpetual,
@@ -593,20 +632,41 @@ function featureTag(f){
 function render(){
   const inv = els.fInvestor.value;
   const rat = els.fRating.value;
+  const ratCo = els.fRatingCompany.value;
   const risk = els.fRisk.value;
   const feat = els.fFeature.value;
   const ytmRange = els.fYtm.value;
   const lifeRange = els.fLife.value;
+  const searchTerm = (searchEl && searchEl.value || '').trim().toLowerCase();
 
-  const filtered = BONDS.filter(b=>{
+  // Filters (dropdowns) that determine whether we keep the "highlight first" order
+  // or instead order results by the criteria the user filtered on.
+  const filtersActive = !!(inv || rat || ratCo || risk || feat || ytmRange || lifeRange);
+
+  let filtered = BONDS.filter(b=>{
     if(inv && b.investor!==inv) return false;
     if(rat && ratingBase(b.ratingLabel)!==rat) return false;
+    if(ratCo && ratingBase(b.ratingCompanyLabel)!==ratCo) return false;
     if(risk && b.risk!==parseInt(risk)) return false;
     if(feat && b.feature!==feat) return false;
     if(ytmRange && !ytmMatch(ytmRange, b.ytm)) return false;
     if(lifeRange && !lifeMatch(lifeRange, lifeNum(b))) return false;
+    if(searchTerm && !(String(b.code).toLowerCase().includes(searchTerm) || String(b.issuer).toLowerCase().includes(searchTerm))) return false;
     return true;
   });
+
+  if(filtersActive){
+    // A filter is in use: order results by the filter's own criteria
+    // instead of forcing highlighted bonds to the top.
+    filtered = filtered.slice().sort((a,b)=>{
+      if(ytmRange) return b.ytm - a.ytm;
+      if(lifeRange) return lifeNum(a) - lifeNum(b);
+      if(risk) return b.ytm - a.ytm;
+      return b.ytm - a.ytm;
+    });
+  }
+  // When no filter is active, BONDS is already ordered highlight-first
+  // (see loadBondsFromWarehouse), so we leave that order untouched.
 
   countEl.textContent = filtered.length;
 
@@ -619,7 +679,7 @@ function render(){
     <div class="card">
       <div class="card-head">
         <div>
-          <div class="bond-name">${b.code}</div>
+          <div class="bond-name">${b.highlight ? '<span class="star">★</span>' : ''}${b.code}</div>
           <div class="bond-issuer">${b.issuer}</div>
           ${featureTag(b.feature)}
         </div>
@@ -635,15 +695,19 @@ function render(){
           <div class="m-val">${b.coupon.toFixed(2)}%</div>
         </div>
         <div class="metric">
-          <div class="m-lbl">อันดับเครดิต</div>
-          <div class="m-val rating">${b.ratingLabel}</div>
+          <div class="m-lbl">เครดิต(ตราสาร)</div>
+          <div class="m-val rating">${b.ratingLabel || '-'}</div>
         </div>
         <div class="metric">
           <div class="m-lbl">อายุคงเหลือ (ปี)</div>
           <div class="m-val">${b.life}</div>
         </div>
       </div>
-      <div class="metrics-grid" style="grid-template-columns:1fr;margin-top:8px;padding-top:0;border-top:none;">
+      <div class="metrics-grid" style="grid-template-columns:1fr 1fr;margin-top:8px;padding-top:0;border-top:none;">
+        <div class="metric">
+          <div class="m-lbl">เครดิต(บริษัท)</div>
+          <div class="m-val rating">${b.ratingCompanyLabel || '-'}</div>
+        </div>
         <div class="metric">
           <div class="m-lbl">ระดับความเสี่ยงของตราสาร (${b.risk}/8)</div>
           ${riskDots(b.risk)}
@@ -795,8 +859,10 @@ cardsEl.addEventListener('input', (e)=>{
 });
 
 ids.forEach(id=> els[id].addEventListener('change', render));
+if(searchEl) searchEl.addEventListener('input', render);
 document.getElementById('resetBtn').addEventListener('click', ()=>{
   ids.forEach(id=> els[id].value = "");
+  if(searchEl) searchEl.value = "";
   render();
 });
 
