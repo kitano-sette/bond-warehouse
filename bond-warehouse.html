@@ -57,7 +57,18 @@ const C = {
 ---------------------------------------------------------------- */
 const SUPABASE_URL = "https://aljiavhlrtctvevxqmzw.supabase.co/rest/v1/";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsamlhdmhscnRjdHZldnhxbXp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MjYyMzMsImV4cCI6MjEwMjIwMjIzM30.KhhAiFiz6vUYZLhlAZMvGE-VzKZRLQf9qE53Tc-aSWg";
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const SUPABASE_CONFIGURED =
+  SUPABASE_URL !== "https://aljiavhlrtctvevxqmzw.supabase.co/rest/v1/" &&
+  SUPABASE_ANON_KEY !== "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsamlhdmhscnRjdHZldnhxbXp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MjYyMzMsImV4cCI6MjEwMjIwMjIzM30.KhhAiFiz6vUYZLhlAZMvGE-VzKZRLQf9qE53Tc-aSWg" &&
+  /^https?:\/\//.test(SUPABASE_URL);
+let supabase = null;
+if (SUPABASE_CONFIGURED) {
+  try {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  } catch (e) {
+    console.error("Supabase init failed:", e);
+  }
+}
 const BONDS_TABLE = "bonds";
 
 /* Convert a bond object (camelCase, used inside this app) into a row
@@ -739,6 +750,8 @@ function BondWarehouseApp() {
   }, []);
 
   useEffect(() => {
+    if (!SUPABASE_CONFIGURED || !supabase) { setLoading(false); return; }
+
     loadFromSupabase().finally(() => setLoading(false));
 
     // Realtime: any insert/update/delete on the bonds table (from this
@@ -832,6 +845,24 @@ function BondWarehouseApp() {
       setExporting(false);
     }, 150);
   };
+
+  if (!SUPABASE_CONFIGURED) {
+    return (
+      <div style={{ width: "100%", minHeight: "100vh", background: C.bgSoft, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+        <div style={{ maxWidth: 480, background: C.bg, border: `1px solid ${C.border}`, borderRadius: 16, padding: 32, textAlign: "center" }}>
+          <IconAlert size={32} color={C.gold} style={{ marginBottom: 12 }} />
+          <div style={{ fontFamily: "Prompt, sans-serif", fontWeight: 700, fontSize: 20, color: C.text, marginBottom: 8 }}>
+            ยังไม่ได้ตั้งค่า Supabase
+          </div>
+          <div style={{ fontSize: 14, color: C.textMute, lineHeight: 1.7 }}>
+            กรุณาเปิดไฟล์นี้ในโปรแกรมแก้ไขข้อความ แล้วแทนที่ค่า <code>SUPABASE_URL</code> และ{" "}
+            <code>SUPABASE_ANON_KEY</code> ใกล้ด้านบนของไฟล์ ด้วย URL และ anon key จากโปรเจกต์ Supabase
+            ของคุณ (ดูวิธีหาค่านี้ในคู่มือที่แนบมาให้) จากนั้นบันทึกไฟล์แล้วเปิดใหม่อีกครั้ง
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ width: "100%", minHeight: "100vh", background: C.bg }}>
