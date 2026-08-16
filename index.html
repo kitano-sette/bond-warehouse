@@ -167,6 +167,18 @@
   }
   .reset-btn:hover{background:#5a2529;}
 
+  .active-filters{
+    display:flex; flex-wrap:wrap; gap:6px;
+    margin:-6px 2px 14px;
+  }
+  .active-filters:empty{margin:0; display:none;}
+  .filter-chip{
+    font-size:11px; font-weight:700; color:var(--maroon);
+    background:#F7ECD6; border:1px solid var(--line);
+    padding:5px 10px; border-radius:999px;
+    white-space:nowrap;
+  }
+
   .count-line{
     font-size:12.5px; color:var(--ink-soft); margin-bottom:10px; padding:0 2px;
   }
@@ -275,6 +287,13 @@
     margin-bottom:12px;
   }
   .login-box.show, .email-box.show{display:flex;}
+  .email-notice{
+    display:none;
+    background:#FBEAEA; color:var(--red); font-weight:700; font-size:11.5px;
+    padding:7px 10px; border-radius:8px; text-align:center;
+    opacity:0; transition:opacity .2s;
+  }
+  .email-notice.show{display:block; opacity:1;}
   .buy-input{
     width:100%;
     font-family:inherit; font-size:13px; color:var(--ink);
@@ -284,6 +303,7 @@
   }
   .buy-input:focus-visible{outline:2px solid var(--amber2); outline-offset:1px;}
   .buy-input:disabled{background:#F1ECE0; color:var(--ink-soft); cursor:not-allowed;}
+  .buy-input.input-error{border-color:var(--red); outline:2px solid var(--red); outline-offset:1px;}
   .login-btn{
     width:100%;
     background:linear-gradient(120deg,var(--amber1),var(--amber2));
@@ -304,6 +324,13 @@
     pointer-events:none; opacity:0; transition:opacity .15s;
   }
   .amount-suffix.show{opacity:1;}
+  .min-notice{
+    display:none;
+    background:#FBEAEA; color:var(--red); font-weight:700; font-size:11.5px;
+    padding:7px 10px; border-radius:8px; margin-bottom:8px; text-align:center;
+    opacity:0; transition:opacity .2s;
+  }
+  .min-notice.show{display:block; opacity:1;}
   .comment-box{
     resize:vertical; min-height:56px; margin-bottom:12px;
   }
@@ -340,20 +367,6 @@
     color:#F3E7C9; font-weight:600; font-size:12px; text-align:center;
   }
 
-  /* ---------- Toast ---------- */
-  .toast{
-    position:fixed; left:50%; bottom:24px; transform:translate(-50%,20px);
-    background:var(--brown); color:#F6E9C9;
-    padding:12px 20px; border-radius:999px;
-    font-size:13px; font-weight:600;
-    box-shadow:0 10px 24px rgba(0,0,0,0.25);
-    opacity:0; pointer-events:none;
-    transition:opacity .25s, transform .25s;
-    z-index:50;
-    max-width:88vw; text-align:center;
-  }
-  .toast.show{opacity:1; transform:translate(-50%,0);}
-
   @media (min-width:420px){
     .filters{grid-template-columns:1fr 1fr;}
   }
@@ -366,6 +379,7 @@
     <div class="coin c2"></div>
     <div class="coin c3"></div>
     <div class="title-block">
+      <div style="display:inline-block; background:#8A1414; color:#FFFFFF; font-weight:700; font-size:11.5px; letter-spacing:.3px; padding:5px 12px; border-radius:999px; box-shadow:0 4px 10px rgba(0,0,0,0.25); margin-bottom:6px;">ใช้ประกวด KSS Innovation Awards 2026 เท่านั้น นะจ๊ะ</div>
       <h1 class="title-main">BOND SCREENER</h1>
       <div class="title-byline">By Kitthanabhumi</div>
     </div>
@@ -397,6 +411,7 @@
         <option value="AA">AA</option>
         <option value="A">A</option>
         <option value="BBB">BBB</option>
+        <option value="Unrated">Unrated</option>
       </select>
       <select id="fRatingCompany">
         <option value="">เครดิต(บริษัท): ทั้งหมด</option>
@@ -404,6 +419,7 @@
         <option value="AA">AA</option>
         <option value="A">A</option>
         <option value="BBB">BBB</option>
+        <option value="Unrated">Unrated</option>
       </select>
       <select id="fRisk">
         <option value="">ความเสี่ยง: ทั้งหมด</option>
@@ -421,7 +437,6 @@
         <option value="normal">หุ้นกู้ปกติ</option>
         <option value="call">Call Option</option>
         <option value="perp">Perpetual Bond</option>
-        <option value="sll">Sustainability-Linked</option>
       </select>
       <select id="fYtm">
         <option value="">YTM: ทั้งหมด</option>
@@ -439,10 +454,18 @@
         <option value="4-5">4-5 ปี</option>
         <option value="gt5">มากกว่า 5 ปี</option>
       </select>
+      <select id="fPrice">
+        <option value="">ราคา: ทั้งหมด</option>
+        <option value="premium">Premium</option>
+        <option value="par">Par</option>
+        <option value="discount">Discount</option>
+      </select>
       <button class="reset-btn" id="resetBtn">ล้างตัวกรองทั้งหมด</button>
     </div>
 
-    <div class="count-line">พบ <b id="countNum">0</b> หุ้นกู้ที่เสนอขาย</div>
+    <div class="active-filters" id="activeFilters"></div>
+
+    <div class="count-line">พบ <b id="countNum">0</b> หุ้นกู้ที่เสนอขาย<span style="display:inline-block;width:10px;"></span><span style="color:var(--line);">|</span><span style="display:inline-block;width:10px;"></span><span style="color:var(--gold);">★</span> Daily Highlight</div>
     <div class="disclaimer-line">ข้อมูลการเสนอขายนี้ ขอสงวนสิทธิ์ในการเปลี่ยนแปลงโดยมิได้ต้องแจ้งให้ทราบล่วงหน้า</div>
 
     <div class="cards" id="cards"></div>
@@ -461,8 +484,6 @@
   </div>
 
   <div class="contact-bar">Krungsri Securities &nbsp;·&nbsp; 0 2638 5500, 0 2659 7777</div>
-
-  <div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -491,10 +512,33 @@ let BONDS = [];
 
 const cardsEl = document.getElementById('cards');
 const countEl = document.getElementById('countNum');
-const toastEl = document.getElementById('toast');
-const ids = ['fInvestor','fRating','fRatingCompany','fRisk','fFeature','fYtm','fLife'];
+const activeFiltersEl = document.getElementById('activeFilters');
+const ids = ['fInvestor','fRating','fRatingCompany','fRisk','fFeature','fYtm','fLife','fPrice'];
 const els = Object.fromEntries(ids.map(id=>[id, document.getElementById(id)]));
 const searchEl = document.getElementById('fSearch');
+
+// หลังเลือกตัวกรองเหล่านี้แล้ว ให้แสดงข้อความหัวข้อกำกับ เช่น "เครดิต(ตราสาร): AAA"
+const chipFilterLabels = {
+  fInvestor: 'นักลงทุน',
+  fRating: 'เครดิต(ตราสาร)',
+  fRatingCompany: 'เครดิต(บริษัท)',
+  fRisk: 'ความเสี่ยง',
+  fFeature: 'คุณลักษณะ',
+  fYtm: 'YTM',
+  fLife: 'อายุคงเหลือ',
+  fPrice: 'ราคา',
+};
+function updateActiveFilterChips(){
+  if(!activeFiltersEl) return;
+  const chips = Object.keys(chipFilterLabels).map(id=>{
+    const el = els[id];
+    if(!el || !el.value) return '';
+    const opt = el.options[el.selectedIndex];
+    const text = opt ? opt.textContent : el.value;
+    return `<span class="filter-chip">${chipFilterLabels[id]}: ${text}</span>`;
+  }).filter(Boolean);
+  activeFiltersEl.innerHTML = chips.join('');
+}
 
 /* ---------- Bond Warehouse -> Bond Screener field mapping ----------
    Field names between the two files don't always match, e.g.:
@@ -606,6 +650,19 @@ function ratingBase(label){
   s = s.replace(/[+\-]\s*$/, '').trim();
   return s;
 }
+// "Unrated" = no rating was ever entered: blank, whitespace-only, or "-"
+function isUnrated(label){
+  const s = String(label || '').trim();
+  return s === '' || s === '-';
+}
+// Notch within a rating grade, used to sort A+ > A > A- (descending) once
+// a specific credit-rating filter has narrowed everything to the same base grade.
+function ratingNotch(label){
+  const s = String(label || '').split('/')[0].trim();
+  if(/\+\s*$/.test(s)) return 1;
+  if(/-\s*$/.test(s)) return -1;
+  return 0;
+}
 function lifeNum(b){
   return b.life === 'PERP' ? Infinity : parseFloat(b.life);
 }
@@ -625,6 +682,15 @@ function lifeMatch(range, life){
   if(range==='gt5') return life>5;
   return true;
 }
+// ราคา (Premium / Par / Discount) inferred from the relationship between
+// coupon rate and YTM: coupon > YTM => Premium, coupon < YTM => Discount,
+// coupon ≈ YTM => Par.
+function priceCategory(b){
+  const diff = b.coupon - b.ytm;
+  if(diff > 0.05) return 'premium';
+  if(diff < -0.05) return 'discount';
+  return 'par';
+}
 function featureTag(f){
   if(f==='call') return '<span class="feature call">Call Option</span>';
   if(f==='perp') return '<span class="feature perp">Perpetual Bond</span>';
@@ -640,20 +706,45 @@ function render(){
   const feat = els.fFeature.value;
   const ytmRange = els.fYtm.value;
   const lifeRange = els.fLife.value;
+  const price = els.fPrice.value;
   const searchTerm = (searchEl && searchEl.value || '').trim().toLowerCase();
 
   // Filters (dropdowns) that determine whether we keep the "highlight first" order
   // or instead order results by the criteria the user filtered on.
-  const filtersActive = !!(inv || rat || ratCo || risk || feat || ytmRange || lifeRange);
+  const filtersActive = !!(inv || rat || ratCo || risk || feat || ytmRange || lifeRange || price);
 
   let filtered = BONDS.filter(b=>{
     if(inv && b.investor!==inv) return false;
-    if(rat && ratingBase(b.ratingLabel)!==rat) return false;
-    if(ratCo && ratingBase(b.ratingCompanyLabel)!==ratCo) return false;
+
+    // เครดิต(ตราสาร): "Unrated" = ไม่ได้ใส่เรตติ้ง (ว่าง หรือ "-")
+    if(rat){
+      if(rat === 'Unrated'){ if(!isUnrated(b.ratingLabel)) return false; }
+      else { if(isUnrated(b.ratingLabel) || ratingBase(b.ratingLabel) !== rat) return false; }
+    }
+
+    // เครดิต(บริษัท): เดียวกันกับข้างต้น
+    if(ratCo){
+      if(ratCo === 'Unrated'){ if(!isUnrated(b.ratingCompanyLabel)) return false; }
+      else { if(isUnrated(b.ratingCompanyLabel) || ratingBase(b.ratingCompanyLabel) !== ratCo) return false; }
+    }
+
     if(risk && b.risk!==parseInt(risk)) return false;
-    if(feat && b.feature!==feat) return false;
+
+    // คุณลักษณะ: "หุ้นกู้ปกติ" = ไม่มีทั้ง "สิทธิ" และ perpetual bond
+    //            "Call Option" = ดูจากข้อความใน "สิทธิ" ว่ามีคำว่า call หรือไม่
+    //            "Perpetual Bond" = ธงจากข้อมูล
+    if(feat){
+      const hasRights = !!(b.rights && String(b.rights).trim() !== '');
+      const isPerp = b.feature === 'perp';
+      const isCall = hasRights && /call/i.test(b.rights);
+      if(feat === 'normal' && (hasRights || isPerp)) return false;
+      if(feat === 'call' && !isCall) return false;
+      if(feat === 'perp' && !isPerp) return false;
+    }
+
     if(ytmRange && !ytmMatch(ytmRange, b.ytm)) return false;
     if(lifeRange && !lifeMatch(lifeRange, lifeNum(b))) return false;
+    if(price && priceCategory(b)!==price) return false;
     if(searchTerm && !(String(b.code).toLowerCase().includes(searchTerm) || String(b.issuer).toLowerCase().includes(searchTerm))) return false;
     return true;
   });
@@ -661,15 +752,23 @@ function render(){
   if(filtersActive){
     // A filter is in use: order results by the filter's own criteria
     // instead of forcing highlighted bonds to the top.
+    const activeFilterCount = [inv, rat, ratCo, risk, feat, ytmRange, lifeRange, price].filter(Boolean).length;
     filtered = filtered.slice().sort((a,b)=>{
-      if(ytmRange) return b.ytm - a.ytm;
+      // เลือกหลายตัวกรองพร้อมกัน: ให้ YTM มากสุดขึ้นก่อนเสมอ ไม่ว่าจะเลือกตัวกรองอะไรร่วมกันบ้าง
+      if(activeFilterCount > 1) return b.ytm - a.ytm;
+      // เลือกตัวกรองเดียว: เรียงตามเกณฑ์ของตัวกรองนั้นโดยเฉพาะ
+      // เครดิต(ตราสาร)/เครดิต(บริษัท): หลังกรองแล้ว เรียงตามสัญลักษณ์จากมากไปน้อย เช่น A+ > A > A-
+      if(rat) return ratingNotch(b.ratingLabel) - ratingNotch(a.ratingLabel);
+      if(ratCo) return ratingNotch(b.ratingCompanyLabel) - ratingNotch(a.ratingCompanyLabel);
       if(lifeRange) return lifeNum(a) - lifeNum(b);
-      if(risk) return b.ytm - a.ytm;
+      // ytmRange, risk, inv, feat, price: เรียงตาม YTM มากไปน้อยเป็นค่าเริ่มต้น
       return b.ytm - a.ytm;
     });
   }
   // When no filter is active, BONDS is already ordered highlight-first
   // (see loadBondsFromWarehouse), so we leave that order untouched.
+
+  updateActiveFilterChips();
 
   countEl.textContent = filtered.length;
 
@@ -703,14 +802,14 @@ function render(){
           <div class="m-val rating">${b.ratingLabel || '-'}</div>
         </div>
         <div class="metric">
-          <div class="m-lbl">อายุคงเหลือ (ปี)</div>
-          <div class="m-val">${b.life}</div>
+          <div class="m-lbl">เครดิต(บริษัท)</div>
+          <div class="m-val rating">${b.ratingCompanyLabel || '-'}</div>
         </div>
       </div>
       <div class="metrics-grid" style="grid-template-columns:1fr 1fr;margin-top:8px;padding-top:0;border-top:none;">
         <div class="metric">
-          <div class="m-lbl">เครดิต(บริษัท)</div>
-          <div class="m-val rating">${b.ratingCompanyLabel || '-'}</div>
+          <div class="m-lbl">อายุคงเหลือ (ปี)</div>
+          <div class="m-val">${b.life}</div>
         </div>
         <div class="metric">
           <div class="m-lbl">ระดับความเสี่ยงของตราสาร (${b.risk}/8)</div>
@@ -740,9 +839,11 @@ function render(){
         </div>
 
         <div class="email-box" id="email-${b.code}">
-          <input type="email" class="buy-input" placeholder="กรอกอีเมลของท่าน">
+          <div class="email-notice" id="emailNotice-${b.code}">กรุณากรอกอีเมลให้ถูกต้อง</div>
+          <input type="email" class="buy-input email-input" data-code="${b.code}" pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\\.[A-Za-z]{2,}$" placeholder="กรอกอีเมลของท่าน">
         </div>
 
+        <div class="min-notice" id="minNotice-${b.code}">โปรดซื้อด้วยจำนวนขั้นต่ำ</div>
         <div class="amount-fields">
           <div class="amount-wrap">
             <input type="text" inputmode="numeric" class="buy-input amount-money" id="money-${b.code}" data-code="${b.code}" placeholder="จำนวนเงิน">
@@ -756,6 +857,7 @@ function render(){
 
         <textarea class="buy-input comment-box" placeholder="Comment"></textarea>
 
+        <div class="min-notice" id="formNotice-${b.code}"></div>
         <button type="button" class="submit-btn" data-code="${b.code}">ส่ง</button>
 
         <div class="thank-you-msg" id="thankyou-${b.code}">ขอบคุณที่สนใจลงทุน เราได้รับความต้องการจากท่านแล้ว จะรีบติดต่อท่านกลับโดยเร็วที่สุด</div>
@@ -773,20 +875,69 @@ function updateDatePill(){
   document.getElementById('datePill').textContent = `${day} ${month} ${buddhistYear}`;
 }
 
-let toastTimer;
-function showToast(msg){
-  toastEl.textContent = msg;
-  toastEl.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=> toastEl.classList.remove('show'), 2200);
+// "โปรดซื้อด้วยจำนวนขั้นต่ำ" แสดงเฉพาะกล่องสนใจซื้อของหุ้นกู้นั้นๆ เหนือฟิลด์จำนวน เป็นเวลา 4 วินาที
+const minNoticeTimers = {};
+function showMinNotice(code){
+  const el = document.getElementById(`minNotice-${code}`);
+  if(!el) return;
+  el.classList.add('show');
+  clearTimeout(minNoticeTimers[code]);
+  minNoticeTimers[code] = setTimeout(()=> el.classList.remove('show'), 3000);
+}
+
+// เมื่อกดปุ่ม "สนใจซื้อ" แล้วกล่องขยายไม่อยู่ในมุมมองหน้าจอ ให้เลื่อนหน้าจอมาโชว์กล่องนั้น
+function ensureVisible(el){
+  if(!el) return;
+  const rect = el.getBoundingClientRect();
+  const viewH = window.innerHeight || document.documentElement.clientHeight;
+  const fullyVisible = rect.top >= 0 && rect.bottom <= viewH;
+  if(!fullyVisible){
+    el.scrollIntoView({ behavior:'smooth', block: rect.top < 0 ? 'start' : 'end' });
+  }
+}
+
+// เช็คความถูกต้องของอีเมล พร้อมแสดง/ซ่อนข้อความเตือนเหนือช่องกรอกอีเมลของบอนด์นั้นๆ
+// forceShowEmpty: true เมื่อกดปุ่ม "ส่ง" (บังคับเช็คแม้ยังไม่ได้พิมพ์อะไร)
+//                 false เมื่อ blur ออกจากช่อง (ยังไม่เตือนถ้าผู้ใช้ยังไม่ได้พิมพ์อะไรเลย)
+const emailPattern = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\.[A-Za-z]{2,}$/;
+function validateEmailField(code, forceShowEmpty){
+  const emailBox = document.getElementById(`email-${code}`);
+  if(!emailBox) return true;
+  const input = emailBox.querySelector('.email-input');
+  const notice = document.getElementById(`emailNotice-${code}`);
+  if(!input) return true;
+  const val = input.value.trim();
+  if(emailPattern.test(val)){
+    input.classList.remove('input-error');
+    if(notice) notice.classList.remove('show');
+    return true;
+  }
+  if(val === '' && !forceShowEmpty){
+    input.classList.remove('input-error');
+    if(notice) notice.classList.remove('show');
+    return false;
+  }
+  input.classList.add('input-error');
+  if(notice) notice.classList.add('show');
+  return false;
 }
 
 cardsEl.addEventListener('click', (e)=>{
-  // Toggle "สนใจซื้อ" expand panel
+  // Toggle "สนใจซื้อ" expand panel — เปิดของบอนด์ที่กด แล้วพับเก็บกล่องของบอนด์ตัวอื่นๆ ทั้งหมด
   const buyBtn = e.target.closest('.buy-btn');
   if(buyBtn){
-    const panel = document.getElementById(`expand-${buyBtn.dataset.code}`);
-    if(panel) panel.classList.toggle('open');
+    const code = buyBtn.dataset.code;
+    const panel = document.getElementById(`expand-${code}`);
+    if(panel){
+      const wasOpen = panel.classList.contains('open');
+      cardsEl.querySelectorAll('.buy-expand.open').forEach(p=>{
+        if(p !== panel) p.classList.remove('open');
+      });
+      panel.classList.toggle('open', !wasOpen);
+      if(panel.classList.contains('open')){
+        requestAnimationFrame(()=> ensureVisible(panel));
+      }
+    }
     return;
   }
 
@@ -798,14 +949,19 @@ cardsEl.addEventListener('click', (e)=>{
     const parent = typeBtn.closest('.type-select');
     parent.querySelectorAll('.type-btn').forEach(b=> b.classList.toggle('active', b===typeBtn));
 
+    const formNotice = document.getElementById(`formNotice-${code}`);
+    if(formNotice) formNotice.classList.remove('show');
+
     const loginBox = document.getElementById(`login-${code}`);
     const emailBox = document.getElementById(`email-${code}`);
     if(type === 'existing'){
       loginBox.classList.add('show');
       emailBox.classList.remove('show');
+      requestAnimationFrame(()=> ensureVisible(loginBox));
     } else {
       emailBox.classList.add('show');
       loginBox.classList.remove('show');
+      requestAnimationFrame(()=> ensureVisible(emailBox));
     }
     return;
   }
@@ -815,6 +971,40 @@ cardsEl.addEventListener('click', (e)=>{
   if(submitBtn){
     const code = submitBtn.dataset.code;
     const panel = document.getElementById(`expand-${code}`);
+    const formNotice = document.getElementById(`formNotice-${code}`);
+
+    // ต้องเลือกประเภทลูกค้าก่อน ("ลูกค้า บล. กรุงศรี" หรือ "ลูกค้าใหม่") ปุ่ม "ส่ง" กดไม่ผ่านถ้ายังไม่เลือก
+    const typeChosen = panel && panel.querySelector('.type-btn.active');
+    if(!typeChosen){
+      if(formNotice){
+        formNotice.textContent = 'กรุณาเลือกประเภทลูกค้าก่อนส่งคำขอ';
+        formNotice.classList.add('show');
+      }
+      requestAnimationFrame(()=> ensureVisible(panel.querySelector('.type-select')));
+      return;
+    }
+
+    // ต้องกรอก "จำนวนเงิน" หรือ "จำนวนหน่วย" อย่างน้อยหนึ่งช่อง ปุ่ม "ส่ง" กดไม่ผ่านถ้ายังไม่กรอก
+    const moneyField = document.getElementById(`money-${code}`);
+    const unitField = document.getElementById(`unit-${code}`);
+    const hasAmount = (moneyField && moneyField.value.trim() !== '') || (unitField && unitField.value.trim() !== '');
+    if(!hasAmount){
+      if(formNotice){
+        formNotice.textContent = 'กรุณากรอกจำนวนเงินหรือจำนวนหน่วย';
+        formNotice.classList.add('show');
+      }
+      requestAnimationFrame(()=> ensureVisible(panel.querySelector('.amount-fields')));
+      return;
+    }
+
+    if(formNotice) formNotice.classList.remove('show');
+
+    // Validate email (only when the "ลูกค้าใหม่" email box is the active one)
+    const emailBox = document.getElementById(`email-${code}`);
+    if(emailBox && emailBox.classList.contains('show')){
+      if(!validateEmailField(code, true)) return;
+    }
+
     const thankYou = document.getElementById(`thankyou-${code}`);
     if(panel){
       panel.querySelectorAll('.type-select, .login-box, .email-box, .amount-fields, .comment-box, .submit-btn').forEach(el=>{
@@ -842,25 +1032,77 @@ function formatNumberInput(el){
   return raw;
 }
 
-// Mutually exclusive "จำนวนเงิน" / "จำนวนหน่วย" fields
-cardsEl.addEventListener('input', (e)=>{
-  if(e.target.classList.contains('amount-money')){
-    const code = e.target.dataset.code;
-    const raw = formatNumberInput(e.target);
-    const suffix = document.getElementById(`moneySuffix-${code}`);
-    if(suffix) suffix.classList.toggle('show', raw !== '');
-    const unitField = document.getElementById(`unit-${code}`);
-    if(unitField) unitField.disabled = raw !== '';
+// "จำนวนเงิน" / "จำนวนหน่วย" เป็นฟิลด์คู่ที่ mutually exclusive กัน (กรอกอย่างใดอย่างหนึ่ง)
+// เก็บ config ของแต่ละฝั่งไว้ที่เดียว เพื่อให้ input/blur handler ด้านล่างใช้ร่วมกันได้
+// แทนที่จะเขียนตรรกะซ้ำสำหรับ money และ unit แยกกัน
+const AMOUNT_FIELD_KINDS = {
+  'amount-money': { suffixPrefix:'moneySuffix', otherFieldPrefix:'unit', minAmount: minMoney => minMoney },
+  'amount-unit':  { suffixPrefix:'unitSuffix',  otherFieldPrefix:'money', minAmount: minMoney => Math.ceil(minMoney/1000) },
+};
+function amountFieldKindFor(el){
+  for(const cls in AMOUNT_FIELD_KINDS){
+    if(el.classList.contains(cls)) return AMOUNT_FIELD_KINDS[cls];
   }
-  if(e.target.classList.contains('amount-unit')){
+  return null;
+}
+
+cardsEl.addEventListener('input', (e)=>{
+  if(e.target.classList.contains('email-input')){
+    // ล้างสถานะ error ทันทีที่แก้ไข ถ้าค่าถูกต้องแล้วให้ซ่อนข้อความเตือนไปเลย
+    const code = e.target.dataset.code;
+    if(emailPattern.test(e.target.value.trim())){
+      e.target.classList.remove('input-error');
+      const notice = document.getElementById(`emailNotice-${code}`);
+      if(notice) notice.classList.remove('show');
+    } else {
+      e.target.classList.remove('input-error');
+    }
+  }
+
+  const kind = amountFieldKindFor(e.target);
+  if(kind){
     const code = e.target.dataset.code;
     const raw = formatNumberInput(e.target);
-    const suffix = document.getElementById(`unitSuffix-${code}`);
+    const suffix = document.getElementById(`${kind.suffixPrefix}-${code}`);
     if(suffix) suffix.classList.toggle('show', raw !== '');
-    const moneyField = document.getElementById(`money-${code}`);
-    if(moneyField) moneyField.disabled = raw !== '';
+    const otherField = document.getElementById(`${kind.otherFieldPrefix}-${code}`);
+    if(otherField) otherField.disabled = raw !== '';
+    if(raw !== ''){
+      const formNotice = document.getElementById(`formNotice-${code}`);
+      if(formNotice) formNotice.classList.remove('show');
+    }
   }
 });
+
+// Enforce ซื้อขั้นต่ำ (minimum purchase) once the user leaves the field.
+// - "จำนวนเงิน" must be >= ซื้อขั้นต่ำ (บาท)
+// - "จำนวนหน่วย" must be >= ซื้อขั้นต่ำ / 1,000 (หน่วย)
+cardsEl.addEventListener('blur', (e)=>{
+  const t = e.target;
+  if(!t.classList) return;
+
+  // ตรวจอีเมลทันทีเมื่อ blur ออกจากช่อง — ขึ้นเตือนเหนือช่องกรอกอีเมลของบอนด์นั้นๆ
+  if(t.classList.contains('email-input')){
+    const code = t.dataset.code;
+    validateEmailField(code, false);
+  }
+
+  const kind = amountFieldKindFor(t);
+  if(kind){
+    const code = t.dataset.code;
+    const bond = BONDS.find(b=> b.code === code);
+    if(!bond) return;
+    const minMoney = Number(String(bond.minPurchase).replace(/[^\d]/g,'')) || 0;
+    const minForThisField = kind.minAmount(minMoney);
+    const raw = Number(t.value.replace(/[^\d]/g,'')) || 0;
+    if(raw > 0 && raw < minForThisField){
+      t.value = minForThisField.toLocaleString('en-US');
+      const suffix = document.getElementById(`${kind.suffixPrefix}-${code}`);
+      if(suffix) suffix.classList.add('show');
+      showMinNotice(code);
+    }
+  }
+}, true); // capture: 'blur' doesn't bubble, so delegation needs the capture phase
 
 ids.forEach(id=> els[id].addEventListener('change', render));
 if(searchEl) searchEl.addEventListener('input', render);

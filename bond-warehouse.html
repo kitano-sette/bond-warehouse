@@ -9,6 +9,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { box-sizing: border-box; }
@@ -26,7 +29,7 @@
 <div id="root"></div>
 
 <script type="text/babel" data-presets="react">
-const { useState, useEffect, useCallback, useMemo } = React;
+const { useState, useEffect, useCallback, useMemo, useRef } = React;
 
 /* ---------------------------------------------------------------
    Design tokens
@@ -163,6 +166,7 @@ const IconSparkles = (p) => <Svg {...p}><path d="M12 3l1.6 4.9L18.5 9l-4.9 1.6L1
 const IconSave = (p) => <Svg {...p}><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" /><polyline points="17 21 17 13 7 13 7 21" /><polyline points="7 3 7 8 15 8" /></Svg>;
 const IconArrowLeft = (p) => <Svg {...p}><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></Svg>;
 const IconLock = (p) => <Svg {...p}><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></Svg>;
+const IconImage = (p) => <Svg {...p}><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></Svg>;
 
 /* ---------------------------------------------------------------
    Helpers
@@ -278,6 +282,187 @@ function formatMillions(raw) {
 function formatPct(v) {
   if (v === "" || v === undefined || v === null || isNaN(Number(v))) return "—";
   return `${Number(v).toFixed(2)}%`;
+}
+
+/* ---------------------------------------------------------------
+   "Export Pic" (Bond Daily Highlight) helpers
+---------------------------------------------------------------- */
+const THAI_MONTHS = [
+  "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
+  "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม",
+];
+/* Thai (Buddhist-era) long date, formatted to match the "14 สิงหาคม 2569" style. */
+function thaiLongDate(d = new Date()) {
+  const day = d.getDate();
+  const month = THAI_MONTHS[d.getMonth()];
+  const year = d.getFullYear() + 543;
+  return `${day} ${month} ${year}`;
+}
+/* Pull just the leading number out of a riskLevel string like "ระดับ 4 (เสี่ยงปานกลางค่อนข้างต่ำ)". */
+function riskLevelNumber(riskLevel) {
+  const m = (riskLevel || "").match(/\d+/);
+  return m ? m[0] : "—";
+}
+/* Credit rating, split on "/" so it can render as two stacked lines (grade / agency), same as the template. */
+function ratingLines(bond) {
+  const val = (bond.ratingInstrument || bond.ratingCompany || "").toUpperCase().trim();
+  if (!val) return ["—"];
+  return val.split("/").map((s) => s.trim()).filter(Boolean);
+}
+/* Offer amount in ล้านบาท (millions), trimmed of trailing zeros — "5", "10.5", "1.7" like the template. */
+function formatMillionsTrim(raw) {
+  if (raw === "" || raw === undefined || raw === null || isNaN(Number(raw))) return "—";
+  const m = Number(raw) / 1000000;
+  let s = m.toFixed(2);
+  if (s.indexOf(".") !== -1) s = s.replace(/0+$/, "").replace(/\.$/, "");
+  return s;
+}
+
+/* ---------------------------------------------------------------
+   "Export PDF" (Corporate BondOffer sheet) helpers
+---------------------------------------------------------------- */
+/* Standard TRIS / Fitch credit-rating scale, best (AAA) to worst, unrated last. */
+const RATING_ORDER = [
+  "AAA",
+  "AA+", "AA", "AA-",
+  "A+", "A", "A-",
+  "BBB+", "BBB", "BBB-",
+  "BB+", "BB", "BB-",
+  "B+", "B", "B-",
+  "C", "D",
+];
+/* Pull just the letter-grade token out of a rating string like
+   "-/TRIS,AAA(tha)/Fitch (Thailand)" or "AA-/TRIS" -> "AAA" / "AA-". */
+function ratingGrade(raw) {
+  if (!raw) return "";
+  const cleaned = raw.toUpperCase();
+  const m = cleaned.match(/A{1,3}[+-]?|BBB[+-]?|BB[+-]?|B[+-]?|C|D/);
+  return m ? m[0] : "";
+}
+/* Rank a bond for the "AAA down to unrated" sort: prefer the instrument
+   rating, fall back to the company rating, unrated bonds sort to the end. */
+function ratingRank(bond) {
+  const grade = ratingGrade(bond.ratingInstrument) || ratingGrade(bond.ratingCompany);
+  const idx = RATING_ORDER.indexOf(grade);
+  return idx === -1 ? RATING_ORDER.length : idx;
+}
+function sortBondsForOffer(bonds) {
+  return [...bonds].sort((a, b) => {
+    const r = ratingRank(a) - ratingRank(b);
+    if (r !== 0) return r;
+    return (a.code || "").localeCompare(b.code || "");
+  });
+}
+/* DD/MM/YYYY (Gregorian), matching the date style used in the Corporate BondOffer sheet. */
+function fmtDateDMY(d) {
+  if (!d) return "-";
+  const dt = new Date(d + "T00:00:00");
+  if (isNaN(dt.getTime())) return "-";
+  const dd = String(dt.getDate()).padStart(2, "0");
+  const mm = String(dt.getMonth() + 1).padStart(2, "0");
+  return `${dd}/${mm}/${dt.getFullYear()}`;
+}
+
+/* Thai font for jsPDF: the 14 built-in PDF fonts only cover Latin, so Thai text
+   needs an embedded TTF. Fetched once from a CORS-friendly CDN and cached as
+   base64 so re-exporting doesn't re-download it. This keeps the PDF a real,
+   searchable/selectable text document instead of a rasterized screenshot —
+   which is also why the file stays small (tens of KB instead of MBs). */
+const ThaiFontCache = { regular: null, bold: null };
+async function fetchFontBase64(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("font fetch failed: " + url);
+  const buf = await res.arrayBuffer();
+  const bytes = new Uint8Array(buf);
+  let binary = "";
+  const CHUNK = 0x8000;
+  for (let i = 0; i < bytes.length; i += CHUNK) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK));
+  }
+  return btoa(binary);
+}
+async function ensureThaiFont(pdf) {
+  if (!ThaiFontCache.regular || !ThaiFontCache.bold) {
+    const [regular, bold] = await Promise.all([
+      fetchFontBase64("https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/sarabun/Sarabun-Regular.ttf"),
+      fetchFontBase64("https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/sarabun/Sarabun-Bold.ttf"),
+    ]);
+    ThaiFontCache.regular = regular;
+    ThaiFontCache.bold = bold;
+  }
+  pdf.addFileToVFS("Sarabun-Regular.ttf", ThaiFontCache.regular);
+  pdf.addFont("Sarabun-Regular.ttf", "Sarabun", "normal");
+  pdf.addFileToVFS("Sarabun-Bold.ttf", ThaiFontCache.bold);
+  pdf.addFont("Sarabun-Bold.ttf", "Sarabun", "bold");
+  pdf.setFont("Sarabun", "normal");
+}
+
+/* Column layout for the offer-sheet table (portrait A4, ~547pt usable width). */
+const OFFER_PDF_COLUMNS = [
+  { header: "สัญลักษณ์", width: 42 },
+  { header: "อันดับ\n(บริษัท)", width: 39 },
+  { header: "อันดับ\n(ตราสาร)", width: 39 },
+  { header: "ระดับ\nความเสี่ยง", width: 27 },
+  { header: "ดอกเบี้ย\nหน้าตั๋ว(%)", width: 33 },
+  { header: "วันที่ออก", width: 42 },
+  { header: "วันครบ\nกำหนด", width: 42 },
+  { header: "อายุคง\nเหลือ(ปี)", width: 29 },
+  { header: "YTM(%)", width: 31 },
+  { header: "เสนอขาย\n(ลบ.)", width: 33 },
+  { header: "ขั้นต่ำ\n(ลบ.)", width: 33 },
+  { header: "บริษัทผู้ออก", width: 92 },
+  { header: "สิทธิ", width: 33 },
+  { header: "ประเภท\nนักลงทุน", width: 33 },
+];
+function offerBondToRow(b) {
+  return [
+    b.code || "-",
+    b.ratingCompany ? b.ratingCompany.toUpperCase() : "-",
+    b.ratingInstrument ? b.ratingInstrument.toUpperCase() : "-",
+    riskLevelNumber(b.riskLevel),
+    formatPct(b.couponRate),
+    fmtDateDMY(b.issueDate),
+    b.perpetual ? "PERP" : fmtDateDMY(b.maturityDate),
+    remainingYearsDisplay(b),
+    formatPct(b.ytmSell),
+    formatMillionsTrim(b.offerAmount),
+    formatMillionsTrim(b.minPurchase),
+    b.instrumentName || b.issuerName || "-",
+    b.rights || "-",
+    b.investorType || "-",
+  ];
+}
+/* Draws the gold banner (logo + title + date + indicative-quotation note) —
+   called on every page via autoTable's didDrawPage hook. */
+function drawOfferPDFHeader(pdf, dateStr) {
+  const pageW = pdf.internal.pageSize.getWidth();
+  const bx = 24, by = 24, bw = pageW - 48, bh = 60;
+  pdf.setFillColor(246, 239, 220);
+  pdf.roundedRect(bx, by, bw, bh, 6, 6, "F");
+  pdf.setFillColor(51, 39, 35);
+  pdf.roundedRect(bx + 9, by + 9, 42, 42, 8, 8, "F");
+  pdf.setDrawColor(233, 217, 174);
+  pdf.setLineWidth(1.6);
+  pdf.circle(bx + 30, by + 30, 9, "S");
+  pdf.setTextColor(51, 39, 35);
+  pdf.setFont("Sarabun", "bold");
+  pdf.setFontSize(12);
+  pdf.text("krungsri", bx + 60, by + 24);
+  pdf.setFont("Sarabun", "normal");
+  pdf.setFontSize(7.5);
+  pdf.text("SECURITIES", bx + 60, by + 37);
+  pdf.setFont("Sarabun", "bold");
+  pdf.setFontSize(16);
+  pdf.text("Corporate BondOffer", bx + bw - 12, by + 25, { align: "right" });
+  pdf.setFont("Sarabun", "normal");
+  pdf.setFontSize(10.5);
+  pdf.text(`วันที่ ${dateStr}`, bx + bw - 12, by + 42, { align: "right" });
+
+  pdf.setFontSize(6.6);
+  pdf.setTextColor(138, 122, 108);
+  const note = "ราคาที่แสดงเป็นเพียง Indicative Quotation (ราคาซื้อ) เท่านั้น ซึ่งราคาดังกล่าวอาจมีการเปลี่ยนแปลงไปตามความเคลื่อนไหวของราคาตลาด (Market Fluctuation) วันที่ทำรายการซื้อขาย (Trade) และวันที่ชำระราคา (Settlement) อาจแตกต่างกันไปในแต่ละตราสาร สามารถสอบถามข้อมูลเพิ่มเติมได้ที่ 0 2638 5641-43";
+  const lines = pdf.splitTextToSize(note, bw);
+  pdf.text(lines, bx, by + bh + 12);
 }
 
 /* ---------------------------------------------------------------
@@ -543,11 +728,295 @@ function SortableTh({ label, sortKey, activeKey, dir, onClick }) {
   );
 }
 
+/* ---------------------------------------------------------------
+   "Bond Daily Highlight" export-image template
+   Rendered off-screen and captured with html2canvas. Mirrors the
+   krungsri Securities "Bond Daily Highlight" flyer as closely as
+   possible, swapping in only the bonds flagged "highlight" and
+   today's date.
+---------------------------------------------------------------- */
+const PIC_W = 1040;
+
+function ExportHighlightImage({ bonds }, ref) {
+  const cols = [
+    { label: "หุ้นกู้", w: 230 },
+    { label: "ระดับ\nความเสี่ยง\nของตราสาร", w: 100 },
+    { label: "อัตรา\nผลตอบแทน\n(YTM)", w: 100 },
+    { label: "อัตรา\nดอกเบี้ย", w: 100 },
+    { label: "อันดับ\nเครดิต", w: 100 },
+    { label: "อายุ\nคงเหลือ\n(ปี)", w: 90 },
+    { label: "ประเภท\nนักลงทุน", w: 100 },
+    { label: "จำนวนที่\nเสนอขาย\n(ล้านบาท)", w: 120 },
+  ];
+
+  return (
+    <div
+      ref={ref}
+      style={{
+        width: PIC_W,
+        fontFamily: "Sarabun, sans-serif",
+        background: "linear-gradient(150deg, #F0A93A 0%, #F3B94A 35%, #F6CE72 65%, #FBE6B0 100%)",
+        padding: "34px 34px 0",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {/* decorative coin blobs */}
+      <div style={{ position: "absolute", top: -60, right: -40, width: 220, height: 220, borderRadius: "50%", background: "radial-gradient(circle at 35% 30%, #FFE9AE, #E8A227 70%)", opacity: 0.55 }} />
+      <div style={{ position: "absolute", bottom: 40, left: -70, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle at 35% 30%, #FFE9AE, #E8A227 70%)", opacity: 0.4 }} />
+
+      {/* header */}
+      <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: 18 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <div style={{
+            width: 74, height: 74, borderRadius: 14, flexShrink: 0,
+            background: "linear-gradient(160deg, #5B4A42, #332723)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <div style={{ width: 34, height: 34, borderRadius: "50%", border: "4px solid #E9D9AE" }} />
+          </div>
+          <div>
+            <div style={{ fontFamily: "Prompt, sans-serif", fontWeight: 700, fontSize: 22, color: "#332723", lineHeight: 1.15 }}>krungsri</div>
+            <div style={{ fontSize: 13, letterSpacing: 2, color: "#5B4A42" }}>Securities</div>
+          </div>
+        </div>
+        <div style={{ textAlign: "right", position: "relative" }}>
+          <div style={{
+            fontFamily: "Prompt, sans-serif", fontWeight: 700, fontSize: 44, letterSpacing: 4,
+            color: "#FFFFFF", textShadow: "0 3px 0 rgba(51,39,35,0.25)",
+          }}>
+            BOND DAILY
+          </div>
+          <div style={{
+            display: "inline-block", marginTop: -4, transform: "rotate(-3deg)",
+            background: "linear-gradient(120deg, #F98C6B, #F6B3A0)", color: "#fff",
+            fontFamily: "Prompt, sans-serif", fontWeight: 700, fontSize: 24, fontStyle: "italic",
+            padding: "4px 22px", borderRadius: 8, boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
+          }}>
+            Highlight
+          </div>
+        </div>
+      </div>
+
+      {/* card */}
+      <div style={{ position: "relative", background: "#FBF9F4", borderRadius: 22, padding: "0 26px 26px", boxShadow: "0 10px 30px rgba(51,39,35,0.18)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 0 }}>
+          <div style={{
+            transform: "translateY(-50%)", background: "#FFD400", color: "#332723",
+            fontFamily: "Prompt, sans-serif", fontWeight: 700, fontSize: 20,
+            padding: "12px 24px", borderRadius: 12, boxShadow: "0 4px 10px rgba(0,0,0,0.12)",
+          }}>
+            เสนอขาย (หุ้นกู้ตลาดรอง)
+          </div>
+          <div style={{
+            background: "#EDE7E2", color: "#332723", fontFamily: "Prompt, sans-serif", fontWeight: 700,
+            fontSize: 20, padding: "8px 22px", borderRadius: 999, marginTop: 14,
+          }}>
+            {thaiLongDate()}
+          </div>
+        </div>
+
+        <div style={{ marginTop: 18, borderRadius: 16, overflow: "hidden", border: "1px solid #E7DFCE" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ background: "#332723" }}>
+                {cols.map((c, i) => (
+                  <th key={i} style={{
+                    color: "#F6EFDC", fontFamily: "Prompt, sans-serif", fontWeight: 600, fontSize: 14,
+                    padding: "14px 8px", whiteSpace: "pre-line", lineHeight: 1.35, width: c.w,
+                    borderLeft: i === 0 ? "none" : "1px solid rgba(255,255,255,0.12)",
+                  }}>
+                    {c.label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {bonds.map((b, idx) => (
+                <tr key={b.id} style={{ background: idx % 2 ? "#FBF9F4" : "#FFFFFF", borderTop: idx === 0 ? "none" : "1px solid #E7DFCE" }}>
+                  <td style={{ padding: "16px 14px", textAlign: "left" }}>
+                    <div style={{ fontFamily: "Prompt, sans-serif", fontWeight: 700, fontSize: 17, color: "#332723", textTransform: "uppercase" }}>
+                      {b.code || "—"}
+                    </div>
+                    {b.issuerName && (
+                      <div style={{ fontSize: 13, color: "#5B4A42", marginTop: 2, lineHeight: 1.4 }}>{b.issuerName}</div>
+                    )}
+                    {b.rights && (
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "#B23B3B", marginTop: 2 }}>{b.rights}</div>
+                    )}
+                    {b.perpetual && (
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "#8F2D9E", marginTop: 2 }}>Perpetual Bond</div>
+                    )}
+                  </td>
+                  <td style={{ padding: "16px 8px", textAlign: "center", fontSize: 16, color: "#332723" }}>{riskLevelNumber(b.riskLevel)}</td>
+                  <td style={{ padding: "16px 8px", textAlign: "center" }}>
+                    <span style={{ background: "#FFD400", fontWeight: 700, fontSize: 17, color: "#332723", textDecoration: "underline", padding: "2px 6px", borderRadius: 3 }}>
+                      {formatPct(b.ytmSell)}
+                    </span>
+                  </td>
+                  <td style={{ padding: "16px 8px", textAlign: "center", fontSize: 16, color: "#332723" }}>{formatPct(b.couponRate)}</td>
+                  <td style={{ padding: "16px 8px", textAlign: "center", fontSize: 15, color: "#332723", lineHeight: 1.35 }}>
+                    {ratingLines(b).map((l, i) => <div key={i}>{l}</div>)}
+                  </td>
+                  <td style={{ padding: "16px 8px", textAlign: "center", fontSize: 16, fontWeight: 700, color: "#332723" }}>
+                    {remainingYearsDisplay(b)}
+                  </td>
+                  <td style={{ padding: "16px 8px", textAlign: "center", fontSize: 16, color: "#332723" }}>{b.investorType}</td>
+                  <td style={{ padding: "16px 8px", textAlign: "center", fontSize: 16, color: "#332723" }}>{formatMillionsTrim(b.offerAmount)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* footer */}
+      <div style={{ position: "relative", padding: "20px 34px 18px", fontSize: 12.5, color: "#332723", lineHeight: 1.85 }}>
+        <div style={{ fontFamily: "Prompt, sans-serif", fontWeight: 700, marginBottom: 4 }}>คำเตือน</div>
+        <div>• การลงทุนมีความเสี่ยง ผู้ลงทุนโปรดศึกษาลักษณะของหุ้นกู้ เงื่อนไขผลตอบแทนและความเสี่ยงจากหนังสือชี้ชวนก่อนของการตัดสินใจลงทุน</div>
+        <div>• ผลตอบแทนที่เสนอขายดังระบุข้างต้น เป็นอัตราผลตอบแทนอ้างอิง สำหรับใช้เป็นข้อมูลในการตัดสินใจของนักลงทุนเท่านั้น</div>
+        <div>• กรณีเสนอขายนักลงทุนรายใหญ่ (HNW) จะต้องเป็นไปตามคุณสมบัติที่ ก.ล.ต. กำหนด</div>
+        <div>• ข้อมูลข้างต้น บริษัทขอสงวนสิทธิในการเปลี่ยนแปลงโดยมิต้องแจ้งให้ทราบล่วงหน้า</div>
+        <div>• YTM = Yield To Maturity หรืออัตราผลตอบแทนที่ผู้ลงทุนจะได้รับในกรณีที่ผู้ลงทุนถือหุ้นกู้ตัวนั้น จนครบกำหนดอายุตราสาร</div>
+      </div>
+      <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, padding: "14px 0", background: "rgba(51,39,35,0.06)", fontFamily: "Prompt, sans-serif", fontWeight: 600, fontSize: 14, color: "#332723" }}>
+        <span>Krungsri Securities</span>
+        <span style={{ opacity: 0.5 }}>|</span>
+        <span>0 2638 5500, 0 2659 7777</span>
+      </div>
+    </div>
+  );
+}
+const ExportHighlightImageRF = React.forwardRef(ExportHighlightImage);
+
 function ListView({ bonds, onEdit, onDeleteReq, onExport, exporting, onToggleStatus }) {
   const [q, setQ] = useState("");
   const [expandedId, setExpandedId] = useState(null);
   const [sortKey, setSortKey] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
+  const [exportingPic, setExportingPic] = useState(false);
+  const picRef = useRef(null);
+  const [exportingPdf, setExportingPdf] = useState(false);
+
+  const highlightBonds = useMemo(() => bonds.filter((b) => b.highlight), [bonds]);
+
+  const handleExportPDF = async () => {
+    if (!bonds.length) {
+      alert("ยังไม่มีหุ้นกู้ในคลังสินค้า");
+      return;
+    }
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+      alert("ไม่สามารถโหลดไลบรารีสร้าง PDF ได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต");
+      return;
+    }
+    setExportingPdf(true);
+    try {
+      const sorted = sortBondsForOffer(bonds);
+      const dateStr = thaiLongDate(); // today's date, same "D MMMM YYYY" (พ.ศ.) style as the source sheet
+
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({ orientation: "portrait", unit: "pt", format: "a4" });
+      await ensureThaiFont(pdf); // embed Sarabun so Thai text is real, selectable text — not a screenshot
+      if (typeof pdf.autoTable !== "function") throw new Error("autotable plugin not loaded");
+
+      const HEADER_RESERVED = 148; // space at top of every page for the gold banner + note
+      pdf.autoTable({
+        head: [OFFER_PDF_COLUMNS.map((c) => c.header)],
+        body: sorted.map(offerBondToRow),
+        startY: HEADER_RESERVED,
+        margin: { top: HEADER_RESERVED, left: 24, right: 24, bottom: 34 },
+        styles: { font: "Sarabun", fontSize: 6.6, cellPadding: 3, valign: "middle", overflow: "linebreak", textColor: [51, 39, 35], lineColor: [230, 222, 210], lineWidth: 0.5 },
+        headStyles: { font: "Sarabun", fontStyle: "bold", fontSize: 6.6, fillColor: [51, 39, 35], textColor: [246, 239, 220], halign: "center", valign: "middle" },
+        alternateRowStyles: { fillColor: [251, 249, 244] },
+        columnStyles: OFFER_PDF_COLUMNS.reduce((acc, c, i) => {
+          acc[i] = { cellWidth: c.width, halign: i === 11 ? "left" : "center" };
+          return acc;
+        }, {}),
+        didParseCell: (data) => {
+          if (data.section !== "body") return;
+          if (data.column.index === 8) { // YTM(%) — highlight like the source sheet
+            data.cell.styles.fillColor = [255, 212, 0];
+            data.cell.styles.fontStyle = "bold";
+          }
+          if (data.column.index === 12 && data.cell.raw !== "-") { // สิทธิ (e.g. Call Option)
+            data.cell.styles.textColor = [176, 42, 42];
+            data.cell.styles.fontStyle = "bold";
+          }
+        },
+        didDrawPage: () => drawOfferPDFHeader(pdf, dateStr),
+      });
+
+      // disclaimer / contact notes page, same content the source sheet prints after the table
+      pdf.addPage();
+      pdf.setTextColor(51, 39, 35);
+      pdf.setFont("Sarabun", "bold");
+      pdf.setFontSize(12);
+      pdf.text("คำเตือน", 34, 50);
+      pdf.setFont("Sarabun", "normal");
+      pdf.setFontSize(9.5);
+      const bullets = [
+        "• ข้อมูลการเสนอขายนี้อาจมีการเปลี่ยนแปลงได้",
+        "• กรณีเสนอขายนักลงทุนรายใหญ่ (HNW) จะต้องเป็นไปตามคุณสมบัติที่ ก.ล.ต. กำหนด",
+        "• การลงทุนมีความเสี่ยง ผู้ลงทุนควรศึกษาข้อมูลก่อนตัดสินใจลงทุน โดยเฉพาะความเสี่ยงด้านเครดิตและสภาพคล่องของหลักทรัพย์",
+        "• สรุปข้อมูลสำคัญของตราสารหนี้ (factsheet) ที่ www.sec.or.th",
+      ];
+      let y = 72;
+      const pageW = pdf.internal.pageSize.getWidth();
+      bullets.forEach((line) => {
+        const wrapped = pdf.splitTextToSize(line, pageW - 68);
+        pdf.text(wrapped, 34, y);
+        y += wrapped.length * 13 + 4;
+      });
+      pdf.setFont("Sarabun", "bold");
+      pdf.setFontSize(9.5);
+      pdf.text("หากท่านสนใจลงทุน หรือต้องการสอบถามข้อมูลเพิ่มเติม โปรดติดต่อฝ่ายค้าตราสารหนี้ โทร. 0 2638 5641-43", 34, y + 8);
+
+      // page numbers, now that the total page count is known
+      const pageH = pdf.internal.pageSize.getHeight();
+      const totalPages = pdf.internal.getNumberOfPages();
+      for (let p = 1; p <= totalPages; p++) {
+        pdf.setPage(p);
+        pdf.setFont("Sarabun", "normal");
+        pdf.setFontSize(8);
+        pdf.setTextColor(138, 122, 108);
+        pdf.text(`Page ${p}`, pageW - 24, pageH - 16, { align: "right" });
+      }
+
+      pdf.save(`CorporateBondOffer_${todayISO()}.pdf`);
+    } catch (e) {
+      console.error(e);
+      alert("เกิดข้อผิดพลาดในการสร้าง PDF");
+    }
+    setExportingPdf(false);
+  };
+
+  const handleExportPic = async () => {
+    if (!highlightBonds.length) {
+      alert("ยังไม่มีหุ้นกู้ที่ติด Highlight — กรุณาติ๊ก Highlight ในรายการที่ต้องการก่อน");
+      return;
+    }
+    if (!window.html2canvas) {
+      alert("ไม่สามารถโหลดไลบรารีสร้างภาพได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต");
+      return;
+    }
+    setExportingPic(true);
+    try {
+      // let the off-screen template paint before snapshotting it
+      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+      const canvas = await window.html2canvas(picRef.current, { scale: 2, backgroundColor: "#ffffff", useCORS: true });
+      const url = canvas.toDataURL("image/png");
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `BondDailyHighlight_${todayISO()}.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (e) {
+      console.error(e);
+      alert("เกิดข้อผิดพลาดในการสร้างภาพ");
+    }
+    setExportingPic(false);
+  };
 
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
@@ -609,6 +1078,14 @@ function ListView({ bonds, onEdit, onDeleteReq, onExport, exporting, onToggleSta
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ fontSize: 12, color: C.textMute }}>ทั้งหมด {bonds.length} รายการ</span>
+          <Button variant="outline" onClick={handleExportPic} disabled={exportingPic}
+            style={{ borderColor: C.gold, color: C.goldDeep }}>
+            {exportingPic ? <IconLoader size={16} /> : <IconImage size={16} />} Export Pic
+          </Button>
+          <Button variant="outline" onClick={handleExportPDF} disabled={exportingPdf}
+            style={{ borderColor: C.brown, color: C.brown }}>
+            {exportingPdf ? <IconLoader size={16} /> : <IconDownload size={16} />} Export PDF
+          </Button>
           <Button variant="dark" onClick={onExport} disabled={exporting}>
             {exporting ? <IconLoader size={16} /> : <IconDownload size={16} />} Export Excel
           </Button>
@@ -692,6 +1169,11 @@ function ListView({ bonds, onEdit, onDeleteReq, onExport, exporting, onToggleSta
           </table>
         </div>
       )}
+
+      {/* off-screen "Bond Daily Highlight" template, captured by handleExportPic */}
+      <div style={{ position: "fixed", top: 0, left: -99999, zIndex: -1, pointerEvents: "none" }}>
+        <ExportHighlightImageRF ref={picRef} bonds={highlightBonds} />
+      </div>
     </div>
   );
 }
