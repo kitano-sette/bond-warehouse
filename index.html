@@ -509,6 +509,7 @@ if (SUPABASE_CONFIGURED) {
 }
 const BONDS_TABLE = "bonds";
 let BONDS = [];
+let _bondUidSeq = 0; // guarantees every card gets a unique DOM id, even when two bonds share the same "code" (same-name bonds)
 
 const cardsEl = document.getElementById('cards');
 const countEl = document.getElementById('countNum');
@@ -576,6 +577,7 @@ function whMinPurchaseDisplay(minPurchase){
 }
 function mapWarehouseBond(w){
   return {
+    _uid: 'bond' + (_bondUidSeq++), // unique per bond record — NOT the same as `code`, which can repeat for same-name bonds
     code: w.code || '',
     issuer: w.issuerName || '',
     investor: w.investorType || '',
@@ -823,44 +825,44 @@ function render(){
           <span class="amount-line">เสนอขาย <b>${b.amount}</b> ล้านบาท</span>
           <span class="amount-line">ซื้อขั้นต่ำ <b>${b.minPurchase}</b> บาท</span>
         </div>
-        <button class="buy-btn" data-code="${b.code}">สนใจซื้อ</button>
+        <button class="buy-btn" data-code="${b._uid}">สนใจซื้อ</button>
       </div>
 
-      <div class="buy-expand" id="expand-${b.code}">
+      <div class="buy-expand" id="expand-${b._uid}">
         <div class="type-select">
-          <button type="button" class="type-btn" data-type="existing" data-code="${b.code}">ลูกค้า บล. กรุงศรี</button>
-          <button type="button" class="type-btn" data-type="new" data-code="${b.code}">ลูกค้าใหม่</button>
+          <button type="button" class="type-btn" data-type="existing" data-code="${b._uid}">ลูกค้า บล. กรุงศรี</button>
+          <button type="button" class="type-btn" data-type="new" data-code="${b._uid}">ลูกค้าใหม่</button>
         </div>
 
-        <div class="login-box" id="login-${b.code}">
+        <div class="login-box" id="login-${b._uid}">
           <input type="text" class="buy-input" placeholder="ชื่อผู้ใช้งาน (Username)">
           <input type="password" class="buy-input" placeholder="รหัสผ่าน (Password)">
-          <button type="button" class="login-btn" data-code="${b.code}">Log in</button>
+          <button type="button" class="login-btn" data-code="${b._uid}">Log in</button>
         </div>
 
-        <div class="email-box" id="email-${b.code}">
-          <div class="email-notice" id="emailNotice-${b.code}">กรุณากรอกอีเมลให้ถูกต้อง</div>
-          <input type="email" class="buy-input email-input" data-code="${b.code}" pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\\.[A-Za-z]{2,}$" placeholder="กรอกอีเมลของท่าน">
+        <div class="email-box" id="email-${b._uid}">
+          <div class="email-notice" id="emailNotice-${b._uid}">กรุณากรอกอีเมลให้ถูกต้อง</div>
+          <input type="email" class="buy-input email-input" data-code="${b._uid}" pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\\.[A-Za-z]{2,}$" placeholder="กรอกอีเมลของท่าน">
         </div>
 
-        <div class="min-notice" id="minNotice-${b.code}">โปรดซื้อด้วยจำนวนขั้นต่ำ</div>
+        <div class="min-notice" id="minNotice-${b._uid}">โปรดซื้อด้วยจำนวนขั้นต่ำ</div>
         <div class="amount-fields">
           <div class="amount-wrap">
-            <input type="text" inputmode="numeric" class="buy-input amount-money" id="money-${b.code}" data-code="${b.code}" placeholder="จำนวนเงิน">
-            <span class="amount-suffix" id="moneySuffix-${b.code}">บาท</span>
+            <input type="text" inputmode="numeric" class="buy-input amount-money" id="money-${b._uid}" data-code="${b._uid}" placeholder="จำนวนเงิน">
+            <span class="amount-suffix" id="moneySuffix-${b._uid}">บาท</span>
           </div>
           <div class="amount-wrap">
-            <input type="text" inputmode="numeric" class="buy-input amount-unit" id="unit-${b.code}" data-code="${b.code}" placeholder="จำนวนหน่วย">
-            <span class="amount-suffix" id="unitSuffix-${b.code}">หน่วย</span>
+            <input type="text" inputmode="numeric" class="buy-input amount-unit" id="unit-${b._uid}" data-code="${b._uid}" placeholder="จำนวนหน่วย">
+            <span class="amount-suffix" id="unitSuffix-${b._uid}">หน่วย</span>
           </div>
         </div>
 
         <textarea class="buy-input comment-box" placeholder="Comment"></textarea>
 
-        <div class="min-notice" id="formNotice-${b.code}"></div>
-        <button type="button" class="submit-btn" data-code="${b.code}">ส่ง</button>
+        <div class="min-notice" id="formNotice-${b._uid}"></div>
+        <button type="button" class="submit-btn" data-code="${b._uid}">ส่ง</button>
 
-        <div class="thank-you-msg" id="thankyou-${b.code}">ขอบคุณที่สนใจลงทุน เราได้รับความต้องการจากท่านแล้ว จะรีบติดต่อท่านกลับโดยเร็วที่สุด</div>
+        <div class="thank-you-msg" id="thankyou-${b._uid}">ขอบคุณที่สนใจลงทุน เราได้รับความต้องการจากท่านแล้ว จะรีบติดต่อท่านกลับโดยเร็วที่สุด</div>
       </div>
     </div>
   `).join('');
@@ -1090,7 +1092,7 @@ cardsEl.addEventListener('blur', (e)=>{
   const kind = amountFieldKindFor(t);
   if(kind){
     const code = t.dataset.code;
-    const bond = BONDS.find(b=> b.code === code);
+    const bond = BONDS.find(b=> b._uid === code);
     if(!bond) return;
     const minMoney = Number(String(bond.minPurchase).replace(/[^\d]/g,'')) || 0;
     const minForThisField = kind.minAmount(minMoney);
