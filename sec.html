@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SEC Investor MVP</title>
+<style>
+:root{--bg:#f4f6f8;--card:#fff;--text:#17202a;--muted:#667085;--line:#e5e7eb;--accent:#111827}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:760px;margin:auto;padding:14px}.card{background:var(--card);border-radius:16px;padding:15px;margin-bottom:10px;box-shadow:0 2px 12px #0000000b}
+h1{font-size:21px;margin:0 0 4px}h2{font-size:17px;margin:0 0 10px}.muted{color:var(--muted);font-size:13px}
+.row{display:flex;gap:8px}.row>*{min-width:0;flex:1}
+input,button{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px;font-size:15px;background:white}
+button{background:var(--accent);color:white;border:0;font-weight:700;cursor:pointer}
+.tabs{display:flex;gap:6px;overflow:auto;margin:10px 0}.tabs button{width:auto;white-space:nowrap;background:#e9edf2;color:#17202a}.tabs button.active{background:#17202a;color:#fff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.metric{padding:12px;background:#f7f8fa;border-radius:12px}.metric span{font-size:12px;color:var(--muted)}.metric b{display:block;font-size:18px;margin-top:3px}
+table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:8px 4px;border-bottom:1px solid #eef0f2;text-align:right}th:first-child,td:first-child{text-align:left;max-width:180px;word-break:break-word}
+.badge{display:inline-block;border-radius:99px;padding:4px 8px;background:#eef2f6;font-size:12px}.err{color:#b42318}.ok{color:#067647}.hide{display:none}.scroll{overflow:auto}
+.bond{padding:12px;border:1px solid var(--line);border-radius:12px;margin:8px 0}.bond h3{font-size:14px;margin:0 0 6px}
+@media(min-width:600px){.wrap{padding:24px}.grid{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="card"><h1>SEC Investor MVP</h1><div class="muted">Company • Financial • Ratio • Bond • Rating</div></div>
+
+<div class="card">
+<h2>SEC API Key</h2>
+<input id="apiKey" type="password" placeholder="Ocp-Apim-Subscription-Key">
+<div class="muted" style="margin-top:6px">Prototype: key ใช้เฉพาะใน browser นี้ สำหรับ Production ควรย้ายไป Backend</div>
+</div>
+
+<div class="card">
+<h2>ค้นหาบริษัท</h2>
+<div class="row"><input id="symbol" value="KTB" placeholder="PTT, KTB, KBANK"><button onclick="searchCompany()">ค้นหา</button></div>
+<div id="msg" class="muted" style="margin-top:8px"></div>
+</div>
+
+<div id="dashboard" class="hide">
+<div class="card"><h2 id="company"></h2><div id="companyInfo" class="muted"></div></div>
+<div class="tabs">
+<button class="active" onclick="showTab('overview',this)">ภาพรวม</button>
+<button onclick="showTab('financial',this)">งบการเงิน</button>
+<button onclick="showTab('ratio',this)">Ratio</button>
+<button onclick="showTab('bond',this)">หุ้นกู้</button>
+</div>
+
+<section id="overview">
+<div class="grid">
+<div class="metric"><span>ROE*</span><b id="roe">-</b></div>
+<div class="metric"><span>Ratio*</span><b id="ratio1">-</b></div>
+<div class="metric"><span>Ratio*</span><b id="ratio2">-</b></div>
+<div class="metric"><span>Records</span><b id="records">-</b></div>
+</div>
+<div class="card" style="margin-top:10px"><h2>ข้อมูลล่าสุด</h2><div id="rawSummary" class="muted"></div></div>
+</section>
+
+<section id="financial" class="hide">
+<div class="card"><h2>Balance Sheet</h2><div id="bs" class="scroll"></div></div>
+<div class="card"><h2>Income Statement</h2><div id="is" class="scroll"></div></div>
+<div class="card"><h2>Cash Flow</h2><div id="cf" class="scroll"></div></div>
+</section>
+
+<section id="ratio" class="hide">
+<div class="card"><h2>Financial Ratio</h2><div class="muted">ยังไม่ตีความ set_code — แสดงค่าจาก SEC โดยตรง</div><div id="ratios" class="scroll" style="margin-top:8px"></div></div>
+</section>
+
+<section id="bond" class="hide">
+<div class="card"><h2>หุ้นกู้</h2><div id="bondMsg" class="muted">กำลังโหลดเมื่อเปิดหน้านี้...</div><div id="bondList"></div></div>
+</section>
+</div>
+</div>
+
+<script>
+const BASE="https://api.sec.or.th";
+let companyData=null, fsData=[], bondLoaded=false;
+
+function headers(){
+ const k=document.getElementById("apiKey").value.trim();
+ return {"Content-Type":"application/json","Cache-Control":"no-cache","Ocp-Apim-Subscription-Key":k};
+}
+async function api(path){
+ const r=await fetch(BASE+path,{headers:headers()});
+ if(!r.ok) throw new Error(r.status+" "+r.statusText);
+ return r.json();
+}
+function esc(v){return String(v??"").replace(/[&<>"']/g,x=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[x]));}
+function num(v){if(v===null||v===undefined||v==="")return "-";return typeof v==="number"?new Intl.NumberFormat("th-TH",{maximumFractionDigits:2}).format(v):esc(v);}
+function table(rows){
+ if(!rows.length)return '<div class="muted">ไม่มีข้อมูล</div>';
+ return `<table><thead><tr><th>set_code</th><th>ล่าสุด</th><th>ปีก่อน</th><th>2 ปีก่อน</th></tr></thead><tbody>`+
+ rows.map(x=>`<tr><td>${esc(x.set_code)}</td><td>${num(x.asof_year)}</td><td>${num(x.asof_yesteryear)}</td><td>${num(x.asof_year_before_yesteryear)}</td></tr>`).join("")+
+ "</tbody></table>";
+}
+function ratio(code){return fsData.find(x=>x.financial_statement==="financialRatio"&&x.set_code===code)?.asof_year??null;}
+function showTab(id,btn){
+ ["overview","financial","ratio","bond"].forEach(x=>document.getElementById(x).classList.toggle("hide",x!==id));
+ document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));btn.classList.add("active");
+ if(id==="bond"&&!bondLoaded) loadBonds();
+}
+async function searchCompany(){
+ const msg=document.getElementById("msg"); msg.textContent="กำลังโหลด...";
+ document.getElementById("dashboard").classList.add("hide");
+ try{
+  const sym=document.getElementById("symbol").value.trim().toUpperCase();
+  const list=await api("/v1/one-report/sbo/2021/info/T");
+  companyData=list.find(x=>(x.symbol||"").toUpperCase()===sym);
+  if(!companyData) throw new Error("ไม่พบ "+sym+" ในข้อมูลปี 2021");
+  fsData=await api(`/v1/one-report/fs/2021/financial_statement/${encodeURIComponent(companyData.unique_id)}`);
+  document.getElementById("company").textContent=`${companyData.symbol} — ${companyData.corp_name}`;
+  document.getElementById("companyInfo").textContent=`${companyData.business_type||""} • unique_id: ${companyData.unique_id}`;
+  document.getElementById("records").textContent=fsData.length;
+  document.getElementById("roe").textContent=num(ratio("710206"));
+  document.getElementById("ratio1").textContent=num(ratio("OP710202"));
+  document.getElementById("ratio2").textContent=num(ratio("OP710204"));
+  document.getElementById("bs").innerHTML=table(fsData.filter(x=>x.financial_statement==="balanceSheet"));
+  document.getElementById("is").innerHTML=table(fsData.filter(x=>x.financial_statement==="incomeStatement"));
+  document.getElementById("cf").innerHTML=table(fsData.filter(x=>x.financial_statement==="cashFlow"));
+  document.getElementById("ratios").innerHTML=table(fsData.filter(x=>x.financial_statement==="financialRatio"));
+  document.getElementById("rawSummary").innerHTML=`รายงานปี 2021 • อัปเดตล่าสุด ${esc(fsData[0]?.last_upd_date||"-")}<br><br><span class="badge">* ค่า Ratio แสดงตาม SEC set_code โดยยังไม่ตีความชื่อ</span>`;
+  bondLoaded=false;document.getElementById("bondList").innerHTML="";
+  msg.innerHTML='<span class="ok">✓ โหลดข้อมูลสำเร็จ</span>';
+  document.getElementById("dashboard").classList.remove("hide");
+ }catch(e){msg.innerHTML=`<span class="err">ผิดพลาด: ${esc(e.message)}</span>`;}
+}
+async function loadBonds(){
+ const box=document.getElementById("bondMsg");box.textContent="กำลังโหลดข้อมูลหุ้นกู้...";
+ try{
+  const [issuers,features,ratings,outstanding]=await Promise.all([
+   api("/v2/bond/issuers"),api("/v2/bond/features"),api("/v2/bond/credit-ratings"),api("/v2/bond/outstanding-values")
+  ]);
+  const companyId=(issuers.items||[]).find(x=>(x.company_name_th||"").includes(companyData.corp_name.split(" จำกัด")[0])||(x.company_name_en||"").toUpperCase().includes((companyData.symbol||"").toUpperCase()))?.company_id;
+  const involved=companyId;
+  let bonds=(features.items||[]);
+  if(companyId){
+   const ids=new Set((await api("/v2/bond/involve-parties")).items.filter(x=>String(x.company_id).trim()===String(companyId).trim()).map(x=>x.bond_id));
+   bonds=bonds.filter(x=>ids.has(x.bond_id)||String(x.company_id||"").trim()===String(companyId).trim());
+  }
+  if(!bonds.length){box.textContent="ไม่พบหุ้นกู้ที่เชื่อมโยงกับบริษัทจากข้อมูลที่โหลดได้";bondLoaded=true;return;}
+  const rmap=new Map((ratings.items||[]).map(x=>[x.bond_id,x.rating_code]));
+  const omap=new Map((outstanding.items||[]).map(x=>[x.bond_id,x.outstanding_value_mm_baht]));
+  document.getElementById("bondList").innerHTML=bonds.slice(0,50).map(b=>`<div class="bond">
+   <h3>${esc(b.bond_name_th||b.bond_name_en||b.bond_id)}</h3>
+   <div class="muted">Bond ID: ${esc(b.bond_id)}</div>
+   <div style="margin-top:6px">Coupon: <b>${esc(b.coupon?.rate??"-")}%</b> &nbsp; Rating: <b>${esc(rmap.get(b.bond_id)??"-")}</b></div>
+   <div style="margin-top:4px">ครบกำหนด: ${esc((b.maturity?.maturity_date||"").slice(0,10)||"-")} &nbsp; Outstanding: <b>${num(omap.get(b.bond_id))}</b> ล้านบาท</div>
+   <div style="margin-top:4px">${esc(b.secured_info?.name_th||"-")} • ${esc(b.offer_type?.name_th||"-")}</div>
+  </div>`).join("");
+  box.innerHTML=`<span class="ok">✓ พบ ${bonds.length} รายการ</span>`;
+  bondLoaded=true;
+ }catch(e){box.innerHTML=`<span class="err">โหลดหุ้นกู้ไม่ได้: ${esc(e.message)}</span>`;}
+}
+</script>
+</body>
+</html>
