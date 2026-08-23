@@ -433,7 +433,7 @@ function offerBondToRow(b) {
     b.code || "-",
     b.ratingCompany ? b.ratingCompany.toUpperCase() : "-",
     b.ratingInstrument ? b.ratingInstrument.toUpperCase() : "-",
-    String(riskLevelNumber(b.riskLevel) ?? "-"),
+    riskLevelNumber(b.riskLevel),
     formatPct(b.couponRate),
     fmtDateDMY(b.issueDate),
     b.perpetual ? "PERP" : fmtDateDMY(b.maturityDate),
@@ -1015,13 +1015,23 @@ function ListView({ bonds, onEdit, onDeleteReq, onExport, exporting, onToggleSta
     }
     setExportingPic(true);
     try {
-      // let the off-screen template paint before snapshotting it
+      // Wait for (1) any pending React commit to paint, and (2) the Prompt/Sarabun
+      // web fonts to finish loading — html2canvas reads computed styles immediately
+      // and won't wait for a late-loading font on its own, which can otherwise make
+      // an export look "stuck" on a previous render right after fresh data comes in.
+      if (document.fonts && document.fonts.ready) {
+        await document.fonts.ready;
+      }
       await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
       const canvas = await window.html2canvas(picRef.current, { scale: 2, backgroundColor: "#ffffff", useCORS: true });
       const url = canvas.toDataURL("image/png");
       const a = document.createElement("a");
       a.href = url;
-      a.download = `BondDailyHighlight_${todayISO()}.png`;
+      // Stamped with the time (not just the date) so exporting again the same day
+      // always saves as a distinct file instead of silently overwriting/being
+      // treated as "already downloaded" by the browser.
+      const stamp = `${todayISO()}_${new Date().toTimeString().slice(0, 8).replace(/:/g, "")}`;
+      a.download = `BondDailyHighlight_${stamp}.png`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -1196,7 +1206,7 @@ function ListView({ bonds, onEdit, onDeleteReq, onExport, exporting, onToggleSta
 
       {/* off-screen "Bond Daily Highlight" template, captured by handleExportPic */}
       <div style={{ position: "fixed", top: 0, left: -99999, zIndex: -1, pointerEvents: "none" }}>
-        <ExportHighlightImageRF ref={picRef} bonds={highlightBonds} />
+        <ExportHighlightImageRF key={highlightBonds.map((b) => b.id).join(",")} ref={picRef} bonds={highlightBonds} />
       </div>
     </div>
   );
