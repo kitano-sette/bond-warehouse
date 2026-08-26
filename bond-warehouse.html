@@ -101,6 +101,7 @@ function bondToRow(b) {
     purchased_from: b.purchasedFrom || [],
     comment: b.comment || "",
     updated_at: b.updatedAt || new Date().toISOString(),
+    created_at: b.createdAt || new Date().toISOString(),
   };
 }
 
@@ -130,6 +131,7 @@ function rowToBond(r) {
     purchasedFrom: Array.isArray(r.purchased_from) && r.purchased_from.length ? r.purchased_from : [emptyPurchaseRow()],
     comment: r.comment || "",
     updatedAt: r.updated_at || new Date().toISOString(),
+    createdAt: r.created_at || r.updated_at || new Date().toISOString(),
   };
 }
 
@@ -197,6 +199,7 @@ const emptyBond = () => ({
   purchasedFrom: [emptyPurchaseRow()],
   comment: "",
   updatedAt: new Date().toISOString(),
+  createdAt: new Date().toISOString(),
 });
 
 function remainingYearsRaw(maturityDate) {
@@ -229,6 +232,17 @@ function todayISO() {
   const m = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
+}
+
+// "New" badge: shown only for bonds that were newly added to the warehouse
+// (based on their original creation timestamp, which never changes when a
+// bond's other fields are later edited), for this many days after creation.
+const NEW_BADGE_DAYS = 3;
+function isNewBond(b) {
+  if (!b.createdAt) return false;
+  const created = new Date(b.createdAt).getTime();
+  if (isNaN(created)) return false;
+  return (Date.now() - created) < NEW_BADGE_DAYS * 24 * 60 * 60 * 1000;
 }
 
 function fmtDateTimeTH(iso) {
@@ -419,7 +433,7 @@ function offerBondToRow(b) {
     b.code || "-",
     b.ratingCompany ? b.ratingCompany.toUpperCase() : "-",
     b.ratingInstrument ? b.ratingInstrument.toUpperCase() : "-",
-    String(riskLevelNumber(b.riskLevel) ?? "-"),
+    riskLevelNumber(b.riskLevel),
     formatPct(b.couponRate),
     fmtDateDMY(b.issueDate),
     b.perpetual ? "PERP" : fmtDateDMY(b.maturityDate),
@@ -1001,13 +1015,23 @@ function ListView({ bonds, onEdit, onDeleteReq, onExport, exporting, onToggleSta
     }
     setExportingPic(true);
     try {
-      // let the off-screen template paint before snapshotting it
+      // Wait for (1) any pending React commit to paint, and (2) the Prompt/Sarabun
+      // web fonts to finish loading — html2canvas reads computed styles immediately
+      // and won't wait for a late-loading font on its own, which can otherwise make
+      // an export look "stuck" on a previous render right after fresh data comes in.
+      if (document.fonts && document.fonts.ready) {
+        await document.fonts.ready;
+      }
       await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
       const canvas = await window.html2canvas(picRef.current, { scale: 2, backgroundColor: "#ffffff", useCORS: true });
       const url = canvas.toDataURL("image/png");
       const a = document.createElement("a");
       a.href = url;
-      a.download = `BondDailyHighlight_${todayISO()}.png`;
+      // Stamped with the time (not just the date) so exporting again the same day
+      // always saves as a distinct file instead of silently overwriting/being
+      // treated as "already downloaded" by the browser.
+      const stamp = `${todayISO()}_${new Date().toTimeString().slice(0, 8).replace(/:/g, "")}`;
+      a.download = `BondDailyHighlight_${stamp}.png`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -1134,6 +1158,16 @@ function ListView({ bonds, onEdit, onDeleteReq, onExport, exporting, onToggleSta
                     >
                       <td style={{ padding: "0 4px 0 12px", width: 20 }}><IconChevron open={open} size={14} color={C.textMute} /></td>
                       <td style={{ padding: "12px 16px", fontWeight: 700, color: C.brown, whiteSpace: "nowrap" }}>
+                        {isNewBond(b) && (
+                          <React.Fragment>
+                            <span style={{
+                              display: "inline-block", fontSize: 10, fontWeight: 800, letterSpacing: 0.4, color: "#fff",
+                              background: `linear-gradient(100deg, ${C.accentFrom}, ${C.accentTo})`,
+                              padding: "1px 7px", borderRadius: 999,
+                            }}>NEW</span>
+                            <br />
+                          </React.Fragment>
+                        )}
                         <span style={{
                           display: "inline-block", width: 7, height: 7, borderRadius: 999, marginRight: 6,
                           background: faded ? C.textMute : C.ok,
@@ -1172,7 +1206,7 @@ function ListView({ bonds, onEdit, onDeleteReq, onExport, exporting, onToggleSta
 
       {/* off-screen "Bond Daily Highlight" template, captured by handleExportPic */}
       <div style={{ position: "fixed", top: 0, left: -99999, zIndex: -1, pointerEvents: "none" }}>
-        <ExportHighlightImageRF ref={picRef} bonds={highlightBonds} />
+        <ExportHighlightImageRF key={highlightBonds.map((b) => b.id).join(",")} ref={picRef} bonds={highlightBonds} />
       </div>
     </div>
   );
