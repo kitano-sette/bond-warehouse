@@ -198,7 +198,6 @@
   .card-head{display:flex; justify-content:space-between; gap:8px; align-items:flex-start;}
   .bond-name{font-weight:700; color:var(--brown); font-size:16px;}
   .bond-name .star{color:var(--gold); margin-right:4px;}
-  .cart-item-code .star{color:var(--gold); margin-right:4px;}
   .new-badge{
     display:block;
     width:fit-content;
@@ -292,21 +291,21 @@
     top:calc(16px + env(safe-area-inset-top,0px));
     right:16px;
     z-index:60;
-    width:50px; height:50px;
+    width:36px; height:36px;
     border-radius:999px;
     border:none;
     background:var(--brown);
-    box-shadow:0 8px 18px -6px rgba(0,0,0,0.4);
+    box-shadow:0 6px 14px -6px rgba(0,0,0,0.4);
     display:flex; align-items:center; justify-content:center;
     cursor:pointer;
   }
   .cart-fab svg{stroke:#fff;}
   .cart-fab-badge{
-    position:absolute; top:-4px; right:-4px;
-    min-width:20px; height:20px; padding:0 4px;
+    position:absolute; top:-3px; right:-3px;
+    min-width:16px; height:16px; padding:0 3px;
     border-radius:999px;
     background:var(--red);
-    color:#fff; font-size:11px; font-weight:800;
+    color:#fff; font-size:9.5px; font-weight:800;
     display:none; align-items:center; justify-content:center;
     box-shadow:0 0 0 2px var(--cream);
   }
@@ -342,27 +341,43 @@
   .cart-empty{
     text-align:center; padding:36px 16px; color:var(--ink-soft); font-size:13.5px;
   }
-  .cart-list{display:flex; flex-direction:column; gap:10px;}
-  .cart-item{
-    display:flex; align-items:center; gap:10px;
+  .card-in-cart{position:relative; padding-bottom:34px;}
+  .cart-remove-btn{
+    position:absolute; right:14px; bottom:14px;
+    background:#FBEAEA; border:1.5px solid #F3C6C6; cursor:pointer;
+    width:30px; height:30px; display:flex; align-items:center; justify-content:center;
+    border-radius:999px; color:var(--red);
+    box-shadow:0 3px 8px -3px rgba(138,20,20,0.35);
+    transition:transform .12s, background .15s;
+  }
+  .cart-remove-btn:active{transform:scale(0.92); background:var(--red); color:#fff; border-color:var(--red);}
+  .cart-buy-btn{width:100%; margin-top:16px;}
+
+  /* ---------- Cart checkout ---------- */
+  .checkout-header{display:flex; align-items:center; gap:8px; margin-bottom:14px;}
+  .checkout-back-btn{
+    background:none; border:none; cursor:pointer;
+    width:32px; height:32px; display:flex; align-items:center; justify-content:center;
+    border-radius:999px; color:var(--brown); flex:none;
+  }
+  .checkout-back-btn:active{background:var(--line);}
+  .checkout-list{display:flex; flex-direction:column; gap:14px;}
+  .checkout-item{
     background:var(--paper);
     border:1px solid var(--line);
     border-radius:14px;
-    padding:10px 12px;
+    padding:12px;
   }
-  .cart-item-info{flex:1; min-width:0;}
-  .cart-item-code{font-weight:700; color:var(--brown); font-size:14px;}
-  .cart-item-issuer{font-size:11.5px; color:var(--ink-soft); margin-top:1px; line-height:1.3;}
-  .cart-item-ytm{font-size:11.5px; color:var(--gold); font-weight:700; margin-top:2px;}
-  .cart-item-remove{
-    flex:none;
-    width:34px; height:34px; border-radius:999px;
-    border:1px solid var(--line);
-    background:#FBF8F1;
-    display:flex; align-items:center; justify-content:center;
-    cursor:pointer; color:var(--red);
+  .checkout-item-min{font-size:11px; color:var(--ink-soft); margin:2px 0 10px;}
+  .checkout-item-min b{color:var(--ink);}
+  .checkout-submit-btn{
+    width:100%; margin-top:4px;
+    background:var(--maroon); color:#fff; border:none;
+    padding:11px; border-radius:9px;
+    font-family:inherit; font-weight:700; font-size:13.5px;
+    cursor:pointer;
   }
-  .cart-item-remove:active{transform:scale(0.92);}
+  .checkout-submit-btn:hover{background:#5a2529;}
 
   .empty-state{
     text-align:center; padding:40px 16px; color:var(--ink-soft); font-size:13.5px;
@@ -484,10 +499,19 @@
 </head>
 <body>
 
-  <button class="cart-fab" id="cartFab" type="button" aria-label="ตะกร้าหุ้นกู้ที่สนใจ">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-    <span class="cart-fab-badge" id="cartFabBadge">0</span>
-  </button>
+  <div class="hero">
+    <button class="cart-fab" id="cartFab" type="button" aria-label="ตะกร้าหุ้นกู้ที่สนใจ">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+      <span class="cart-fab-badge" id="cartFabBadge">0</span>
+    </button>
+    <div class="coin c1"></div>
+    <div class="coin c2"></div>
+    <div class="coin c3"></div>
+    <div class="title-block">
+      <h1 class="title-main">BOND SCREENER</h1>
+      <div class="title-byline">By Kitthanabhumi</div>
+    </div>
+  </div>
 
   <div class="cart-overlay" id="cartOverlay">
     <div class="cart-panel">
@@ -498,16 +522,6 @@
         </button>
       </div>
       <div id="cartListWrap"></div>
-    </div>
-  </div>
-
-  <div class="hero">
-    <div class="coin c1"></div>
-    <div class="coin c2"></div>
-    <div class="coin c3"></div>
-    <div class="title-block">
-      <h1 class="title-main">BOND SCREENER</h1>
-      <div class="title-byline">By Kitthanabhumi</div>
     </div>
   </div>
 
@@ -693,18 +707,81 @@ function renderCartPanel(){
     wrap.innerHTML = `<div class="cart-empty">ยังไม่มีหุ้นกู้ในตะกร้า</div>`;
     return;
   }
-  wrap.innerHTML = `<div class="cart-list">${items.map(b=>`
-    <div class="cart-item">
-      <div class="cart-item-info">
-        <div class="cart-item-code">${b.highlight ? '<span class="star">★</span>' : ''}${b.code}</div>
-        <div class="cart-item-issuer">${b.issuer}</div>
-        <div class="cart-item-ytm">YTM ${b.ytm.toFixed(2)}%</div>
-      </div>
-      <button class="cart-item-remove" data-id="${b._id}" aria-label="นำออกจากตะกร้า">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+  // Render the same full card as the main list, but with the per-card
+  // "ตะกร้า" / "สนใจซื้อ" buttons hidden (a small × replaces them for
+  // removing that item from the cart) — the drawer instead shows one
+  // shared "สนใจซื้อ" button below the whole list, which opens the
+  // checkout summary (renderCartCheckout) for every item in the cart.
+  wrap.innerHTML = `
+    <div class="cards">${items.map(b=> bondCardHTML(b, b._uid + '_cart', { showActions:false })).join('')}</div>
+    <button type="button" class="buy-btn cart-buy-btn" id="cartBuyBtn">สนใจซื้อ</button>
+  `;
+}
+
+// Checkout summary: one screen listing every bond in the cart, each with
+// its own "จำนวนเงิน" / "จำนวนหน่วย" amount fields and a message box, plus
+// a single "ส่ง" button at the bottom that submits all of them together.
+function renderCartCheckout(){
+  const wrap = document.getElementById('cartListWrap');
+  if(!wrap) return;
+  const items = BONDS.filter(b=> cartIds.includes(b._id));
+  if(items.length === 0){ renderCartPanel(); return; }
+
+  wrap.innerHTML = `
+    <div class="checkout-header">
+      <button type="button" class="checkout-back-btn" id="checkoutBackBtn" aria-label="ย้อนกลับ">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
       </button>
+      <div class="cart-panel-title">สรุปคำสั่งซื้อ</div>
     </div>
-  `).join('')}</div>`;
+    <div class="checkout-list">
+      ${items.map(b=>{
+        const code = `${b._uid}_checkout`;
+        return `
+        <div class="checkout-item">
+          <div class="cart-item-code">${b.highlight ? '<span class="star">★</span>' : ''}${b.code}</div>
+          <div class="checkout-item-min">YTM <b>${b.ytm.toFixed(2)}%</b> · อายุคงเหลือ <b>${b.life}</b> ปี · ซื้อขั้นต่ำ <b>${b.minPurchase}</b> บาท</div>
+
+          <div class="min-notice" id="minNotice-${code}">โปรดซื้อด้วยจำนวนขั้นต่ำ</div>
+          <div class="amount-fields">
+            <div class="amount-wrap">
+              <input type="text" inputmode="numeric" class="buy-input amount-money" id="money-${code}" data-code="${code}" placeholder="จำนวนเงิน">
+              <span class="amount-suffix" id="moneySuffix-${code}">บาท</span>
+            </div>
+            <div class="amount-wrap">
+              <input type="text" inputmode="numeric" class="buy-input amount-unit" id="unit-${code}" data-code="${code}" placeholder="จำนวนหน่วย">
+              <span class="amount-suffix" id="unitSuffix-${code}">หน่วย</span>
+            </div>
+          </div>
+
+          <div class="min-notice" id="itemNotice-${code}">กรุณากรอกจำนวนเงินหรือจำนวนหน่วย</div>
+        </div>
+        `;
+      }).join('')}
+    </div>
+
+    <textarea class="buy-input comment-box" id="comment-checkoutGlobal" placeholder="ข้อความเพิ่มเติม (ถ้ามี)" style="margin-top:14px;"></textarea>
+
+    <div class="type-select">
+      <button type="button" class="type-btn" data-type="existing" data-code="checkoutGlobal">ลูกค้า บล. กรุงศรี</button>
+      <button type="button" class="type-btn" data-type="new" data-code="checkoutGlobal">ลูกค้าใหม่</button>
+    </div>
+
+    <div class="login-box" id="login-checkoutGlobal">
+      <input type="text" class="buy-input" placeholder="ชื่อผู้ใช้งาน (Username)">
+      <input type="password" class="buy-input" placeholder="รหัสผ่าน (Password)">
+      <button type="button" class="login-btn" data-code="checkoutGlobal">Log in</button>
+    </div>
+
+    <div class="email-box" id="email-checkoutGlobal">
+      <div class="email-notice" id="emailNotice-checkoutGlobal">กรุณากรอกอีเมลให้ถูกต้อง</div>
+      <input type="email" class="buy-input email-input" data-code="checkoutGlobal" pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\\.[A-Za-z]{2,}$" placeholder="กรอกอีเมลของท่าน">
+    </div>
+
+    <div class="min-notice" id="formNotice-checkoutGlobal"></div>
+    <button type="button" class="checkout-submit-btn" id="checkoutSubmitBtn">ส่ง</button>
+    <div class="thank-you-msg" id="checkoutThankYou">ขอบคุณที่สนใจลงทุน เราได้รับความต้องการจากท่านแล้ว จะรีบติดต่อท่านกลับโดยเร็วที่สุด</div>
+  `;
 }
 
 // หลังเลือกตัวกรองเหล่านี้แล้ว ให้แสดงข้อความหัวข้อกำกับ เช่น "เครดิต(ตราสาร): AAA"
@@ -989,8 +1066,22 @@ function render(){
     return;
   }
 
-  cardsEl.innerHTML = filtered.map(b=>`
-    <div class="card">
+  cardsEl.innerHTML = filtered.map(b=> bondCardHTML(b, b._uid)).join('');
+}
+
+// Renders one full bond card. instanceCode uniquifies every DOM id/data-code
+// inside the card so the exact same bond can be rendered twice on the page
+// at once (once in the main list, once inside the cart drawer) without id
+// collisions — instanceCode is `${b._uid}` in the main list and
+// `${b._uid}_cart` inside the cart drawer.
+// opts.showActions (default true) controls whether the per-card "ตะกร้า" /
+// "สนใจซื้อ" buttons and the interest-form panel are rendered — the cart
+// drawer renders cards with showActions:false since it shows one shared
+// "สนใจซื้อ" button for the whole drawer instead (see renderCartPanel()).
+function bondCardHTML(b, instanceCode, opts){
+  const showActions = !opts || opts.showActions !== false;
+  return `
+    <div class="card${showActions ? '' : ' card-in-cart'}">
       <div class="card-head">
         <div>
           <div class="bond-name">${isNewBond(b) ? '<span class="new-badge">NEW</span>' : ''}${b.highlight ? '<span class="star">★</span>' : ''}${b.code}</div>
@@ -1035,50 +1126,59 @@ function render(){
           <span class="amount-line">เสนอขาย <b>${b.amount}</b> ล้านบาท</span>
           <span class="amount-line">ซื้อขั้นต่ำ <b>${b.minPurchase}</b> บาท</span>
         </div>
+        ${showActions ? `
         <button class="cart-toggle-btn${isInCart(b._id) ? ' in-cart' : ''}" data-id="${b._id}" aria-label="เพิ่มลงตะกร้า">
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
         </button>
-        <button class="buy-btn" data-code="${b._uid}">สนใจซื้อ</button>
+        <button class="buy-btn" data-code="${instanceCode}">สนใจซื้อ</button>
+        ` : ''}
       </div>
 
-      <div class="buy-expand" id="expand-${b._uid}">
+      ${showActions ? `
+      <div class="buy-expand" id="expand-${instanceCode}">
         <div class="type-select">
-          <button type="button" class="type-btn" data-type="existing" data-code="${b._uid}">ลูกค้า บล. กรุงศรี</button>
-          <button type="button" class="type-btn" data-type="new" data-code="${b._uid}">ลูกค้าใหม่</button>
+          <button type="button" class="type-btn" data-type="existing" data-code="${instanceCode}">ลูกค้า บล. กรุงศรี</button>
+          <button type="button" class="type-btn" data-type="new" data-code="${instanceCode}">ลูกค้าใหม่</button>
         </div>
 
-        <div class="login-box" id="login-${b._uid}">
+        <div class="login-box" id="login-${instanceCode}">
           <input type="text" class="buy-input" placeholder="ชื่อผู้ใช้งาน (Username)">
           <input type="password" class="buy-input" placeholder="รหัสผ่าน (Password)">
-          <button type="button" class="login-btn" data-code="${b._uid}">Log in</button>
+          <button type="button" class="login-btn" data-code="${instanceCode}">Log in</button>
         </div>
 
-        <div class="email-box" id="email-${b._uid}">
-          <div class="email-notice" id="emailNotice-${b._uid}">กรุณากรอกอีเมลให้ถูกต้อง</div>
-          <input type="email" class="buy-input email-input" data-code="${b._uid}" pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\\.[A-Za-z]{2,}$" placeholder="กรอกอีเมลของท่าน">
+        <div class="email-box" id="email-${instanceCode}">
+          <div class="email-notice" id="emailNotice-${instanceCode}">กรุณากรอกอีเมลให้ถูกต้อง</div>
+          <input type="email" class="buy-input email-input" data-code="${instanceCode}" pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\\.[A-Za-z]{2,}$" placeholder="กรอกอีเมลของท่าน">
         </div>
 
-        <div class="min-notice" id="minNotice-${b._uid}">โปรดซื้อด้วยจำนวนขั้นต่ำ</div>
+        <div class="min-notice" id="minNotice-${instanceCode}">โปรดซื้อด้วยจำนวนขั้นต่ำ</div>
         <div class="amount-fields">
           <div class="amount-wrap">
-            <input type="text" inputmode="numeric" class="buy-input amount-money" id="money-${b._uid}" data-code="${b._uid}" placeholder="จำนวนเงิน">
-            <span class="amount-suffix" id="moneySuffix-${b._uid}">บาท</span>
+            <input type="text" inputmode="numeric" class="buy-input amount-money" id="money-${instanceCode}" data-code="${instanceCode}" placeholder="จำนวนเงิน">
+            <span class="amount-suffix" id="moneySuffix-${instanceCode}">บาท</span>
           </div>
           <div class="amount-wrap">
-            <input type="text" inputmode="numeric" class="buy-input amount-unit" id="unit-${b._uid}" data-code="${b._uid}" placeholder="จำนวนหน่วย">
-            <span class="amount-suffix" id="unitSuffix-${b._uid}">หน่วย</span>
+            <input type="text" inputmode="numeric" class="buy-input amount-unit" id="unit-${instanceCode}" data-code="${instanceCode}" placeholder="จำนวนหน่วย">
+            <span class="amount-suffix" id="unitSuffix-${instanceCode}">หน่วย</span>
           </div>
         </div>
 
         <textarea class="buy-input comment-box" placeholder="Comment"></textarea>
 
-        <div class="min-notice" id="formNotice-${b._uid}"></div>
-        <button type="button" class="submit-btn" data-code="${b._uid}">ส่ง</button>
+        <div class="min-notice" id="formNotice-${instanceCode}"></div>
+        <button type="button" class="submit-btn" data-code="${instanceCode}">ส่ง</button>
 
-        <div class="thank-you-msg" id="thankyou-${b._uid}">ขอบคุณที่สนใจลงทุน เราได้รับความต้องการจากท่านแล้ว จะรีบติดต่อท่านกลับโดยเร็วที่สุด</div>
+        <div class="thank-you-msg" id="thankyou-${instanceCode}">ขอบคุณที่สนใจลงทุน เราได้รับความต้องการจากท่านแล้ว จะรีบติดต่อท่านกลับโดยเร็วที่สุด</div>
       </div>
+      ` : ''}
+      ${!showActions ? `
+      <button type="button" class="cart-remove-btn" data-id="${b._id}" aria-label="นำออกจากตะกร้า">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+      ` : ''}
     </div>
-  `).join('');
+  `;
 }
 
 function updateDatePill(){
@@ -1137,17 +1237,107 @@ function validateEmailField(code, forceShowEmpty){
   return false;
 }
 
-cardsEl.addEventListener('click', (e)=>{
-  // Add/remove this bond from the cart (ตะกร้า)
+document.addEventListener('click', (e)=>{
+  // Add/remove this bond from the cart (ตะกร้า) — works from a card shown
+  // in the main list OR from the same card shown inside the cart drawer.
   const cartBtn = e.target.closest('.cart-toggle-btn');
   if(cartBtn){
     const id = cartBtn.dataset.id;
     if(id){
       if(isInCart(id)) removeFromCart(id); else addToCart(id);
-      cartBtn.classList.toggle('in-cart', isInCart(id));
+      // Sync every instance of this bond's toggle button on the page
+      // (it can appear both in the main list and in the cart drawer at once).
+      document.querySelectorAll(`.cart-toggle-btn[data-id="${CSS.escape(id)}"]`).forEach(btn=>{
+        btn.classList.toggle('in-cart', isInCart(id));
+      });
       updateCartFabBadge();
-      if(document.getElementById('cartOverlay').classList.contains('open')) renderCartPanel();
+      if(cartOverlayEl.classList.contains('open')) renderCartPanel();
     }
+    return;
+  }
+
+  // Remove one item from the cart while viewing the cart drawer (the
+  // small × shown in place of the hidden "ตะกร้า"/"สนใจซื้อ" buttons there)
+  const cartRemoveBtn = e.target.closest('.cart-remove-btn');
+  if(cartRemoveBtn){
+    const id = cartRemoveBtn.dataset.id;
+    if(id){
+      removeFromCart(id);
+      document.querySelectorAll(`.cart-toggle-btn[data-id="${CSS.escape(id)}"]`).forEach(btn=>{
+        btn.classList.remove('in-cart');
+      });
+      updateCartFabBadge();
+      renderCartPanel();
+    }
+    return;
+  }
+
+  // Open the checkout summary (one screen listing every cart item)
+  const cartBuyBtn = e.target.closest('#cartBuyBtn');
+  if(cartBuyBtn){
+    renderCartCheckout();
+    return;
+  }
+
+  // Back from the checkout summary to the cart drawer's card list
+  const checkoutBackBtn = e.target.closest('#checkoutBackBtn');
+  if(checkoutBackBtn){
+    renderCartPanel();
+    return;
+  }
+
+  // Submit the checkout summary — every cart item must have either
+  // "จำนวนเงิน" or "จำนวนหน่วย" filled in before it goes through.
+  const checkoutSubmitBtn = e.target.closest('#checkoutSubmitBtn');
+  if(checkoutSubmitBtn){
+    const items = BONDS.filter(b=> cartIds.includes(b._id));
+    const globalNotice = document.getElementById('formNotice-checkoutGlobal');
+    let firstInvalid = null;
+    items.forEach(b=>{
+      const code = `${b._uid}_checkout`;
+      const moneyField = document.getElementById(`money-${code}`);
+      const unitField = document.getElementById(`unit-${code}`);
+      const itemNotice = document.getElementById(`itemNotice-${code}`);
+      const hasAmount = (moneyField && moneyField.value.trim() !== '') || (unitField && unitField.value.trim() !== '');
+      if(itemNotice) itemNotice.classList.toggle('show', !hasAmount);
+      if(!hasAmount && !firstInvalid) firstInvalid = itemNotice;
+    });
+    if(firstInvalid){
+      if(globalNotice) globalNotice.classList.remove('show');
+      requestAnimationFrame(()=> ensureVisible(firstInvalid));
+      return;
+    }
+
+    // ต้องเลือกประเภทลูกค้าก่อน ("ลูกค้า บล. กรุงศรี" หรือ "ลูกค้าใหม่") ปุ่ม "ส่ง" กดไม่ผ่านถ้ายังไม่เลือก
+    const typeSelect = document.querySelector('#cartListWrap .type-select');
+    const typeChosen = typeSelect && typeSelect.querySelector('.type-btn.active');
+    if(!typeChosen){
+      if(globalNotice){
+        globalNotice.textContent = 'กรุณาเลือกประเภทลูกค้าก่อนส่งคำขอ';
+        globalNotice.classList.add('show');
+      }
+      requestAnimationFrame(()=> ensureVisible(typeSelect));
+      return;
+    }
+
+    if(globalNotice) globalNotice.classList.remove('show');
+
+    // Validate email (only when the "ลูกค้าใหม่" email box is the active one)
+    const emailBox = document.getElementById('email-checkoutGlobal');
+    if(emailBox && emailBox.classList.contains('show')){
+      if(!validateEmailField('checkoutGlobal', true)) return;
+    }
+
+    const list = document.querySelector('#cartListWrap .checkout-list');
+    const commentBox = document.getElementById('comment-checkoutGlobal');
+    const submitBtn = document.getElementById('checkoutSubmitBtn');
+    const thankYou = document.getElementById('checkoutThankYou');
+    if(list) list.style.display = 'none';
+    if(commentBox) commentBox.style.display = 'none';
+    if(typeSelect) typeSelect.style.display = 'none';
+    document.querySelectorAll('#cartListWrap .login-box, #cartListWrap .email-box').forEach(el=> el.style.display = 'none');
+    if(submitBtn) submitBtn.style.display = 'none';
+    if(thankYou) thankYou.classList.add('show');
     return;
   }
 
@@ -1158,7 +1348,7 @@ cardsEl.addEventListener('click', (e)=>{
     const panel = document.getElementById(`expand-${code}`);
     if(panel){
       const wasOpen = panel.classList.contains('open');
-      cardsEl.querySelectorAll('.buy-expand.open').forEach(p=>{
+      document.querySelectorAll('.buy-expand.open').forEach(p=>{
         if(p !== panel) p.classList.remove('open');
       });
       panel.classList.toggle('open', !wasOpen);
@@ -1274,7 +1464,7 @@ function amountFieldKindFor(el){
   return null;
 }
 
-cardsEl.addEventListener('input', (e)=>{
+document.addEventListener('input', (e)=>{
   if(e.target.classList.contains('email-input')){
     // ล้างสถานะ error ทันทีที่แก้ไข ถ้าค่าถูกต้องแล้วให้ซ่อนข้อความเตือนไปเลย
     const code = e.target.dataset.code;
@@ -1305,7 +1495,7 @@ cardsEl.addEventListener('input', (e)=>{
 // Enforce ซื้อขั้นต่ำ (minimum purchase) once the user leaves the field.
 // - "จำนวนเงิน" must be >= ซื้อขั้นต่ำ (บาท)
 // - "จำนวนหน่วย" must be >= ซื้อขั้นต่ำ / 1,000 (หน่วย)
-cardsEl.addEventListener('blur', (e)=>{
+document.addEventListener('blur', (e)=>{
   const t = e.target;
   if(!t.classList) return;
 
@@ -1318,7 +1508,11 @@ cardsEl.addEventListener('blur', (e)=>{
   const kind = amountFieldKindFor(t);
   if(kind){
     const code = t.dataset.code;
-    const bond = BONDS.find(b=> b._uid === code);
+    // instanceCode carries a "_cart" or "_checkout" suffix when this field
+    // is inside the cart drawer / checkout summary's copy of the card —
+    // strip it to find the real bond.
+    const realUid = code.replace(/_cart$/, '').replace(/_checkout$/, '');
+    const bond = BONDS.find(b=> b._uid === realUid);
     if(!bond) return;
     const minMoney = Number(String(bond.minPurchase).replace(/[^\d]/g,'')) || 0;
     const minForThisField = kind.minAmount(minMoney);
@@ -1352,17 +1546,6 @@ document.getElementById('cartCloseBtn').addEventListener('click', ()=>{
 cartOverlayEl.addEventListener('click', (e)=>{
   // Clicking the dark backdrop (not the panel itself) closes the cart
   if(e.target === cartOverlayEl) cartOverlayEl.classList.remove('open');
-});
-document.getElementById('cartListWrap').addEventListener('click', (e)=>{
-  const removeBtn = e.target.closest('.cart-item-remove');
-  if(!removeBtn) return;
-  const id = removeBtn.dataset.id;
-  removeFromCart(id);
-  updateCartFabBadge();
-  renderCartPanel();
-  // Keep the "in-cart" highlight on the matching card button in sync, if visible
-  const cardBtn = cardsEl.querySelector(`.cart-toggle-btn[data-id="${CSS.escape(id)}"]`);
-  if(cardBtn) cardBtn.classList.remove('in-cart');
 });
 updateCartFabBadge();
 
