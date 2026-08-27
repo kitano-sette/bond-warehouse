@@ -102,6 +102,7 @@ function bondToRow(b) {
     comment: b.comment || "",
     updated_at: b.updatedAt || new Date().toISOString(),
     created_at: b.createdAt || new Date().toISOString(),
+    added_via_app: b.addedViaApp === true,
   };
 }
 
@@ -132,6 +133,7 @@ function rowToBond(r) {
     comment: r.comment || "",
     updatedAt: r.updated_at || new Date().toISOString(),
     createdAt: r.created_at || r.updated_at || new Date().toISOString(),
+    addedViaApp: !!r.added_via_app,
   };
 }
 
@@ -200,6 +202,7 @@ const emptyBond = () => ({
   comment: "",
   updatedAt: new Date().toISOString(),
   createdAt: new Date().toISOString(),
+  addedViaApp: true,
 });
 
 function remainingYearsRaw(maturityDate) {
@@ -234,11 +237,13 @@ function todayISO() {
   return `${y}-${m}-${day}`;
 }
 
-// "New" badge: shown only for bonds that were newly added to the warehouse
-// (based on their original creation timestamp, which never changes when a
-// bond's other fields are later edited), for this many days after creation.
+// "New" badge: shown only for bonds newly added through this app's own
+// "เพิ่มหุ้นกู้" button (b.addedViaApp) — NOT for bonds that arrived by
+// uploading/editing rows directly in the Supabase table — for this many
+// days after creation.
 const NEW_BADGE_DAYS = 3;
 function isNewBond(b) {
+  if (!b.addedViaApp) return false;
   if (!b.createdAt) return false;
   const created = new Date(b.createdAt).getTime();
   if (isNaN(created)) return false;

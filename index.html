@@ -198,6 +198,7 @@
   .card-head{display:flex; justify-content:space-between; gap:8px; align-items:flex-start;}
   .bond-name{font-weight:700; color:var(--brown); font-size:16px;}
   .bond-name .star{color:var(--gold); margin-right:4px;}
+  .cart-item-code .star{color:var(--gold); margin-right:4px;}
   .new-badge{
     display:block;
     width:fit-content;
@@ -266,6 +267,102 @@
     transition:transform .12s;
   }
   .buy-btn:active{transform:scale(0.96);}
+
+  /* ---------- Cart (basket) ---------- */
+  .cart-toggle-btn{
+    flex:none;
+    display:flex; align-items:center; justify-content:center;
+    width:42px; height:42px;
+    border-radius:999px;
+    border:1.5px solid var(--line);
+    background:#FBF8F1;
+    cursor:pointer;
+    transition:transform .12s, background .15s, border-color .15s;
+  }
+  .cart-toggle-btn svg{stroke:var(--brown);}
+  .cart-toggle-btn:active{transform:scale(0.92);}
+  .cart-toggle-btn.in-cart{
+    background:linear-gradient(120deg,var(--amber1),var(--amber2));
+    border-color:transparent;
+  }
+  .cart-toggle-btn.in-cart svg{stroke:#fff;}
+
+  .cart-fab{
+    position:fixed;
+    top:calc(16px + env(safe-area-inset-top,0px));
+    right:16px;
+    z-index:60;
+    width:50px; height:50px;
+    border-radius:999px;
+    border:none;
+    background:var(--brown);
+    box-shadow:0 8px 18px -6px rgba(0,0,0,0.4);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+  }
+  .cart-fab svg{stroke:#fff;}
+  .cart-fab-badge{
+    position:absolute; top:-4px; right:-4px;
+    min-width:20px; height:20px; padding:0 4px;
+    border-radius:999px;
+    background:var(--red);
+    color:#fff; font-size:11px; font-weight:800;
+    display:none; align-items:center; justify-content:center;
+    box-shadow:0 0 0 2px var(--cream);
+  }
+  .cart-fab-badge.show{display:flex;}
+
+  .cart-overlay{
+    position:fixed; inset:0; z-index:70;
+    background:rgba(51,38,33,0.55);
+    display:none;
+    align-items:flex-start; justify-content:center;
+    padding:calc(16px + env(safe-area-inset-top,0px)) 12px 16px;
+    overflow-y:auto;
+  }
+  .cart-overlay.open{display:flex;}
+  .cart-panel{
+    width:100%; max-width:480px;
+    background:var(--cream);
+    border-radius:18px;
+    padding:16px;
+    box-shadow:0 20px 40px -10px rgba(0,0,0,0.4);
+  }
+  .cart-panel-head{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:12px;
+  }
+  .cart-panel-title{font-weight:800; font-size:16px; color:var(--brown);}
+  .cart-close-btn{
+    background:none; border:none; cursor:pointer;
+    width:32px; height:32px; display:flex; align-items:center; justify-content:center;
+    border-radius:999px; color:var(--ink-soft);
+  }
+  .cart-close-btn:active{background:var(--line);}
+  .cart-empty{
+    text-align:center; padding:36px 16px; color:var(--ink-soft); font-size:13.5px;
+  }
+  .cart-list{display:flex; flex-direction:column; gap:10px;}
+  .cart-item{
+    display:flex; align-items:center; gap:10px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:10px 12px;
+  }
+  .cart-item-info{flex:1; min-width:0;}
+  .cart-item-code{font-weight:700; color:var(--brown); font-size:14px;}
+  .cart-item-issuer{font-size:11.5px; color:var(--ink-soft); margin-top:1px; line-height:1.3;}
+  .cart-item-ytm{font-size:11.5px; color:var(--gold); font-weight:700; margin-top:2px;}
+  .cart-item-remove{
+    flex:none;
+    width:34px; height:34px; border-radius:999px;
+    border:1px solid var(--line);
+    background:#FBF8F1;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; color:var(--red);
+  }
+  .cart-item-remove:active{transform:scale(0.92);}
 
   .empty-state{
     text-align:center; padding:40px 16px; color:var(--ink-soft); font-size:13.5px;
@@ -387,12 +484,28 @@
 </head>
 <body>
 
+  <button class="cart-fab" id="cartFab" type="button" aria-label="ตะกร้าหุ้นกู้ที่สนใจ">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+    <span class="cart-fab-badge" id="cartFabBadge">0</span>
+  </button>
+
+  <div class="cart-overlay" id="cartOverlay">
+    <div class="cart-panel">
+      <div class="cart-panel-head">
+        <div class="cart-panel-title">ตะกร้าหุ้นกู้ที่สนใจ</div>
+        <button class="cart-close-btn" id="cartCloseBtn" type="button" aria-label="ปิด">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div id="cartListWrap"></div>
+    </div>
+  </div>
+
   <div class="hero">
     <div class="coin c1"></div>
     <div class="coin c2"></div>
     <div class="coin c3"></div>
     <div class="title-block">
-      <div style="display:inline-block; background:#8A1414; color:#FFFFFF; font-weight:700; font-size:11.5px; letter-spacing:.3px; padding:5px 12px; border-radius:999px; box-shadow:0 4px 10px rgba(0,0,0,0.25); margin-bottom:6px;">ใช้ประกวด KSS Innovation Awards 2026 เท่านั้น นะจ๊ะ</div>
       <h1 class="title-main">BOND SCREENER</h1>
       <div class="title-byline">By Kitthanabhumi</div>
     </div>
@@ -531,6 +644,69 @@ const ids = ['fInvestor','fRating','fRatingCompany','fRisk','fFeature','fYtm','f
 const els = Object.fromEntries(ids.map(id=>[id, document.getElementById(id)]));
 const searchEl = document.getElementById('fSearch');
 
+// ---------- Cart (ตะกร้าหุ้นกู้ที่สนใจ) ----------
+// Persisted client-side (per browser) with localStorage, keyed by the
+// Supabase row id (b._id) so it survives reloads across days. An item drops
+// out automatically once its bond is no longer in the live "open" listing
+// (closed / deleted) — otherwise it stays until the customer removes it.
+const CART_STORAGE_KEY = 'bondScreenerCart_v1';
+function loadCartIds(){
+  try{
+    const raw = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || '[]');
+    return Array.isArray(raw) ? raw.filter(x=> typeof x === 'string' && x) : [];
+  }catch(e){ return []; }
+}
+function saveCartIds(){
+  try{ localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartIds)); }catch(e){}
+}
+let cartIds = loadCartIds();
+function isInCart(id){ return !!id && cartIds.includes(id); }
+function addToCart(id){
+  if(!id || cartIds.includes(id)) return;
+  cartIds.push(id);
+  saveCartIds();
+}
+function removeFromCart(id){
+  const before = cartIds.length;
+  cartIds = cartIds.filter(x=> x !== id);
+  if(cartIds.length !== before) saveCartIds();
+}
+// Drop cart entries whose bond is no longer in the current live listing
+// (closed / removed) — called every time BONDS is refreshed.
+function pruneCart(){
+  const validIds = new Set(BONDS.map(b=> b._id).filter(Boolean));
+  const before = cartIds.length;
+  cartIds = cartIds.filter(id=> validIds.has(id));
+  if(cartIds.length !== before) saveCartIds();
+}
+function updateCartFabBadge(){
+  const badge = document.getElementById('cartFabBadge');
+  if(!badge) return;
+  badge.textContent = cartIds.length;
+  badge.classList.toggle('show', cartIds.length > 0);
+}
+function renderCartPanel(){
+  const wrap = document.getElementById('cartListWrap');
+  if(!wrap) return;
+  const items = BONDS.filter(b=> cartIds.includes(b._id));
+  if(items.length === 0){
+    wrap.innerHTML = `<div class="cart-empty">ยังไม่มีหุ้นกู้ในตะกร้า</div>`;
+    return;
+  }
+  wrap.innerHTML = `<div class="cart-list">${items.map(b=>`
+    <div class="cart-item">
+      <div class="cart-item-info">
+        <div class="cart-item-code">${b.highlight ? '<span class="star">★</span>' : ''}${b.code}</div>
+        <div class="cart-item-issuer">${b.issuer}</div>
+        <div class="cart-item-ytm">YTM ${b.ytm.toFixed(2)}%</div>
+      </div>
+      <button class="cart-item-remove" data-id="${b._id}" aria-label="นำออกจากตะกร้า">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+  `).join('')}</div>`;
+}
+
 // หลังเลือกตัวกรองเหล่านี้แล้ว ให้แสดงข้อความหัวข้อกำกับ เช่น "เครดิต(ตราสาร): AAA"
 const chipFilterLabels = {
   fInvestor: 'นักลงทุน',
@@ -591,6 +767,7 @@ function whMinPurchaseDisplay(minPurchase){
 function mapWarehouseBond(w){
   return {
     _uid: 'bond' + (_bondUidSeq++), // unique per bond record — NOT the same as `code`, which can repeat for same-name bonds
+    _id: w.id || '', // stable Supabase row id — persists across reloads, used as the cart's item key
     code: w.code || '',
     issuer: w.issuerName || '',
     investor: w.investorType || '',
@@ -609,12 +786,14 @@ function mapWarehouseBond(w){
     highlight: !!w.highlight,
     _updatedAt: w.updatedAt || '',
     _createdAt: w.createdAt || '',
+    _addedViaApp: !!w.addedViaApp,
   };
 }
 // Convert a Supabase row (snake_case, same "bonds" table Bond Warehouse
 // writes to) into the camelCase shape mapWarehouseBond() expects.
 function rowToWarehouseShape(r){
   return {
+    id: r.id,
     code: r.code,
     issuerName: r.issuer_name,
     investorType: r.investor_type,
@@ -631,6 +810,7 @@ function rowToWarehouseShape(r){
     highlight: r.highlight,
     updatedAt: r.updated_at,
     createdAt: r.created_at,
+    addedViaApp: r.added_via_app,
     status: r.status,
   };
 }
@@ -653,7 +833,10 @@ async function loadBondsFromWarehouse(){
 }
 async function refreshBonds(){
   BONDS = await loadBondsFromWarehouse();
+  pruneCart();
+  updateCartFabBadge();
   render();
+  if(document.getElementById('cartOverlay').classList.contains('open')) renderCartPanel();
 }
 
 function riskDots(n){
@@ -708,11 +891,13 @@ function priceCategory(b){
   if(diff < -0.05) return 'discount';
   return 'par';
 }
-// "New" badge: shown only for bonds that were newly added to the warehouse
-// (based on their original creation timestamp, which never changes when a
-// bond's other fields are later edited), for this many days after creation.
+// "New" badge: shown only for bonds newly added through the Bond Warehouse
+// web app's own "เพิ่มหุ้นกู้" button (b._addedViaApp) — NOT for bonds that
+// arrived by uploading/editing rows directly in the Supabase table — for
+// this many days after creation.
 const NEW_BADGE_DAYS = 3;
 function isNewBond(b){
+  if(!b._addedViaApp) return false;
   if(!b._createdAt) return false;
   const created = new Date(b._createdAt).getTime();
   if(isNaN(created)) return false;
@@ -850,6 +1035,9 @@ function render(){
           <span class="amount-line">เสนอขาย <b>${b.amount}</b> ล้านบาท</span>
           <span class="amount-line">ซื้อขั้นต่ำ <b>${b.minPurchase}</b> บาท</span>
         </div>
+        <button class="cart-toggle-btn${isInCart(b._id) ? ' in-cart' : ''}" data-id="${b._id}" aria-label="เพิ่มลงตะกร้า">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+        </button>
         <button class="buy-btn" data-code="${b._uid}">สนใจซื้อ</button>
       </div>
 
@@ -950,6 +1138,19 @@ function validateEmailField(code, forceShowEmpty){
 }
 
 cardsEl.addEventListener('click', (e)=>{
+  // Add/remove this bond from the cart (ตะกร้า)
+  const cartBtn = e.target.closest('.cart-toggle-btn');
+  if(cartBtn){
+    const id = cartBtn.dataset.id;
+    if(id){
+      if(isInCart(id)) removeFromCart(id); else addToCart(id);
+      cartBtn.classList.toggle('in-cart', isInCart(id));
+      updateCartFabBadge();
+      if(document.getElementById('cartOverlay').classList.contains('open')) renderCartPanel();
+    }
+    return;
+  }
+
   // Toggle "สนใจซื้อ" expand panel — เปิดของบอนด์ที่กด แล้วพับเก็บกล่องของบอนด์ตัวอื่นๆ ทั้งหมด
   const buyBtn = e.target.closest('.buy-btn');
   if(buyBtn){
@@ -1138,6 +1339,32 @@ document.getElementById('resetBtn').addEventListener('click', ()=>{
   if(searchEl) searchEl.value = "";
   render();
 });
+
+// ---------- Cart FAB / overlay wiring ----------
+const cartOverlayEl = document.getElementById('cartOverlay');
+document.getElementById('cartFab').addEventListener('click', ()=>{
+  renderCartPanel();
+  cartOverlayEl.classList.add('open');
+});
+document.getElementById('cartCloseBtn').addEventListener('click', ()=>{
+  cartOverlayEl.classList.remove('open');
+});
+cartOverlayEl.addEventListener('click', (e)=>{
+  // Clicking the dark backdrop (not the panel itself) closes the cart
+  if(e.target === cartOverlayEl) cartOverlayEl.classList.remove('open');
+});
+document.getElementById('cartListWrap').addEventListener('click', (e)=>{
+  const removeBtn = e.target.closest('.cart-item-remove');
+  if(!removeBtn) return;
+  const id = removeBtn.dataset.id;
+  removeFromCart(id);
+  updateCartFabBadge();
+  renderCartPanel();
+  // Keep the "in-cart" highlight on the matching card button in sync, if visible
+  const cardBtn = cardsEl.querySelector(`.cart-toggle-btn[data-id="${CSS.escape(id)}"]`);
+  if(cardBtn) cardBtn.classList.remove('in-cart');
+});
+updateCartFabBadge();
 
 updateDatePill();
 refreshBonds(); // initial load from Supabase
