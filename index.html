@@ -589,6 +589,7 @@
       <select id="fLife">
         <option value="">อายุคงเหลือ (ปี): ทั้งหมด</option>
         <option value="lt1">น้อยกว่า 1 ปี</option>
+        <option value="1-2">1-2 ปี</option>
         <option value="2-3">2-3 ปี</option>
         <option value="3-4">3-4 ปี</option>
         <option value="4-5">4-5 ปี</option>
@@ -847,7 +848,7 @@ function mapWarehouseBond(w){
     _id: w.id || '', // stable Supabase row id — persists across reloads, used as the cart's item key
     code: w.code || '',
     issuer: w.issuerName || '',
-    investor: investorNorm(w.investorType) || 'PO',
+    investor: w.investorType || '',
     ytm: Number(w.ytmSell) || 0,               // YTM = "YTM ขาย (%)"
     ratingLabel: w.ratingInstrument || '',       // เครดิต(ตราสาร) = "อันดับความน่าเชื่อถือ (ตราสาร)"
     ratingCompanyLabel: w.ratingCompany || '',   // เครดิต(บริษัท) = "อันดับความน่าเชื่อถือ (บริษัท)"
@@ -927,21 +928,6 @@ function ratingBase(label){
   s = s.replace(/[+\-]\s*$/, '').trim();
   return s;
 }
-// Normalize investor_type so rows edited directly in the Supabase table
-// (extra spaces, lowercase) still line up with the "PO" / "II/HNW" / "PG"
-// values used by the filter dropdown.
-function investorNorm(label){
-  return String(label || '').trim().toUpperCase();
-}
-// Split an investor_type value into its individual category tokens on ANY
-// non-alphanumeric separator ("/", "&", ",", space, etc.) — e.g.
-// "ii/hnw" -> ["II","HNW"], "II&HNW" -> ["II","HNW"], "HNW" -> ["HNW"].
-// Used so a row entered as just "HNW" (or "II") alone, or joined with a
-// separator other than "/", still matches the combined "II/HNW" filter
-// option, and so case/spacing/punctuation differences never cause a false miss.
-function investorTokens(label){
-  return investorNorm(label).split(/[^A-Z0-9]+/).filter(Boolean);
-}
 // "Unrated" = no rating was ever entered: blank, whitespace-only, or "-"
 function isUnrated(label){
   const s = String(label || '').trim();
@@ -968,6 +954,7 @@ function ytmMatch(range, ytm){
 }
 function lifeMatch(range, life){
   if(range==='lt1') return life<1;
+  if(range==='1-2') return life>=1 && life<2;
   if(range==='2-3') return life>=2 && life<=3;
   if(range==='3-4') return life>=3 && life<4;
   if(range==='4-5') return life>=4 && life<5;
@@ -1018,11 +1005,7 @@ function render(){
   const filtersActive = !!(inv || rat || ratCo || risk || feat || ytmRange || lifeRange || price);
 
   let filtered = BONDS.filter(b=>{
-    if(inv){
-      const bTokens = investorTokens(b.investor);
-      const invTokens = investorTokens(inv);
-      if(!bTokens.some(t => invTokens.includes(t))) return false;
-    }
+    if(inv && b.investor!==inv) return false;
 
     // เครดิต(ตราสาร): "Unrated" = ไม่ได้ใส่เรตติ้ง (ว่าง หรือ "-")
     if(rat){
@@ -1057,7 +1040,10 @@ function render(){
     return true;
   });
 
-  if(filtersActive){
+  if(searchTerm){
+    // มีการค้นหา: เรียงตามอายุคงเหลือน้อยไปมาก แล้วตามด้วย YTM สูงไปต่ำ
+    filtered = filtered.slice().sort((a,b)=> (lifeNum(a) - lifeNum(b)) || (b.ytm - a.ytm));
+  } else if(filtersActive){
     // A filter is in use: order results by the filter's own criteria
     // instead of forcing highlighted bonds to the top.
     const activeFilterCount = [inv, rat, ratCo, risk, feat, ytmRange, lifeRange, price].filter(Boolean).length;
