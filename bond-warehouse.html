@@ -630,7 +630,7 @@ function DetailRow({ label, value }) {
   );
 }
 
-function ExpandedDetail({ bond, onEdit, onDeleteReq, onToggleStatus }) {
+function ExpandedDetail({ bond, onEdit, onDeleteReq, onToggleStatus, onToggleHighlight }) {
   const closed = bond.status === "closed";
   const maturingSoon = isMaturingSoon(bond);
   const matured = isMatured(bond);
@@ -647,17 +647,30 @@ function ExpandedDetail({ bond, onEdit, onDeleteReq, onToggleStatus }) {
         </div>
       )}
       <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center", marginBottom: 16 }}>
+        <label
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            display: "inline-flex", alignItems: "center", gap: 6, cursor: "pointer", userSelect: "none",
+            padding: "4px 12px 4px 10px", borderRadius: 999,
+            background: bond.highlight ? C.goldFaint : "#fff",
+            border: `1px solid ${bond.highlight ? C.gold : C.border}`,
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={bond.highlight}
+            onChange={() => onToggleHighlight(bond)}
+            style={{ width: 15, height: 15, accentColor: C.gold, cursor: "pointer" }}
+          />
+          <IconStar size={13} filled={bond.highlight} color={C.gold} />
+          <span style={{ fontSize: 12, fontWeight: 700, color: bond.highlight ? C.goldDeep : C.brown }}>Highlight ตราสารหนี้</span>
+        </label>
         <span style={{
           padding: "4px 12px", borderRadius: 999, fontSize: 12, fontWeight: 700,
           background: closed ? "#EDE7E2" : "#E7F4EA", color: closed ? C.brownSoft : C.ok,
         }}>
           {closed ? "ปิดการขายแล้ว" : "กำลังเสนอขาย"}
         </span>
-        {bond.highlight && (
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 12, fontWeight: 700, color: C.goldDeep }}>
-            <IconStar size={13} filled color={C.gold} /> Highlight
-          </span>
-        )}
         <span style={{
           padding: "4px 12px", borderRadius: 999, fontSize: 12, fontWeight: 700, background: C.goldSoft, color: C.brown,
         }}>
@@ -908,7 +921,7 @@ function ExportHighlightImage({ bonds }, ref) {
 }
 const ExportHighlightImageRF = React.forwardRef(ExportHighlightImage);
 
-function ListView({ bonds, onEdit, onDeleteReq, onExport, exporting, onToggleStatus }) {
+function ListView({ bonds, onEdit, onDeleteReq, onExport, exporting, onToggleStatus, onToggleHighlight }) {
   const [q, setQ] = useState("");
   const [expandedId, setExpandedId] = useState(null);
   const [sortKey, setSortKey] = useState(null);
@@ -1197,7 +1210,7 @@ function ListView({ bonds, onEdit, onDeleteReq, onExport, exporting, onToggleSta
                     {open && (
                       <tr>
                         <td colSpan={cols.length} style={{ padding: 0 }}>
-                          <ExpandedDetail bond={b} onEdit={onEdit} onDeleteReq={onDeleteReq} onToggleStatus={onToggleStatus} />
+                          <ExpandedDetail bond={b} onEdit={onEdit} onDeleteReq={onDeleteReq} onToggleStatus={onToggleStatus} onToggleHighlight={onToggleHighlight} />
                         </td>
                       </tr>
                     )}
@@ -1458,6 +1471,21 @@ function BondWarehouseApp() {
     }
   };
 
+  const handleToggleHighlight = async (bond) => {
+    try {
+      const { error } = await sb
+        .from(BONDS_TABLE)
+        .update({ highlight: !bond.highlight, updated_at: new Date().toISOString() })
+        .eq("id", bond.id);
+      if (error) throw error;
+      setSaveError(false);
+      await loadFromSupabase();
+    } catch (e) {
+      console.error(e);
+      setSaveError(true);
+    }
+  };
+
   const handleExport = () => {
     setExporting(true);
     setTimeout(() => {
@@ -1527,7 +1555,7 @@ function BondWarehouseApp() {
         </div>
       ) : view === "list" ? (
         <ListView bonds={bonds} onEdit={(b) => { setEditing(b); setView("form"); }} onDeleteReq={setDeleteTarget}
-          onExport={handleExport} exporting={exporting} onToggleStatus={handleToggleStatus} />
+          onExport={handleExport} exporting={exporting} onToggleStatus={handleToggleStatus} onToggleHighlight={handleToggleHighlight} />
       ) : (
         <FormView initial={editing} onSave={handleSave} onCancel={() => { setView("list"); setEditing(null); }} />
       )}

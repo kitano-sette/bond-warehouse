@@ -776,7 +776,7 @@ function initMultiSelect(id){
       const text = checked[0].closest('.ms-option').querySelector('.ms-option-text').textContent;
       labelEl.textContent = `${baseLabel}: ${text}`;
     } else {
-      labelEl.textContent = `${baseLabel}: เลือก ${checked.length} รายการ`;
+      labelEl.textContent = `${baseLabel}: ${checked.length} รายการ`;
     }
   }
 
