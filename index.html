@@ -159,6 +159,57 @@
     width:100%;
   }
   .filters select:focus-visible{outline:2px solid var(--amber2); outline-offset:1px;}
+
+  /* ---------- Multi-select filter dropdowns (checkbox groups) ---------- */
+  .multiselect{position:relative;}
+  .multiselect-btn{
+    appearance:none; -webkit-appearance:none;
+    font-family:inherit;
+    background:#fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="8"><path d="M1 1l5 5 5-5" stroke="%237A6B62" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>') no-repeat right 10px center;
+    border:1px solid var(--line);
+    border-radius:9px;
+    padding:9px 26px 9px 10px;
+    font-size:12.5px;
+    color:var(--ink);
+    cursor:pointer;
+    width:100%;
+    text-align:left;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .multiselect-btn:focus-visible{outline:2px solid var(--amber2); outline-offset:1px;}
+  .multiselect.has-selection .multiselect-btn{border-color:var(--amber2); color:var(--maroon); font-weight:700;}
+  .multiselect-panel{
+    display:none;
+    position:absolute; left:0; right:0; top:calc(100% + 5px);
+    background:#fff; border:1px solid var(--line); border-radius:10px;
+    box-shadow:0 14px 28px -12px rgba(74,58,52,0.35);
+    padding:6px; z-index:30;
+    max-height:230px; overflow-y:auto;
+  }
+  .multiselect.open .multiselect-panel{display:block;}
+  .ms-panel-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:4px 6px 6px; margin-bottom:2px;
+    border-bottom:1px solid var(--line);
+  }
+  .ms-panel-title{font-size:10.5px; color:var(--ink-soft); font-weight:600;}
+  .ms-clear-btn{
+    background:none; border:none; font-family:inherit;
+    font-size:11px; font-weight:700; color:var(--maroon);
+    cursor:pointer; padding:2px 4px;
+  }
+  .ms-clear-btn:hover{text-decoration:underline;}
+  .ms-option{
+    display:flex; align-items:center; gap:8px;
+    padding:8px 6px; border-radius:7px;
+    font-size:12.5px; color:var(--ink);
+    cursor:pointer;
+  }
+  .ms-option:hover{background:#FBF3DF;}
+  .ms-option input[type="checkbox"]{
+    width:16px; height:16px; flex:0 0 auto;
+    accent-color:var(--amber2); cursor:pointer;
+  }
   .reset-btn{
     grid-column:1 / -1;
     background:var(--maroon); color:#fff; border:none;
@@ -545,56 +596,96 @@
         <option value="II/HNW">รายใหญ่/สถาบัน</option>
         <option value="PG">ตราสารหนี้ภาครัฐ (PG)</option>
       </select>
-      <select id="fRating">
-        <option value="">เครดิต(ตราสาร): ทั้งหมด</option>
-        <option value="AAA">AAA</option>
-        <option value="AA">AA</option>
-        <option value="A">A</option>
-        <option value="BBB">BBB</option>
-        <option value="Unrated">Unrated</option>
-      </select>
-      <select id="fRatingCompany">
-        <option value="">เครดิต(บริษัท): ทั้งหมด</option>
-        <option value="AAA">AAA</option>
-        <option value="AA">AA</option>
-        <option value="A">A</option>
-        <option value="BBB">BBB</option>
-        <option value="Unrated">Unrated</option>
-      </select>
-      <select id="fRisk">
-        <option value="">ความเสี่ยง: ทั้งหมด</option>
-        <option value="1">ระดับ 1</option>
-        <option value="2">ระดับ 2</option>
-        <option value="3">ระดับ 3</option>
-        <option value="4">ระดับ 4</option>
-        <option value="5">ระดับ 5</option>
-        <option value="6">ระดับ 6</option>
-        <option value="7">ระดับ 7</option>
-        <option value="8">ระดับ 8</option>
-      </select>
+      <div class="multiselect" data-id="fRating">
+        <button type="button" class="multiselect-btn" aria-haspopup="listbox" aria-expanded="false">
+          <span class="ms-label">เครดิต(ตราสาร): ทั้งหมด</span>
+        </button>
+        <div class="multiselect-panel" role="listbox" aria-multiselectable="true">
+          <div class="ms-panel-head">
+            <span class="ms-panel-title">เลือกได้หลายรายการ</span>
+            <button type="button" class="ms-clear-btn">ล้าง</button>
+          </div>
+          <label class="ms-option"><input type="checkbox" value="AAA"><span class="ms-option-text">AAA</span></label>
+          <label class="ms-option"><input type="checkbox" value="AA"><span class="ms-option-text">AA</span></label>
+          <label class="ms-option"><input type="checkbox" value="A"><span class="ms-option-text">A</span></label>
+          <label class="ms-option"><input type="checkbox" value="BBB"><span class="ms-option-text">BBB</span></label>
+          <label class="ms-option"><input type="checkbox" value="Unrated"><span class="ms-option-text">Unrated</span></label>
+        </div>
+      </div>
+      <div class="multiselect" data-id="fRatingCompany">
+        <button type="button" class="multiselect-btn" aria-haspopup="listbox" aria-expanded="false">
+          <span class="ms-label">เครดิต(บริษัท): ทั้งหมด</span>
+        </button>
+        <div class="multiselect-panel" role="listbox" aria-multiselectable="true">
+          <div class="ms-panel-head">
+            <span class="ms-panel-title">เลือกได้หลายรายการ</span>
+            <button type="button" class="ms-clear-btn">ล้าง</button>
+          </div>
+          <label class="ms-option"><input type="checkbox" value="AAA"><span class="ms-option-text">AAA</span></label>
+          <label class="ms-option"><input type="checkbox" value="AA"><span class="ms-option-text">AA</span></label>
+          <label class="ms-option"><input type="checkbox" value="A"><span class="ms-option-text">A</span></label>
+          <label class="ms-option"><input type="checkbox" value="BBB"><span class="ms-option-text">BBB</span></label>
+          <label class="ms-option"><input type="checkbox" value="Unrated"><span class="ms-option-text">Unrated</span></label>
+        </div>
+      </div>
+      <div class="multiselect" data-id="fRisk">
+        <button type="button" class="multiselect-btn" aria-haspopup="listbox" aria-expanded="false">
+          <span class="ms-label">ความเสี่ยง: ทั้งหมด</span>
+        </button>
+        <div class="multiselect-panel" role="listbox" aria-multiselectable="true">
+          <div class="ms-panel-head">
+            <span class="ms-panel-title">เลือกได้หลายรายการ</span>
+            <button type="button" class="ms-clear-btn">ล้าง</button>
+          </div>
+          <label class="ms-option"><input type="checkbox" value="1"><span class="ms-option-text">ระดับ 1</span></label>
+          <label class="ms-option"><input type="checkbox" value="2"><span class="ms-option-text">ระดับ 2</span></label>
+          <label class="ms-option"><input type="checkbox" value="3"><span class="ms-option-text">ระดับ 3</span></label>
+          <label class="ms-option"><input type="checkbox" value="4"><span class="ms-option-text">ระดับ 4</span></label>
+          <label class="ms-option"><input type="checkbox" value="5"><span class="ms-option-text">ระดับ 5</span></label>
+          <label class="ms-option"><input type="checkbox" value="6"><span class="ms-option-text">ระดับ 6</span></label>
+          <label class="ms-option"><input type="checkbox" value="7"><span class="ms-option-text">ระดับ 7</span></label>
+          <label class="ms-option"><input type="checkbox" value="8"><span class="ms-option-text">ระดับ 8</span></label>
+        </div>
+      </div>
       <select id="fFeature">
         <option value="">คุณลักษณะ: ทั้งหมด</option>
         <option value="normal">หุ้นกู้ปกติ</option>
         <option value="call">Call Option</option>
         <option value="perp">Perpetual Bond</option>
       </select>
-      <select id="fYtm">
-        <option value="">YTM: ทั้งหมด</option>
-        <option value="gt5">มากกว่า 5%</option>
-        <option value="4-5">4-5%</option>
-        <option value="3-4">3-4%</option>
-        <option value="2-3">2-3%</option>
-        <option value="lt2">น้อยกว่า 2%</option>
-      </select>
-      <select id="fLife">
-        <option value="">อายุคงเหลือ (ปี): ทั้งหมด</option>
-        <option value="lt1">น้อยกว่า 1 ปี</option>
-        <option value="1-2">1-2 ปี</option>
-        <option value="2-3">2-3 ปี</option>
-        <option value="3-4">3-4 ปี</option>
-        <option value="4-5">4-5 ปี</option>
-        <option value="gt5">มากกว่า 5 ปี</option>
-      </select>
+      <div class="multiselect" data-id="fYtm">
+        <button type="button" class="multiselect-btn" aria-haspopup="listbox" aria-expanded="false">
+          <span class="ms-label">YTM: ทั้งหมด</span>
+        </button>
+        <div class="multiselect-panel" role="listbox" aria-multiselectable="true">
+          <div class="ms-panel-head">
+            <span class="ms-panel-title">เลือกได้หลายรายการ</span>
+            <button type="button" class="ms-clear-btn">ล้าง</button>
+          </div>
+          <label class="ms-option"><input type="checkbox" value="gt5"><span class="ms-option-text">มากกว่า 5%</span></label>
+          <label class="ms-option"><input type="checkbox" value="4-5"><span class="ms-option-text">4-5%</span></label>
+          <label class="ms-option"><input type="checkbox" value="3-4"><span class="ms-option-text">3-4%</span></label>
+          <label class="ms-option"><input type="checkbox" value="2-3"><span class="ms-option-text">2-3%</span></label>
+          <label class="ms-option"><input type="checkbox" value="lt2"><span class="ms-option-text">น้อยกว่า 2%</span></label>
+        </div>
+      </div>
+      <div class="multiselect" data-id="fLife">
+        <button type="button" class="multiselect-btn" aria-haspopup="listbox" aria-expanded="false">
+          <span class="ms-label">อายุคงเหลือ (ปี): ทั้งหมด</span>
+        </button>
+        <div class="multiselect-panel" role="listbox" aria-multiselectable="true">
+          <div class="ms-panel-head">
+            <span class="ms-panel-title">เลือกได้หลายรายการ</span>
+            <button type="button" class="ms-clear-btn">ล้าง</button>
+          </div>
+          <label class="ms-option"><input type="checkbox" value="lt1"><span class="ms-option-text">น้อยกว่า 1 ปี</span></label>
+          <label class="ms-option"><input type="checkbox" value="1-2"><span class="ms-option-text">1-2 ปี</span></label>
+          <label class="ms-option"><input type="checkbox" value="2-3"><span class="ms-option-text">2-3 ปี</span></label>
+          <label class="ms-option"><input type="checkbox" value="3-4"><span class="ms-option-text">3-4 ปี</span></label>
+          <label class="ms-option"><input type="checkbox" value="4-5"><span class="ms-option-text">4-5 ปี</span></label>
+          <label class="ms-option"><input type="checkbox" value="gt5"><span class="ms-option-text">มากกว่า 5 ปี</span></label>
+        </div>
+      </div>
       <select id="fPrice">
         <option value="">ราคา: ทั้งหมด</option>
         <option value="premium">Premium</option>
@@ -655,9 +746,80 @@ let _bondUidSeq = 0; // guarantees every card gets a unique DOM id, even when tw
 const cardsEl = document.getElementById('cards');
 const countEl = document.getElementById('countNum');
 const activeFiltersEl = document.getElementById('activeFilters');
-const ids = ['fInvestor','fRating','fRatingCompany','fRisk','fFeature','fYtm','fLife','fPrice'];
+const ids = ['fInvestor','fFeature','fPrice']; // plain single-select dropdowns
 const els = Object.fromEntries(ids.map(id=>[id, document.getElementById(id)]));
 const searchEl = document.getElementById('fSearch');
+
+// ---------- Multi-select filter dropdowns (checkbox groups) ----------
+// เครดิต(ตราสาร), เครดิต(บริษัท), ความเสี่ยง, YTM, อายุคงเหลือ ใช้ checkbox
+// เพื่อให้เลือกได้หลายตัวเลือกพร้อมกัน (OR ภายในตัวกรองเดียวกัน, AND ระหว่างตัวกรอง)
+const multiFilterIds = ['fRating','fRatingCompany','fRisk','fYtm','fLife'];
+const multiFilterState = Object.fromEntries(multiFilterIds.map(id=>[id, []]));
+const multiSelectResetters = {};
+function initMultiSelect(id){
+  const root = document.querySelector(`.multiselect[data-id="${id}"]`);
+  if(!root) return;
+  const btn = root.querySelector('.multiselect-btn');
+  const labelEl = btn.querySelector('.ms-label');
+  const baseLabel = labelEl.textContent.split(':')[0];
+  const panel = root.querySelector('.multiselect-panel');
+  const checkboxes = [...panel.querySelectorAll('input[type="checkbox"]')];
+
+  function updateLabel(){
+    const checked = checkboxes.filter(c=> c.checked);
+    multiFilterState[id] = checked.map(c=> c.value);
+    root.classList.toggle('has-selection', checked.length>0);
+    btn.setAttribute('aria-expanded', root.classList.contains('open') ? 'true' : 'false');
+    if(checked.length===0){
+      labelEl.textContent = `${baseLabel}: ทั้งหมด`;
+    } else if(checked.length===1){
+      const text = checked[0].closest('.ms-option').querySelector('.ms-option-text').textContent;
+      labelEl.textContent = `${baseLabel}: ${text}`;
+    } else {
+      labelEl.textContent = `${baseLabel}: เลือก ${checked.length} รายการ`;
+    }
+  }
+
+  checkboxes.forEach(cb=> cb.addEventListener('change', ()=>{ updateLabel(); render(); }));
+
+  btn.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    const wasOpen = root.classList.contains('open');
+    closeAllMultiSelects();
+    if(!wasOpen){
+      root.classList.add('open');
+      btn.setAttribute('aria-expanded','true');
+    }
+  });
+
+  const clearBtn = panel.querySelector('.ms-clear-btn');
+  if(clearBtn){
+    clearBtn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      checkboxes.forEach(cb=> cb.checked = false);
+      updateLabel();
+      render();
+    });
+  }
+
+  multiSelectResetters[id] = ()=>{
+    checkboxes.forEach(cb=> cb.checked = false);
+    updateLabel();
+  };
+
+  updateLabel();
+}
+function closeAllMultiSelects(){
+  document.querySelectorAll('.multiselect.open').forEach(el=>{
+    el.classList.remove('open');
+    const b = el.querySelector('.multiselect-btn');
+    if(b) b.setAttribute('aria-expanded','false');
+  });
+}
+document.addEventListener('click', (e)=>{
+  if(!e.target.closest('.multiselect')) closeAllMultiSelects();
+});
+multiFilterIds.forEach(initMultiSelect);
 
 // ---------- Cart (ตะกร้าหุ้นกู้ที่สนใจ) ----------
 // Persisted client-side (per browser) with localStorage, keyed by the
@@ -798,13 +960,27 @@ const chipFilterLabels = {
 };
 function updateActiveFilterChips(){
   if(!activeFiltersEl) return;
-  const chips = Object.keys(chipFilterLabels).map(id=>{
+  const chips = [];
+  // ตัวกรองแบบ dropdown เดี่ยว (นักลงทุน / คุณลักษณะ / ราคา)
+  ids.forEach(id=>{
     const el = els[id];
-    if(!el || !el.value) return '';
+    if(!el || !el.value) return;
     const opt = el.options[el.selectedIndex];
     const text = opt ? opt.textContent : el.value;
-    return `<span class="filter-chip">${chipFilterLabels[id]}: ${text}</span>`;
-  }).filter(Boolean);
+    chips.push(`<span class="filter-chip">${chipFilterLabels[id]}: ${text}</span>`);
+  });
+  // ตัวกรองแบบ checkbox หลายตัวเลือก (YTM / เครดิต(ตราสาร) / เครดิต(บริษัท) / ความเสี่ยง / อายุคงเหลือ)
+  multiFilterIds.forEach(id=>{
+    const values = multiFilterState[id];
+    if(!values.length) return;
+    const root = document.querySelector(`.multiselect[data-id="${id}"]`);
+    const texts = values.map(v=>{
+      const cb = root && root.querySelector(`input[value="${CSS.escape(v)}"]`);
+      const textEl = cb && cb.closest('.ms-option').querySelector('.ms-option-text');
+      return textEl ? textEl.textContent : v;
+    });
+    chips.push(`<span class="filter-chip">${chipFilterLabels[id]}: ${texts.join(', ')}</span>`);
+  });
   activeFiltersEl.innerHTML = chips.join('');
 }
 
@@ -1006,18 +1182,18 @@ function featureTag(f){
 
 function render(){
   const inv = els.fInvestor.value;
-  const rat = els.fRating.value;
-  const ratCo = els.fRatingCompany.value;
-  const risk = els.fRisk.value;
+  const rat = multiFilterState.fRating;             // array — เครดิต(ตราสาร)
+  const ratCo = multiFilterState.fRatingCompany;     // array — เครดิต(บริษัท)
+  const risk = multiFilterState.fRisk;               // array — ความเสี่ยง
   const feat = els.fFeature.value;
-  const ytmRange = els.fYtm.value;
-  const lifeRange = els.fLife.value;
+  const ytmRange = multiFilterState.fYtm;            // array — YTM
+  const lifeRange = multiFilterState.fLife;          // array — อายุคงเหลือ
   const price = els.fPrice.value;
   const searchTerm = (searchEl && searchEl.value || '').trim().toLowerCase();
 
-  // Filters (dropdowns) that determine whether we keep the "highlight first" order
-  // or instead order results by the criteria the user filtered on.
-  const filtersActive = !!(inv || rat || ratCo || risk || feat || ytmRange || lifeRange || price || searchTerm);
+  // Filters (dropdowns/checkboxes) that determine whether we keep the "highlight first"
+  // order or instead order results by the criteria the user filtered on.
+  const filtersActive = !!(inv || rat.length || ratCo.length || risk.length || feat || ytmRange.length || lifeRange.length || price || searchTerm);
 
   let filtered = BONDS.filter(b=>{
     if(inv){
@@ -1026,19 +1202,24 @@ function render(){
       if(!bTokens.some(t => invTokens.includes(t))) return false;
     }
 
-    // เครดิต(ตราสาร): "Unrated" = ไม่ได้ใส่เรตติ้ง (ว่าง หรือ "-")
-    if(rat){
-      if(rat === 'Unrated'){ if(!isUnrated(b.ratingLabel)) return false; }
-      else { if(isUnrated(b.ratingLabel) || ratingBase(b.ratingLabel) !== rat) return false; }
+    // เครดิต(ตราสาร): เลือกได้หลายรายการ (OR) — "Unrated" = ไม่ได้ใส่เรตติ้ง (ว่าง หรือ "-")
+    if(rat.length){
+      const matches = rat.some(r=> r === 'Unrated'
+        ? isUnrated(b.ratingLabel)
+        : (!isUnrated(b.ratingLabel) && ratingBase(b.ratingLabel) === r));
+      if(!matches) return false;
     }
 
     // เครดิต(บริษัท): เดียวกันกับข้างต้น
-    if(ratCo){
-      if(ratCo === 'Unrated'){ if(!isUnrated(b.ratingCompanyLabel)) return false; }
-      else { if(isUnrated(b.ratingCompanyLabel) || ratingBase(b.ratingCompanyLabel) !== ratCo) return false; }
+    if(ratCo.length){
+      const matches = ratCo.some(r=> r === 'Unrated'
+        ? isUnrated(b.ratingCompanyLabel)
+        : (!isUnrated(b.ratingCompanyLabel) && ratingBase(b.ratingCompanyLabel) === r));
+      if(!matches) return false;
     }
 
-    if(risk && b.risk!==parseInt(risk)) return false;
+    // ความเสี่ยง: เลือกได้หลายระดับ (OR)
+    if(risk.length && !risk.some(r=> b.risk === parseInt(r))) return false;
 
     // คุณลักษณะ: "หุ้นกู้ปกติ" = ไม่มีทั้ง "สิทธิ" และ perpetual bond
     //            "Call Option" = ดูจากข้อความใน "สิทธิ" ว่ามีคำว่า call หรือไม่
@@ -1052,8 +1233,9 @@ function render(){
       if(feat === 'perp' && !isPerp) return false;
     }
 
-    if(ytmRange && !ytmMatch(ytmRange, b.ytm)) return false;
-    if(lifeRange && !lifeMatch(lifeRange, lifeNum(b))) return false;
+    // YTM / อายุคงเหลือ: เลือกได้หลายช่วง (OR)
+    if(ytmRange.length && !ytmRange.some(r=> ytmMatch(r, b.ytm))) return false;
+    if(lifeRange.length && !lifeRange.some(r=> lifeMatch(r, lifeNum(b)))) return false;
     if(price && priceCategory(b)!==price) return false;
     if(searchTerm && !(String(b.code).toLowerCase().includes(searchTerm) || String(b.issuer).toLowerCase().includes(searchTerm))) return false;
     return true;
@@ -1062,7 +1244,7 @@ function render(){
   if(filtersActive){
     // A filter is in use: order results by the filter's own criteria
     // instead of forcing highlighted bonds to the top.
-    const activeFilterCount = [inv, rat, ratCo, risk, feat, ytmRange, lifeRange, price].filter(Boolean).length;
+    const activeFilterCount = [inv, rat.length, ratCo.length, risk.length, feat, ytmRange.length, lifeRange.length, price].filter(Boolean).length;
     filtered = filtered.slice().sort((a,b)=>{
       // ช่องค้นหา (รหัสหุ้นกู้/ผู้ออก): เรียงตามอายุคงเหลือน้อยไปมาก แล้วตามด้วย
       // YTM มากไปน้อย เสมอ ไม่ว่าจะใช้ร่วมกับตัวกรองอื่นด้วยหรือไม่ก็ตาม
@@ -1075,9 +1257,9 @@ function render(){
       if(activeFilterCount > 1) return b.ytm - a.ytm;
       // เลือกตัวกรองเดียว: เรียงตามเกณฑ์ของตัวกรองนั้นโดยเฉพาะ
       // เครดิต(ตราสาร)/เครดิต(บริษัท): หลังกรองแล้ว เรียงตามสัญลักษณ์จากมากไปน้อย เช่น A+ > A > A-
-      if(rat) return ratingNotch(b.ratingLabel) - ratingNotch(a.ratingLabel);
-      if(ratCo) return ratingNotch(b.ratingCompanyLabel) - ratingNotch(a.ratingCompanyLabel);
-      if(lifeRange) return lifeNum(a) - lifeNum(b);
+      if(rat.length) return ratingNotch(b.ratingLabel) - ratingNotch(a.ratingLabel);
+      if(ratCo.length) return ratingNotch(b.ratingCompanyLabel) - ratingNotch(a.ratingCompanyLabel);
+      if(lifeRange.length) return lifeNum(a) - lifeNum(b);
       // ytmRange, risk, inv, feat, price: เรียงตาม YTM มากไปน้อยเป็นค่าเริ่มต้น
       return b.ytm - a.ytm;
     });
@@ -1558,6 +1740,7 @@ ids.forEach(id=> els[id].addEventListener('change', render));
 if(searchEl) searchEl.addEventListener('input', render);
 document.getElementById('resetBtn').addEventListener('click', ()=>{
   ids.forEach(id=> els[id].value = "");
+  multiFilterIds.forEach(id=> multiSelectResetters[id] && multiSelectResetters[id]());
   if(searchEl) searchEl.value = "";
   render();
 });
