@@ -176,7 +176,7 @@ const IconImage = (p) => <Svg {...p}><rect x="3" y="3" width="18" height="18" rx
    Helpers
 ---------------------------------------------------------------- */
 const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
-const emptyPurchaseRow = () => ({ id: uid(), name: "", units: "" });
+const emptyPurchaseRow = () => ({ id: uid(), name: "", units: "", location: "" });
 
 const emptyBond = () => ({
   id: uid(),
@@ -487,10 +487,10 @@ function drawOfferPDFHeader(pdf, dateStr) {
 /* ---------------------------------------------------------------
    UI primitives
 ---------------------------------------------------------------- */
-function Field({ label, children, hint, required }) {
+function Field({ label, children, hint, required, labelColor }) {
   return (
     <label className="block mb-4" style={{ display: "block", marginBottom: 16 }}>
-      <span style={{ display: "block", fontSize: 12, fontWeight: 600, marginBottom: 6, color: C.brownSoft, letterSpacing: 0.2 }}>
+      <span style={{ display: "block", fontSize: 12, fontWeight: 600, marginBottom: 6, color: labelColor || C.brownSoft, letterSpacing: 0.2 }}>
         {label} {required && <span style={{ color: C.rose }}>*</span>}
       </span>
       {children}
@@ -527,14 +527,14 @@ function NumberField({ value, onChange, allowDecimal = true, placeholder, style 
   );
 }
 
-function PercentField({ value, onChange }) {
+function PercentField({ value, onChange, style }) {
   const handleBlur = (e) => {
     if (e.target.value === "") return;
     const num = Number(e.target.value);
     if (!isNaN(num)) onChange(num.toFixed(2));
   };
   return (
-    <TInput type="number" step="0.01" value={value} onChange={(e) => onChange(e.target.value)} onBlur={handleBlur} />
+    <TInput type="number" step="0.01" value={value} onChange={(e) => onChange(e.target.value)} onBlur={handleBlur} style={style} />
   );
 }
 
@@ -630,7 +630,7 @@ function DetailRow({ label, value }) {
   );
 }
 
-function ExpandedDetail({ bond, onEdit, onDeleteReq, onToggleStatus, onToggleHighlight }) {
+function ExpandedDetail({ bond, onEdit, onDeleteReq, onToggleStatus }) {
   const closed = bond.status === "closed";
   const maturingSoon = isMaturingSoon(bond);
   const matured = isMatured(bond);
@@ -647,30 +647,17 @@ function ExpandedDetail({ bond, onEdit, onDeleteReq, onToggleStatus, onToggleHig
         </div>
       )}
       <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center", marginBottom: 16 }}>
-        <label
-          onClick={(e) => e.stopPropagation()}
-          style={{
-            display: "inline-flex", alignItems: "center", gap: 6, cursor: "pointer", userSelect: "none",
-            padding: "4px 12px 4px 10px", borderRadius: 999,
-            background: bond.highlight ? C.goldFaint : "#fff",
-            border: `1px solid ${bond.highlight ? C.gold : C.border}`,
-          }}
-        >
-          <input
-            type="checkbox"
-            checked={bond.highlight}
-            onChange={() => onToggleHighlight(bond)}
-            style={{ width: 15, height: 15, accentColor: C.gold, cursor: "pointer" }}
-          />
-          <IconStar size={13} filled={bond.highlight} color={C.gold} />
-          <span style={{ fontSize: 12, fontWeight: 700, color: bond.highlight ? C.goldDeep : C.brown }}>Highlight ตราสารหนี้</span>
-        </label>
         <span style={{
           padding: "4px 12px", borderRadius: 999, fontSize: 12, fontWeight: 700,
           background: closed ? "#EDE7E2" : "#E7F4EA", color: closed ? C.brownSoft : C.ok,
         }}>
           {closed ? "ปิดการขายแล้ว" : "กำลังเสนอขาย"}
         </span>
+        {bond.highlight && (
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 12, fontWeight: 700, color: C.goldDeep }}>
+            <IconStar size={13} filled color={C.gold} /> Highlight
+          </span>
+        )}
         <span style={{
           padding: "4px 12px", borderRadius: 999, fontSize: 12, fontWeight: 700, background: C.goldSoft, color: C.brown,
         }}>
@@ -697,7 +684,7 @@ function ExpandedDetail({ bond, onEdit, onDeleteReq, onToggleStatus, onToggleHig
         <div style={{ marginBottom: 10 }}>
           {bond.purchasedFrom.filter((r) => r.name).map((r) => (
             <div key={r.id} style={{ fontSize: 13, color: C.text, padding: "4px 0", borderBottom: `1px solid ${C.border}` }}>
-              {r.name} — {formatDisplay(r.units || "0")} หน่วย
+              {r.name} — {formatDisplay(r.units || "0")} หน่วย{r.location ? ` · ${r.location}` : ""}
             </div>
           ))}
         </div>
@@ -921,7 +908,7 @@ function ExportHighlightImage({ bonds }, ref) {
 }
 const ExportHighlightImageRF = React.forwardRef(ExportHighlightImage);
 
-function ListView({ bonds, onEdit, onDeleteReq, onExport, exporting, onToggleStatus, onToggleHighlight }) {
+function ListView({ bonds, onEdit, onDeleteReq, onExport, exporting, onToggleStatus }) {
   const [q, setQ] = useState("");
   const [expandedId, setExpandedId] = useState(null);
   const [sortKey, setSortKey] = useState(null);
@@ -1210,7 +1197,7 @@ function ListView({ bonds, onEdit, onDeleteReq, onExport, exporting, onToggleSta
                     {open && (
                       <tr>
                         <td colSpan={cols.length} style={{ padding: 0 }}>
-                          <ExpandedDetail bond={b} onEdit={onEdit} onDeleteReq={onDeleteReq} onToggleStatus={onToggleStatus} onToggleHighlight={onToggleHighlight} />
+                          <ExpandedDetail bond={b} onEdit={onEdit} onDeleteReq={onDeleteReq} onToggleStatus={onToggleStatus} />
                         </td>
                       </tr>
                     )}
@@ -1229,6 +1216,23 @@ function ListView({ bonds, onEdit, onDeleteReq, onExport, exporting, onToggleSta
     </div>
   );
 }
+
+/* ---------------------------------------------------------------
+   ตัวอย่าง Pre-fill ข้อมูลตราสารจากรหัสหุ้นกู้
+   (ตัวอย่างสาธิต — ในระบบจริงอาจดึงจากฐานข้อมูล/แหล่งข้อมูลภายนอกแทน)
+---------------------------------------------------------------- */
+const BOND_CODE_PREFILL = {
+  "SIRIN2809A": {
+    instrumentName: "หุ้นกู้ของบริษัทสิริน จำกัด",
+    issuerName: "หุ้นกู้ของบริษัทสิริน จำกัด",
+    ratingCompany: "AA",
+    ratingInstrument: "AA",
+    riskLevel: "ระดับ 4 (เสี่ยงปานกลางค่อนข้างต่ำ)",
+    couponRate: "5",
+    issueDate: "2025-08-08",
+    maturityDate: "2028-08-08",
+  },
+};
 
 /* ---------------------------------------------------------------
    Form view
@@ -1267,20 +1271,23 @@ function FormView({ initial, onSave, onCancel }) {
     <div style={{ padding: 24, maxWidth: 720, margin: "0 auto" }}>
       <SectionTitle>ข้อมูลตราสาร</SectionTitle>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 24px" }} className="grid-form">
-        <Field label="รหัสหุ้นกู้ (Code)" required>
-          <TInput value={bond.code} onChange={(e) => set("code", e.target.value.toUpperCase())} placeholder="เช่น SIRIN2809A" style={{ textTransform: "uppercase" }} />
+        <Field label="รหัสหุ้นกู้ (Code)" required hint="ลองพิมพ์ SIRIN2809A เพื่อดูตัวอย่างการ Pre-fill ข้อมูลอัตโนมัติ">
+          <TInput
+            value={bond.code}
+            onChange={(e) => {
+              const code = e.target.value.toUpperCase();
+              const prefill = BOND_CODE_PREFILL[code];
+              setBond((b) => (prefill ? { ...b, code, ...prefill } : { ...b, code }));
+            }}
+            placeholder="เช่น SIRIN2809A"
+            style={{ textTransform: "uppercase" }}
+          />
         </Field>
         <Field label="ชื่อตราสาร" required>
           <TInput value={bond.instrumentName} onChange={(e) => set("instrumentName", e.target.value)} />
         </Field>
         <Field label="ชื่อบริษัทผู้ออก">
           <TInput value={bond.issuerName} onChange={(e) => set("issuerName", e.target.value)} />
-        </Field>
-        <Field label="YTM ขาย (%)">
-          <PercentField value={bond.ytmSell} onChange={(v) => set("ytmSell", v)} />
-        </Field>
-        <Field label="YTM รับซื้อ (%)">
-          <PercentField value={bond.ytmBuy} onChange={(v) => set("ytmBuy", v)} />
         </Field>
         <Field label="อันดับความน่าเชื่อถือ (บริษัท)">
           <TInput value={bond.ratingCompany} onChange={(e) => set("ratingCompany", e.target.value.toUpperCase())} style={{ textTransform: "uppercase" }} />
@@ -1336,18 +1343,41 @@ function FormView({ initial, onSave, onCancel }) {
         <IconStar size={14} color={C.gold} filled={bond.highlight} />
       </label>
 
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 24px" }} className="grid-form">
+        <Field label="YTM รับซื้อ (%)" labelColor={C.ok}>
+          <PercentField value={bond.ytmBuy} onChange={(v) => set("ytmBuy", v)} style={{ color: C.ok, borderColor: C.ok }} />
+        </Field>
+        <Field label="YTM ขาย (%)" labelColor={C.danger}>
+          <PercentField value={bond.ytmSell} onChange={(v) => set("ytmSell", v)} style={{ color: C.danger, borderColor: C.danger }} />
+        </Field>
+      </div>
+
       <SectionTitle>รับซื้อจาก</SectionTitle>
       <div style={{ borderRadius: 12, overflow: "hidden", marginBottom: 8, border: `1px solid ${C.border}` }}>
         <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 32px", fontSize: 12, fontWeight: 600, padding: "8px 12px", background: C.goldFaint, color: C.brown }}>
           <span>ชื่อ</span><span>จำนวน(หน่วย)</span><span />
         </div>
         {bond.purchasedFrom.map((row) => (
-          <div key={row.id} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 32px", gap: 8, padding: "8px 12px", alignItems: "center", borderTop: `1px solid ${C.border}` }}>
-            <TInput value={row.name} onChange={(e) => updatePurchaseRow(row.id, "name", e.target.value)} placeholder="ชื่อคู่ค้า" />
-            <UnitField value={row.units} onChange={(v) => updatePurchaseRow(row.id, "units", v)} placeholder="0" />
-            <button onClick={() => removePurchaseRow(row.id)} style={{ padding: 6, borderRadius: 8, margin: "0 auto", background: "#fff" }}>
-              <IconTrash size={14} color={C.danger} />
-            </button>
+          <div key={row.id} style={{ padding: "8px 12px", borderTop: `1px solid ${C.border}` }}>
+            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 32px", gap: 8, alignItems: "center" }}>
+              <TInput value={row.name} onChange={(e) => updatePurchaseRow(row.id, "name", e.target.value)} placeholder="ชื่อคู่ค้า" />
+              <UnitField value={row.units} onChange={(v) => updatePurchaseRow(row.id, "units", v)} placeholder="0" />
+              <button onClick={() => removePurchaseRow(row.id)} style={{ padding: 6, borderRadius: 8, margin: "0 auto", background: "#fff" }}>
+                <IconTrash size={14} color={C.danger} />
+              </button>
+            </div>
+            <div style={{ marginTop: 8 }}>
+              <TSelect
+                value={row.location || ""}
+                onChange={(e) => updatePurchaseRow(row.id, "location", e.target.value)}
+                style={{ width: "100%" }}
+              >
+                <option value="">— เลือกที่อยู่ของหุ้นกู้ —</option>
+                <option value="อยู่ในพอร์ต KSS">อยู่ในพอร์ต KSS</option>
+                <option value="อยู่พอร์ตที่อื่น">อยู่พอร์ตที่อื่น</option>
+                <option value="ใบหุ้น">ใบหุ้น</option>
+              </TSelect>
+            </div>
           </div>
         ))}
       </div>
@@ -1471,21 +1501,6 @@ function BondWarehouseApp() {
     }
   };
 
-  const handleToggleHighlight = async (bond) => {
-    try {
-      const { error } = await sb
-        .from(BONDS_TABLE)
-        .update({ highlight: !bond.highlight, updated_at: new Date().toISOString() })
-        .eq("id", bond.id);
-      if (error) throw error;
-      setSaveError(false);
-      await loadFromSupabase();
-    } catch (e) {
-      console.error(e);
-      setSaveError(true);
-    }
-  };
-
   const handleExport = () => {
     setExporting(true);
     setTimeout(() => {
@@ -1555,7 +1570,7 @@ function BondWarehouseApp() {
         </div>
       ) : view === "list" ? (
         <ListView bonds={bonds} onEdit={(b) => { setEditing(b); setView("form"); }} onDeleteReq={setDeleteTarget}
-          onExport={handleExport} exporting={exporting} onToggleStatus={handleToggleStatus} onToggleHighlight={handleToggleHighlight} />
+          onExport={handleExport} exporting={exporting} onToggleStatus={handleToggleStatus} />
       ) : (
         <FormView initial={editing} onSave={handleSave} onCancel={() => { setView("list"); setEditing(null); }} />
       )}
