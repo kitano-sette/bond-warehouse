@@ -630,7 +630,7 @@ function DetailRow({ label, value }) {
   );
 }
 
-function ExpandedDetail({ bond, onEdit, onDeleteReq, onToggleStatus }) {
+function ExpandedDetail({ bond, onEdit, onDeleteReq, onToggleStatus, onToggleHighlight }) {
   const closed = bond.status === "closed";
   const maturingSoon = isMaturingSoon(bond);
   const matured = isMatured(bond);
@@ -664,6 +664,15 @@ function ExpandedDetail({ bond, onEdit, onDeleteReq, onToggleStatus }) {
           {bond.investorType}
         </span>
       </div>
+
+      <label style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 16, cursor: "pointer", userSelect: "none" }}>
+        <input
+          type="checkbox"
+          checked={!!bond.highlight}
+          onChange={(e) => onToggleHighlight(bond, e.target.checked)}
+        />
+        <span style={{ fontSize: 13, fontWeight: 600, color: C.brown }}>Highlight</span>
+      </label>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "4px 24px" }}>
         <DetailRow label="ชื่อตราสาร" value={bond.instrumentName} />
@@ -908,7 +917,7 @@ function ExportHighlightImage({ bonds }, ref) {
 }
 const ExportHighlightImageRF = React.forwardRef(ExportHighlightImage);
 
-function ListView({ bonds, onEdit, onDeleteReq, onExport, exporting, onToggleStatus }) {
+function ListView({ bonds, onEdit, onDeleteReq, onExport, exporting, onToggleStatus, onToggleHighlight }) {
   const [q, setQ] = useState("");
   const [expandedId, setExpandedId] = useState(null);
   const [sortKey, setSortKey] = useState(null);
@@ -1197,7 +1206,7 @@ function ListView({ bonds, onEdit, onDeleteReq, onExport, exporting, onToggleSta
                     {open && (
                       <tr>
                         <td colSpan={cols.length} style={{ padding: 0 }}>
-                          <ExpandedDetail bond={b} onEdit={onEdit} onDeleteReq={onDeleteReq} onToggleStatus={onToggleStatus} />
+                          <ExpandedDetail bond={b} onEdit={onEdit} onDeleteReq={onDeleteReq} onToggleStatus={onToggleStatus} onToggleHighlight={onToggleHighlight} />
                         </td>
                       </tr>
                     )}
@@ -1501,6 +1510,21 @@ function BondWarehouseApp() {
     }
   };
 
+  const handleToggleHighlight = async (bond, highlight) => {
+    try {
+      const { error } = await sb
+        .from(BONDS_TABLE)
+        .update({ highlight, updated_at: new Date().toISOString() })
+        .eq("id", bond.id);
+      if (error) throw error;
+      setSaveError(false);
+      await loadFromSupabase();
+    } catch (e) {
+      console.error(e);
+      setSaveError(true);
+    }
+  };
+
   const handleExport = () => {
     setExporting(true);
     setTimeout(() => {
@@ -1570,7 +1594,7 @@ function BondWarehouseApp() {
         </div>
       ) : view === "list" ? (
         <ListView bonds={bonds} onEdit={(b) => { setEditing(b); setView("form"); }} onDeleteReq={setDeleteTarget}
-          onExport={handleExport} exporting={exporting} onToggleStatus={handleToggleStatus} />
+          onExport={handleExport} exporting={exporting} onToggleStatus={handleToggleStatus} onToggleHighlight={handleToggleHighlight} />
       ) : (
         <FormView initial={editing} onSave={handleSave} onCancel={() => { setView("list"); setEditing(null); }} />
       )}
