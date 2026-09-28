@@ -158,6 +158,7 @@ const Svg = ({ children, size = 16, color = "currentColor", style, className }) 
   </svg>
 );
 const IconPlus = (p) => <Svg {...p}><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></Svg>;
+const IconX = (p) => <Svg {...p}><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></Svg>;
 const IconTrash = (p) => <Svg {...p}><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" /></Svg>;
 const IconSearch = (p) => <Svg {...p}><circle cx="11" cy="11" r="7" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></Svg>;
 const IconDownload = (p) => <Svg {...p}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></Svg>;
@@ -1112,7 +1113,16 @@ function ListView({ bonds, onEdit, onDeleteReq, onExport, exporting, onToggleSta
       <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 20 }}>
         <div style={{ position: "relative", width: 320, maxWidth: "100%" }}>
           <IconSearch size={16} style={{ position: "absolute", left: 12, top: 11, color: C.textMute }} />
-          <TInput placeholder="ค้นหา รหัส / ชื่อตราสาร / ผู้ออก" value={q} onChange={(e) => setQ(e.target.value)} style={{ paddingLeft: 34 }} />
+          <TInput placeholder="ค้นหา รหัส / ชื่อตราสาร / ผู้ออก" value={q} onChange={(e) => setQ(e.target.value)} style={{ paddingLeft: 34, paddingRight: q ? 34 : undefined }} />
+          {q && (
+            <button type="button" aria-label="ล้างคำค้นหา" title="ล้างคำค้นหา" onClick={() => setQ("")}
+              style={{ position: "absolute", right: 8, top: 8, width: 24, height: 24, display: "flex", alignItems: "center", justifyContent: "center",
+                border: "none", borderRadius: "50%", background: "transparent", color: C.textMute, cursor: "pointer", padding: 0 }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = C.bgSoft)}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
+              <IconX size={14} />
+            </button>
+          )}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ fontSize: 12, color: C.textMute }}>ทั้งหมด {bonds.length} รายการ</span>
