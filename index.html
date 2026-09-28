@@ -64,15 +64,6 @@
     text-shadow:0 4px 0 rgba(110,46,50,0.35);
     margin:0;
   }
-  .title-byline{
-    text-align:center;
-    margin-top:4px;
-    font-family:'Noto Sans Thai', sans-serif;
-    font-weight:600;
-    font-size:11px;
-    color:rgba(255,255,255,0.85);
-    letter-spacing:.3px;
-  }
   .title-sub{
     display:inline-block;
     margin-top:6px;
@@ -138,6 +129,48 @@
     width:15px; height:15px; pointer-events:none;
   }
   .search-box .search-icon svg{width:100%; height:100%; display:block;}
+  .search-box input{padding-right:34px;}
+  .search-clear{
+    display:none; position:absolute; right:6px; top:50%; transform:translateY(-50%);
+    width:26px; height:26px; padding:0; border:0; border-radius:50%;
+    background:transparent; color:var(--ink-soft); cursor:pointer;
+    align-items:center; justify-content:center;
+  }
+  .search-clear svg{width:14px; height:14px; display:block;}
+  .search-clear:hover{background:rgba(0,0,0,0.07); color:var(--ink);}
+  .search-clear:focus-visible{outline:2px solid var(--amber2); outline-offset:1px;}
+  /* มีข้อความในช่อง → แสดงปุ่ม x */
+  .search-box input:not(:placeholder-shown) ~ .search-clear{display:flex;}
+
+  /* ---------- Budget (งบลงทุน) ---------- */
+  .budget-box{margin-bottom:10px;}
+  .budget-row{display:flex; align-items:flex-start; gap:8px;}
+  .budget-col{flex:1 1 0; min-width:0;}
+  .budget-field{position:relative; flex:1 1 0; min-width:0;}
+  .budget-field input{
+    width:100%; min-width:0;
+    font-family:inherit; font-size:12.5px; color:var(--ink);
+    border:1px solid var(--line); border-radius:9px;
+    padding:10px 8px; background:#fff;
+  }
+  .budget-field input::placeholder{color:#A99B91;}
+  .budget-field input:focus-visible{outline:2px solid var(--amber2); outline-offset:1px;}
+  .budget-suffix{
+    display:none;
+    position:absolute; right:9px; top:50%; transform:translateY(-50%);
+    font-size:12px; color:var(--ink-soft); pointer-events:none;
+  }
+  /* มีตัวเลข (ระหว่างกรอก/หลังกรอก) → แสดงหน่วย "บาท" ท้ายช่อง */
+  .budget-field.has-value .budget-suffix{display:block;}
+  .budget-field.has-value input{border-color:var(--maroon); padding-right:34px;}
+  .budget-dash{color:var(--ink-soft); font-weight:700; flex:none; margin-top:11px;}
+  .budget-hint{
+    font-size:11px; color:var(--red); font-weight:600; margin:0 2px 0; line-height:1.4;
+    overflow:hidden; max-height:0; opacity:0;
+    transition:max-height .18s ease, opacity .15s ease, margin .18s ease;
+  }
+  /* ขึ้นข้อความสีแดงเฉพาะตอนกำลังพิมพ์อยู่ในช่องนั้นและยังไม่ผ่านเงื่อนไข */
+  .budget-hint.hint-show{max-height:28px; opacity:1; margin-top:5px;}
 
   /* ---------- Filters ---------- */
   .filters{
@@ -146,6 +179,8 @@
     border:1px solid var(--line); border-radius:12px;
     margin-bottom:16px;
   }
+  /* กันไม่ให้ปุ่ม/select ในกล่องตัวกรองดันความกว้างคอลัมน์จนล้นกรอบ */
+  .filters > *{min-width:0;}
   .filters select{
     appearance:none; -webkit-appearance:none;
     font-family:inherit;
@@ -159,10 +194,11 @@
     width:100%;
   }
   .filters select:focus-visible{outline:2px solid var(--amber2); outline-offset:1px;}
+  .filters select.active{border-color:var(--maroon); color:var(--maroon); font-weight:700;}
 
-  /* ---------- Multi-select filter dropdowns (checkbox groups) ---------- */
-  .multiselect{position:relative;}
-  .multiselect-btn{
+  /* ---------- Multi-select filters (YTM / อายุคงเหลือ / เครดิต / ความเสี่ยง) ---------- */
+  .msel{position:relative;}
+  .msel-btn{
     appearance:none; -webkit-appearance:none;
     font-family:inherit;
     background:#fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="8"><path d="M1 1l5 5 5-5" stroke="%237A6B62" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>') no-repeat right 10px center;
@@ -176,59 +212,94 @@
     text-align:left;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
-  .multiselect-btn:focus-visible{outline:2px solid var(--amber2); outline-offset:1px;}
-  .multiselect.has-selection .multiselect-btn{border-color:var(--amber2); color:var(--maroon); font-weight:700;}
-  .multiselect-panel{
+  .msel-btn:focus-visible{outline:2px solid var(--amber2); outline-offset:1px;}
+  .msel-btn.active{border-color:var(--maroon); color:var(--maroon); font-weight:700;}
+  .msel-panel{
     display:none;
-    position:absolute; left:0; right:0; top:calc(100% + 5px);
+    position:absolute; top:calc(100% + 4px); left:0; right:0; z-index:45;
     background:#fff; border:1px solid var(--line); border-radius:10px;
-    box-shadow:0 14px 28px -12px rgba(74,58,52,0.35);
-    padding:6px; z-index:30;
+    padding:6px; box-shadow:0 8px 20px rgba(0,0,0,0.14);
     max-height:230px; overflow-y:auto;
   }
-  .multiselect.open .multiselect-panel{display:block;}
-  .ms-panel-head{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:4px 6px 6px; margin-bottom:2px;
-    border-bottom:1px solid var(--line);
-  }
-  .ms-panel-title{font-size:10.5px; color:var(--ink-soft); font-weight:600;}
-  .ms-clear-btn{
-    background:none; border:none; font-family:inherit;
-    font-size:11px; font-weight:700; color:var(--maroon);
-    cursor:pointer; padding:2px 4px;
-  }
-  .ms-clear-btn:hover{text-decoration:underline;}
-  .ms-option{
+  .msel-panel.open{display:block;}
+  .msel-option{
     display:flex; align-items:center; gap:8px;
-    padding:8px 6px; border-radius:7px;
-    font-size:12.5px; color:var(--ink);
-    cursor:pointer;
+    padding:7px 6px; font-size:12.5px; color:var(--ink);
+    cursor:pointer; border-radius:6px;
   }
-  .ms-option:hover{background:#FBF3DF;}
-  .ms-option input[type="checkbox"]{
-    width:16px; height:16px; flex:0 0 auto;
-    accent-color:var(--amber2); cursor:pointer;
+  .msel-option:hover{background:#FBF8F1;}
+  .msel-option input{flex:none; width:15px; height:15px; accent-color:var(--maroon); cursor:pointer;}
+  /* แถวปุ่ม: ล้างตัวกรอง (ซ้าย เล็ก สีอ่อน) คู่กับ ค้นหา (ขวา ใหญ่ สีส้มเด่น) */
+  .filter-actions{
+    grid-column:1 / -1;
+    display:flex; gap:8px; margin-top:2px;
   }
   .reset-btn{
-    grid-column:1 / -1;
-    background:var(--maroon); color:#fff; border:none;
-    padding:9px; border-radius:9px; font-size:12.5px;
+    flex:1 1 0;
+    background:#fff; color:var(--maroon);
+    border:1.5px solid var(--maroon);
+    padding:9px 8px; border-radius:9px; font-size:12.5px;
     cursor:pointer; font-family:inherit; font-weight:600;
   }
-  .reset-btn:hover{background:#5a2529;}
+  .reset-btn:hover{background:#F7ECD6;}
+  .reset-btn:focus-visible, .search-btn:focus-visible{outline:2px solid var(--amber2); outline-offset:2px;}
+  .search-btn{
+    flex:1.5 1 0;
+    display:flex; align-items:center; justify-content:center; gap:7px;
+    background:linear-gradient(120deg,var(--amber1),var(--amber2));
+    color:#fff; border:1.5px solid transparent;
+    padding:9px 8px; border-radius:9px; font-size:13px;
+    cursor:pointer; font-family:inherit; font-weight:700;
+    box-shadow:0 8px 14px -8px rgba(232,134,42,0.8);
+    transition:transform .12s;
+  }
+  .search-btn:active{transform:scale(0.97);}
+  .search-btn svg{width:15px; height:15px; flex:none;}
+  .count-line{scroll-margin-top:14px;}
+  .count-line.flash b{animation:countFlash .9s ease-out;}
+  @keyframes countFlash{
+    0%{background:#F6D746; box-shadow:0 0 0 4px #F6D746; border-radius:4px;}
+    100%{background:transparent; box-shadow:0 0 0 4px transparent; border-radius:4px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .count-line.flash b{animation:none;}
+  }
 
   .active-filters{
-    display:flex; flex-wrap:wrap; gap:6px;
+    display:flex; flex-direction:column; gap:8px;
     margin:-6px 2px 14px;
   }
-  .active-filters:empty{margin:0; display:none;}
-  .filter-chip{
-    font-size:11px; font-weight:700; color:var(--maroon);
-    background:#F7ECD6; border:1px solid var(--line);
-    padding:5px 10px; border-radius:999px;
-    white-space:nowrap;
+  /* Filter chips: 1 แถว = 2 ตัวกรอง */
+  .chip-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px;}
+  .chip-card{
+    min-width:0;
+    display:flex; flex-direction:column; gap:7px;
+    background:#FBF8F1; border:1px solid var(--line); border-radius:12px;
+    padding:8px 9px;
   }
+  .chip-card.sorted{border-color:var(--maroon); background:#FDF6E8;}
+  .chip-title{
+    flex:1;
+    font-size:11.5px; font-weight:700; color:var(--maroon);
+    line-height:1.45; overflow-wrap:anywhere;
+  }
+  .sort-toggle{
+    font-family:inherit; font-size:11.5px; font-weight:700; color:var(--brown);
+    background:#fff; border:1px solid var(--line); border-radius:8px;
+    padding:7px 8px; cursor:pointer; width:100%;
+    white-space:nowrap;
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    line-height:1;
+  }
+  .sort-toggle-text{letter-spacing:0.1px;}
+  .sort-toggle-arrow{
+    font-size:13.5px; font-weight:800; line-height:1;
+  }
+  .sort-toggle:hover{background:#F7ECD6;}
+  .sort-toggle:active{transform:scale(0.98);}
+  .sort-toggle:focus-visible{outline:2px solid var(--amber2); outline-offset:2px;}
+  .chip-card.sorted .sort-toggle{background:var(--maroon); border-color:var(--maroon); color:#fff;}
+  .active-filters:empty{margin:0; display:none;}
 
   .count-line{
     font-size:12.5px; color:var(--ink-soft); margin-bottom:10px; padding:0 2px;
@@ -245,6 +316,11 @@
     border-radius:14px;
     padding:14px;
     background:var(--paper);
+    transition:border-color .15s, box-shadow .15s;
+  }
+  .card:has(.buy-expand.open){
+    border-color:var(--maroon);
+    box-shadow:0 0 0 3px rgba(110,46,50,0.14);
   }
   .card-head{display:flex; justify-content:space-between; gap:8px; align-items:flex-start;}
   .bond-name{font-weight:700; color:var(--brown); font-size:16px;}
@@ -274,7 +350,7 @@
   .ytm-box{
     text-align:right; flex:none;
   }
-  .ytm-box .lbl{font-size:10px; color:var(--ink-soft); margin-bottom:2px;}
+  .ytm-box .lbl{font-size:10px; font-weight:700; color:var(--brown); margin-bottom:2px;}
   .ytm{
     background:#F6D746; font-weight:800; color:var(--ink);
     padding:5px 11px; border-radius:6px; display:inline-block;
@@ -479,6 +555,8 @@
   }
   .buy-input:focus-visible{outline:2px solid var(--amber2); outline-offset:1px;}
   .buy-input:disabled{background:#F1ECE0; color:var(--ink-soft); cursor:not-allowed;}
+  /* กรอกจำนวนเงินแล้ว → ข้อความพรีฟิลด์ "จำนวนหน่วย" หาย (และกลับกัน) */
+  .buy-input:disabled::placeholder{color:transparent; opacity:0; -webkit-text-fill-color:transparent;}
   .buy-input.input-error{border-color:var(--red); outline:2px solid var(--red); outline-offset:1px;}
   .login-btn{
     width:100%;
@@ -505,6 +583,7 @@
     background:#FBEAEA; color:var(--red); font-weight:700; font-size:11.5px;
     padding:7px 10px; border-radius:8px; margin-bottom:8px; text-align:center;
     opacity:0; transition:opacity .2s;
+    white-space:pre-line; line-height:1.5;
   }
   .min-notice.show{display:block; opacity:1;}
   .comment-box{
@@ -528,6 +607,56 @@
   }
   .thank-you-msg.show{display:block;}
 
+  /* ---------- Privacy consent (shown after "ส่ง") ---------- */
+  .privacy-notice{
+    display:none;
+    background:#FBF8F1; border:1px solid var(--line); border-radius:12px;
+    padding:14px; margin-top:4px;
+  }
+  .privacy-notice.show{display:block;}
+  .privacy-notice-text{
+    font-size:11.5px; line-height:1.7; color:var(--ink-soft); margin:0 0 8px;
+  }
+  .privacy-notice-emphasis{
+    font-size:12.5px; line-height:1.7; color:var(--brown); font-weight:800;
+    margin:0 0 12px;
+  }
+  .privacy-check-label{
+    display:flex; align-items:flex-start; gap:8px;
+    font-size:12.5px; font-weight:600; color:var(--brown); line-height:1.6;
+    cursor:pointer; margin-bottom:10px;
+  }
+  .privacy-check-label input[type="checkbox"]{
+    flex:none; width:18px; height:18px; margin-top:1px; accent-color:var(--maroon); cursor:pointer;
+  }
+  .privacy-footnote{
+    font-size:11px; color:var(--ink-soft); margin:0 0 12px;
+  }
+  .privacy-error{
+    display:none;
+    font-size:11.5px; font-weight:700; color:#c0392b; margin:0 0 10px;
+  }
+  .privacy-error.show{display:block;}
+  .privacy-btn-row{display:flex; gap:8px;}
+  .privacy-prev-btn{
+    flex:1;
+    background:#fff; color:var(--brown); border:1px solid var(--line);
+    padding:11px; border-radius:9px;
+    font-family:inherit; font-weight:700; font-size:13.5px;
+    cursor:pointer;
+  }
+  .privacy-prev-btn:hover{background:#F7ECD6;}
+  .final-submit-btn{
+    display:none;
+    flex:1.4;
+    background:var(--maroon); color:#fff; border:none;
+    padding:11px; border-radius:9px;
+    font-family:inherit; font-weight:700; font-size:13.5px;
+    cursor:pointer;
+  }
+  .final-submit-btn.show{display:block;}
+  .final-submit-btn:hover{background:#5a2529;}
+
   /* ---------- Warning ---------- */
   .warning{
     max-width:600px; margin:22px auto 0; padding:0 16px;
@@ -542,6 +671,112 @@
     display:flex; align-items:center; justify-content:center; gap:10px;
     color:#F3E7C9; font-weight:600; font-size:12px; text-align:center;
   }
+
+  /* ---------- ขอบไฟวนรอบการ์ด (ดึงความสนใจ) ---------- */
+  @property --glow-angle{ syntax:'<angle>'; initial-value:0deg; inherits:false; }
+  .glow-run{
+    position:relative;
+    box-shadow:0 0 16px -2px rgba(232,134,42,0.35);
+  }
+  .glow-run::after{
+    content:''; position:absolute; inset:-3px;
+    border-radius:inherit; padding:3px;
+    background:conic-gradient(from var(--glow-angle),
+      rgba(232,134,42,0) 0deg, rgba(232,134,42,0) 190deg,
+      var(--amber2) 270deg, #FFE7B0 335deg, var(--amber1) 360deg);
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+    filter:drop-shadow(0 0 5px rgba(232,134,42,0.75));
+    animation:glowSpin 2.2s linear infinite;
+    pointer-events:none;
+  }
+  /* การ์ดความเป็นส่วนตัว: ขอบเรืองแสงวูบวาบช้าๆ (ไม่หมุน) */
+  .privacy-notice.glow-run::after{display:none;}
+  .privacy-notice.glow-run{
+    border-color:var(--amber2);
+    animation:privacyPulse 4s ease-in-out infinite;
+  }
+  @keyframes privacyPulse{
+    0%,100%{ box-shadow:0 0 0 0 rgba(232,134,42,0), 0 0 2.5px 0 rgba(232,134,42,0.12); border-color:#EBC38A; }
+    50%{ box-shadow:0 0 0 1.5px rgba(232,134,42,0.11), 0 0 11px 2px rgba(232,134,42,0.3); border-color:var(--amber2); }
+  }
+  @keyframes glowSpin{ to{ --glow-angle:360deg; } }
+  @media (prefers-reduced-motion:reduce){
+    .glow-run::after{animation:none;}
+    .privacy-notice.glow-run{animation:none; box-shadow:0 0 0 1.5px rgba(232,134,42,0.11), 0 0 7px 1px rgba(232,134,42,0.2);}
+  }
+
+  /* ---------- Warning popup (ก่อนกรอกจำนวนสนใจซื้อ) ---------- */
+  .warn-overlay{
+    position:fixed; inset:0; z-index:200;
+    background:rgba(51,38,33,0.62);
+    display:none; align-items:center; justify-content:center;
+    padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px));
+  }
+  .warn-overlay.open{display:flex;}
+  .warn-box{
+    width:100%; max-width:440px;
+    max-height:calc(100vh - 32px); max-height:calc(100dvh - 32px);
+    display:flex; flex-direction:column;
+    background:var(--paper);
+    border-radius:20px; overflow:hidden;
+    box-shadow:0 28px 60px -12px rgba(0,0,0,0.5);
+  }
+  .warn-overlay.open .warn-box{animation:warnIn .22s ease-out;}
+  @keyframes warnIn{
+    from{opacity:0; transform:translateY(12px) scale(.97);}
+    to{opacity:1; transform:none;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .warn-overlay.open .warn-box{animation:none;}
+  }
+  .warn-head{
+    flex:none;
+    display:flex; align-items:center; gap:12px;
+    padding:16px 20px;
+    background:linear-gradient(120deg,var(--amber1),var(--amber2));
+    color:#fff;
+  }
+  .warn-icon{
+    flex:none; width:38px; height:38px; border-radius:999px;
+    background:rgba(255,255,255,0.22);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .warn-title{font-family:'Kanit','Noto Sans Thai',sans-serif; font-weight:700; font-size:20px; line-height:1.2;}
+  .warn-body{
+    flex:1 1 auto; min-height:0;
+    overflow-y:auto; -webkit-overflow-scrolling:touch;
+    padding:16px 20px 8px;
+  }
+  .warn-lead{
+    margin:0 0 14px; padding:12px 14px;
+    background:#FBEAEA; border-radius:12px;
+    color:var(--red); font-weight:700; font-size:13px; line-height:1.75;
+  }
+  .warn-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px;}
+  .warn-list li{
+    position:relative; padding-left:18px;
+    font-size:12.5px; line-height:1.75; color:var(--ink);
+  }
+  .warn-list li::before{
+    content:''; position:absolute; left:2px; top:.7em;
+    width:7px; height:7px; border-radius:999px; background:var(--amber2);
+  }
+  .warn-foot{
+    flex:none; padding:12px 20px 18px;
+    background:var(--paper);
+    box-shadow:0 -10px 14px -12px rgba(51,38,33,0.28);
+  }
+  .warn-ack-btn{
+    width:100%;
+    background:var(--maroon); color:#fff; border:none;
+    padding:13px; border-radius:11px;
+    font-family:inherit; font-weight:700; font-size:14.5px;
+    cursor:pointer;
+  }
+  .warn-ack-btn:hover{background:#5a2529;}
+  .warn-ack-btn:active{transform:scale(0.98);}
+  .warn-ack-btn:focus-visible{outline:2px solid var(--amber2); outline-offset:2px;}
 
   @media (min-width:420px){
     .filters{grid-template-columns:1fr 1fr;}
@@ -560,7 +795,6 @@
     <div class="coin c3"></div>
     <div class="title-block">
       <h1 class="title-main">BOND SCREENER</h1>
-      <div class="title-byline">By Kitthanabhumi</div>
     </div>
   </div>
 
@@ -587,64 +821,90 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="#7A6B62" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
       </span>
       <input type="text" id="fSearch" placeholder="ค้นหารหัสหุ้นกู้ หรือชื่อผู้ออก">
+      <button type="button" class="search-clear" id="fSearchClear" aria-label="ล้างคำค้นหา" title="ล้าง">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg>
+      </button>
+    </div>
+
+    <div class="budget-box">
+      <div class="budget-row" role="group" aria-label="งบลงทุน">
+        <div class="budget-col">
+          <div class="budget-field">
+            <input type="text" id="fBudgetMin" inputmode="numeric" autocomplete="off" placeholder="ขั้นต่ำ 100,000 บาท" aria-label="งบลงทุนขั้นต่ำ (บาท)">
+            <span class="budget-suffix" aria-hidden="true">บาท</span>
+          </div>
+          <div class="budget-hint" id="budgetMinHint">ขั้นต่ำ 100,000 บาท</div>
+        </div>
+        <span class="budget-dash" aria-hidden="true">–</span>
+        <div class="budget-col">
+          <div class="budget-field">
+            <input type="text" id="fBudgetMax" inputmode="numeric" autocomplete="off" placeholder="สูงสุด (บาท)" aria-label="งบลงทุนสูงสุด (บาท)">
+            <span class="budget-suffix" aria-hidden="true">บาท</span>
+          </div>
+          <div class="budget-hint" id="budgetMaxHint">สูงสุดต้องไม่น้อยกว่าขั้นต่ำ</div>
+        </div>
+      </div>
     </div>
 
     <div class="filters">
+      <div class="msel" data-msel="fYtm">
+        <button type="button" class="msel-btn" id="fYtmBtn">YTM: ทั้งหมด</button>
+        <div class="msel-panel" id="fYtmPanel">
+          <label class="msel-option"><input type="checkbox" value="gt5"><span>มากกว่า 5%</span></label>
+          <label class="msel-option"><input type="checkbox" value="4-5"><span>4-5%</span></label>
+          <label class="msel-option"><input type="checkbox" value="3-4"><span>3-4%</span></label>
+          <label class="msel-option"><input type="checkbox" value="2-3"><span>2-3%</span></label>
+          <label class="msel-option"><input type="checkbox" value="lt2"><span>น้อยกว่า 2%</span></label>
+        </div>
+      </div>
+      <div class="msel" data-msel="fLife">
+        <button type="button" class="msel-btn" id="fLifeBtn">อายุคงเหลือ (ปี): ทั้งหมด</button>
+        <div class="msel-panel" id="fLifePanel">
+          <label class="msel-option"><input type="checkbox" value="lt1"><span>น้อยกว่า 1 ปี</span></label>
+          <label class="msel-option"><input type="checkbox" value="1-2"><span>1-2 ปี</span></label>
+          <label class="msel-option"><input type="checkbox" value="2-3"><span>2-3 ปี</span></label>
+          <label class="msel-option"><input type="checkbox" value="3-4"><span>3-4 ปี</span></label>
+          <label class="msel-option"><input type="checkbox" value="4-5"><span>4-5 ปี</span></label>
+          <label class="msel-option"><input type="checkbox" value="gt5"><span>มากกว่า 5 ปี</span></label>
+        </div>
+      </div>
+      <div class="msel" data-msel="fRatingCompany">
+        <button type="button" class="msel-btn" id="fRatingCompanyBtn">เครดิต(บริษัท): ทั้งหมด</button>
+        <div class="msel-panel" id="fRatingCompanyPanel">
+          <label class="msel-option"><input type="checkbox" value="AAA"><span>AAA</span></label>
+          <label class="msel-option"><input type="checkbox" value="AA"><span>AA</span></label>
+          <label class="msel-option"><input type="checkbox" value="A"><span>A</span></label>
+          <label class="msel-option"><input type="checkbox" value="BBB"><span>BBB</span></label>
+          <label class="msel-option"><input type="checkbox" value="Unrated"><span>Unrated</span></label>
+        </div>
+      </div>
+      <div class="msel" data-msel="fRating">
+        <button type="button" class="msel-btn" id="fRatingBtn">เครดิต(ตราสาร): ทั้งหมด</button>
+        <div class="msel-panel" id="fRatingPanel">
+          <label class="msel-option"><input type="checkbox" value="AAA"><span>AAA</span></label>
+          <label class="msel-option"><input type="checkbox" value="AA"><span>AA</span></label>
+          <label class="msel-option"><input type="checkbox" value="A"><span>A</span></label>
+          <label class="msel-option"><input type="checkbox" value="BBB"><span>BBB</span></label>
+          <label class="msel-option"><input type="checkbox" value="Unrated"><span>Unrated</span></label>
+        </div>
+      </div>
       <select id="fInvestor">
         <option value="">นักลงทุน: ทั้งหมด</option>
         <option value="PO">ประชาชนทั่วไป (PO)</option>
         <option value="II/HNW">รายใหญ่/สถาบัน</option>
         <option value="PG">ตราสารหนี้ภาครัฐ (PG)</option>
       </select>
-      <div class="multiselect" data-id="fRating">
-        <button type="button" class="multiselect-btn" aria-haspopup="listbox" aria-expanded="false">
-          <span class="ms-label">เครดิต(ตราสาร): ทั้งหมด</span>
-        </button>
-        <div class="multiselect-panel" role="listbox" aria-multiselectable="true">
-          <div class="ms-panel-head">
-            <span class="ms-panel-title">เลือกได้หลายรายการ</span>
-            <button type="button" class="ms-clear-btn">ล้าง</button>
-          </div>
-          <label class="ms-option"><input type="checkbox" value="AAA"><span class="ms-option-text">AAA</span></label>
-          <label class="ms-option"><input type="checkbox" value="AA"><span class="ms-option-text">AA</span></label>
-          <label class="ms-option"><input type="checkbox" value="A"><span class="ms-option-text">A</span></label>
-          <label class="ms-option"><input type="checkbox" value="BBB"><span class="ms-option-text">BBB</span></label>
-          <label class="ms-option"><input type="checkbox" value="Unrated"><span class="ms-option-text">Unrated</span></label>
-        </div>
-      </div>
-      <div class="multiselect" data-id="fRatingCompany">
-        <button type="button" class="multiselect-btn" aria-haspopup="listbox" aria-expanded="false">
-          <span class="ms-label">เครดิต(บริษัท): ทั้งหมด</span>
-        </button>
-        <div class="multiselect-panel" role="listbox" aria-multiselectable="true">
-          <div class="ms-panel-head">
-            <span class="ms-panel-title">เลือกได้หลายรายการ</span>
-            <button type="button" class="ms-clear-btn">ล้าง</button>
-          </div>
-          <label class="ms-option"><input type="checkbox" value="AAA"><span class="ms-option-text">AAA</span></label>
-          <label class="ms-option"><input type="checkbox" value="AA"><span class="ms-option-text">AA</span></label>
-          <label class="ms-option"><input type="checkbox" value="A"><span class="ms-option-text">A</span></label>
-          <label class="ms-option"><input type="checkbox" value="BBB"><span class="ms-option-text">BBB</span></label>
-          <label class="ms-option"><input type="checkbox" value="Unrated"><span class="ms-option-text">Unrated</span></label>
-        </div>
-      </div>
-      <div class="multiselect" data-id="fRisk">
-        <button type="button" class="multiselect-btn" aria-haspopup="listbox" aria-expanded="false">
-          <span class="ms-label">ความเสี่ยง: ทั้งหมด</span>
-        </button>
-        <div class="multiselect-panel" role="listbox" aria-multiselectable="true">
-          <div class="ms-panel-head">
-            <span class="ms-panel-title">เลือกได้หลายรายการ</span>
-            <button type="button" class="ms-clear-btn">ล้าง</button>
-          </div>
-          <label class="ms-option"><input type="checkbox" value="1"><span class="ms-option-text">ระดับ 1</span></label>
-          <label class="ms-option"><input type="checkbox" value="2"><span class="ms-option-text">ระดับ 2</span></label>
-          <label class="ms-option"><input type="checkbox" value="3"><span class="ms-option-text">ระดับ 3</span></label>
-          <label class="ms-option"><input type="checkbox" value="4"><span class="ms-option-text">ระดับ 4</span></label>
-          <label class="ms-option"><input type="checkbox" value="5"><span class="ms-option-text">ระดับ 5</span></label>
-          <label class="ms-option"><input type="checkbox" value="6"><span class="ms-option-text">ระดับ 6</span></label>
-          <label class="ms-option"><input type="checkbox" value="7"><span class="ms-option-text">ระดับ 7</span></label>
-          <label class="ms-option"><input type="checkbox" value="8"><span class="ms-option-text">ระดับ 8</span></label>
+      <div class="msel" data-msel="fRisk">
+        <button type="button" class="msel-btn" id="fRiskBtn">ความเสี่ยง: ทั้งหมด</button>
+        <div class="msel-panel" id="fRiskPanel">
+          <label class="msel-option"><input type="checkbox" value="1"><span>ระดับ 1</span></label>
+          <label class="msel-option"><input type="checkbox" value="2"><span>ระดับ 2</span></label>
+          <label class="msel-option"><input type="checkbox" value="3"><span>ระดับ 3</span></label>
+          <label class="msel-option"><input type="checkbox" value="4"><span>ระดับ 4</span></label>
+          <label class="msel-option"><input type="checkbox" value="5"><span>ระดับ 5</span></label>
+          <label class="msel-option"><input type="checkbox" value="6"><span>ระดับ 6</span></label>
+          <label class="msel-option"><input type="checkbox" value="7"><span>ระดับ 7</span></label>
+          <label class="msel-option"><input type="checkbox" value="8"><span>ระดับ 8</span></label>
         </div>
       </div>
       <select id="fFeature">
@@ -653,46 +913,19 @@
         <option value="call">Call Option</option>
         <option value="perp">Perpetual Bond</option>
       </select>
-      <div class="multiselect" data-id="fYtm">
-        <button type="button" class="multiselect-btn" aria-haspopup="listbox" aria-expanded="false">
-          <span class="ms-label">YTM: ทั้งหมด</span>
-        </button>
-        <div class="multiselect-panel" role="listbox" aria-multiselectable="true">
-          <div class="ms-panel-head">
-            <span class="ms-panel-title">เลือกได้หลายรายการ</span>
-            <button type="button" class="ms-clear-btn">ล้าง</button>
-          </div>
-          <label class="ms-option"><input type="checkbox" value="gt5"><span class="ms-option-text">มากกว่า 5%</span></label>
-          <label class="ms-option"><input type="checkbox" value="4-5"><span class="ms-option-text">4-5%</span></label>
-          <label class="ms-option"><input type="checkbox" value="3-4"><span class="ms-option-text">3-4%</span></label>
-          <label class="ms-option"><input type="checkbox" value="2-3"><span class="ms-option-text">2-3%</span></label>
-          <label class="ms-option"><input type="checkbox" value="lt2"><span class="ms-option-text">น้อยกว่า 2%</span></label>
-        </div>
-      </div>
-      <div class="multiselect" data-id="fLife">
-        <button type="button" class="multiselect-btn" aria-haspopup="listbox" aria-expanded="false">
-          <span class="ms-label">อายุคงเหลือ (ปี): ทั้งหมด</span>
-        </button>
-        <div class="multiselect-panel" role="listbox" aria-multiselectable="true">
-          <div class="ms-panel-head">
-            <span class="ms-panel-title">เลือกได้หลายรายการ</span>
-            <button type="button" class="ms-clear-btn">ล้าง</button>
-          </div>
-          <label class="ms-option"><input type="checkbox" value="lt1"><span class="ms-option-text">น้อยกว่า 1 ปี</span></label>
-          <label class="ms-option"><input type="checkbox" value="1-2"><span class="ms-option-text">1-2 ปี</span></label>
-          <label class="ms-option"><input type="checkbox" value="2-3"><span class="ms-option-text">2-3 ปี</span></label>
-          <label class="ms-option"><input type="checkbox" value="3-4"><span class="ms-option-text">3-4 ปี</span></label>
-          <label class="ms-option"><input type="checkbox" value="4-5"><span class="ms-option-text">4-5 ปี</span></label>
-          <label class="ms-option"><input type="checkbox" value="gt5"><span class="ms-option-text">มากกว่า 5 ปี</span></label>
-        </div>
-      </div>
       <select id="fPrice">
         <option value="">ราคา: ทั้งหมด</option>
         <option value="premium">Premium</option>
         <option value="par">Par</option>
         <option value="discount">Discount</option>
       </select>
-      <button class="reset-btn" id="resetBtn">ล้างตัวกรองทั้งหมด</button>
+      <div class="filter-actions">
+        <button type="button" class="reset-btn" id="resetBtn">ล้างตัวกรอง</button>
+        <button type="button" class="search-btn" id="searchBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <span class="search-label">ค้นหา</span>
+        </button>
+      </div>
     </div>
 
     <div class="active-filters" id="activeFilters"></div>
@@ -715,7 +948,30 @@
     </ul>
   </div>
 
-  <div class="contact-bar">Krungsri Securities &nbsp;·&nbsp; 0 2638 5500, 0 2659 7777</div>
+
+  <div class="warn-overlay" id="warnOverlay" role="dialog" aria-modal="true" aria-labelledby="warnTitle">
+    <div class="warn-box">
+      <div class="warn-head">
+        <span class="warn-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        </span>
+        <div class="warn-title" id="warnTitle">คำเตือน</div>
+      </div>
+      <div class="warn-body">
+        <p class="warn-lead">ราคาที่แสดงเป็นเพียง Indicative Quotation (ราคาชี้นำ) เท่านั้น ซึ่งราคาดังกล่าวอาจมีการเปลี่ยนแปลงโดยขึ้นอยู่กับความผันผวนของราคาตลาด (Market Fluctuation), วันที่ทำรายการซื้อขาย (Trade) และวันที่ชำระราคา (Settlement)</p>
+        <ul class="warn-list">
+          <li>การลงทุนมีความเสี่ยง ผู้ลงทุนโปรดศึกษาลักษณะของหุ้นกู้ เงื่อนไขผลตอบแทนและความเสี่ยงจากหนังสือชี้ชวนก่อนการตัดสินใจลงทุน</li>
+          <li>ผลตอบแทนที่เสนอขายดังระบุข้างต้น เป็นอัตราผลตอบแทนอ้างอิง สำหรับใช้เป็นข้อมูลในการตัดสินใจของนักลงทุนเท่านั้น</li>
+          <li>กรณีเสนอขายนักลงทุนรายใหญ่ (HNW) จะต้องเป็นไปตามคุณสมบัติที่ ก.ล.ต. กำหนด</li>
+          <li>ข้อมูลข้างต้นบริษัทขอสงวนสิทธิ์ในการเปลี่ยนแปลงโดยมิได้ต้องแจ้งให้ทราบล่วงหน้า</li>
+          <li>YTM = Yield To Maturity หรืออัตราผลตอบแทนที่ผู้ลงทุนจะได้รับในกรณีที่ผู้ลงทุนถือหุ้นกู้ตัวนั้น จนครบกำหนดอายุตราสาร</li>
+        </ul>
+      </div>
+      <div class="warn-foot">
+        <button type="button" class="warn-ack-btn" id="warnAckBtn">รับทราบ</button>
+      </div>
+    </div>
+  </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -739,6 +995,13 @@ if (SUPABASE_CONFIGURED) {
     console.error("Supabase init failed:", e);
   }
 }
+// ---------- "สนใจซื้อ" backend email function ----------
+// URL ของ Supabase Edge Function "send-bond-interest" (ดูวิธีสร้าง/ติดตั้งใน
+// setup-guide-email-backend.md) — ค่าเริ่มต้นนี้คำนวณจาก SUPABASE_URL ด้านบน
+// ให้อัตโนมัติ ไม่ต้องแก้ไข ตราบใดที่ deploy ฟังก์ชันไว้ในโปรเจกต์เดียวกัน
+const SEND_INTEREST_FUNCTION_URL = SUPABASE_CONFIGURED
+  ? `${SUPABASE_URL}/functions/v1/send-bond-interest`
+  : "";
 const BONDS_TABLE = "bonds";
 let BONDS = [];
 let _bondUidSeq = 0; // guarantees every card gets a unique DOM id, even when two bonds share the same "code" (same-name bonds)
@@ -746,80 +1009,239 @@ let _bondUidSeq = 0; // guarantees every card gets a unique DOM id, even when tw
 const cardsEl = document.getElementById('cards');
 const countEl = document.getElementById('countNum');
 const activeFiltersEl = document.getElementById('activeFilters');
-const ids = ['fInvestor','fFeature','fPrice']; // plain single-select dropdowns
+const ids = ['fInvestor','fFeature','fPrice'];
 const els = Object.fromEntries(ids.map(id=>[id, document.getElementById(id)]));
-const searchEl = document.getElementById('fSearch');
 
-// ---------- Multi-select filter dropdowns (checkbox groups) ----------
-// เครดิต(ตราสาร), เครดิต(บริษัท), ความเสี่ยง, YTM, อายุคงเหลือ ใช้ checkbox
-// เพื่อให้เลือกได้หลายตัวเลือกพร้อมกัน (OR ภายในตัวกรองเดียวกัน, AND ระหว่างตัวกรอง)
-const multiFilterIds = ['fRating','fRatingCompany','fRisk','fYtm','fLife'];
-const multiFilterState = Object.fromEntries(multiFilterIds.map(id=>[id, []]));
-const multiSelectResetters = {};
-function initMultiSelect(id){
-  const root = document.querySelector(`.multiselect[data-id="${id}"]`);
-  if(!root) return;
-  const btn = root.querySelector('.multiselect-btn');
-  const labelEl = btn.querySelector('.ms-label');
-  const baseLabel = labelEl.textContent.split(':')[0];
-  const panel = root.querySelector('.multiselect-panel');
-  const checkboxes = [...panel.querySelectorAll('input[type="checkbox"]')];
-
-  function updateLabel(){
-    const checked = checkboxes.filter(c=> c.checked);
-    multiFilterState[id] = checked.map(c=> c.value);
-    root.classList.toggle('has-selection', checked.length>0);
-    btn.setAttribute('aria-expanded', root.classList.contains('open') ? 'true' : 'false');
-    if(checked.length===0){
-      labelEl.textContent = `${baseLabel}: ทั้งหมด`;
-    } else if(checked.length===1){
-      const text = checked[0].closest('.ms-option').querySelector('.ms-option-text').textContent;
-      labelEl.textContent = `${baseLabel}: ${text}`;
-    } else {
-      labelEl.textContent = `${baseLabel}: ${checked.length} รายการ`;
-    }
+// ---------- Multi-select filters (YTM / อายุคงเหลือ / เครดิต(บริษัท+ตราสาร) / ความเสี่ยง) ----------
+// Each can have zero, one, or several checkboxes ticked at once (OR logic
+// within the same filter, AND logic across different filters — same as the
+// original single-select dropdowns, just letting more than one value in).
+const multiFilterMeta = {
+  fYtm: 'YTM',
+  fLife: 'อายุคงเหลือ (ปี)',
+  fRatingCompany: 'เครดิต(บริษัท)',
+  fRating: 'เครดิต(ตราสาร)',
+  fRisk: 'ความเสี่ยง',
+};
+const multiIds = Object.keys(multiFilterMeta);
+const multiState = Object.fromEntries(multiIds.map(id=>[id, []]));
+const multiOptionLabels = {}; // id -> { value: displayText }
+multiIds.forEach(id=>{
+  const panel = document.getElementById(`${id}Panel`);
+  multiOptionLabels[id] = {};
+  panel.querySelectorAll('.msel-option').forEach(opt=>{
+    const input = opt.querySelector('input');
+    const span = opt.querySelector('span');
+    multiOptionLabels[id][input.value] = span.textContent;
+  });
+});
+function updateMselButtonLabel(id){
+  const btn = document.getElementById(`${id}Btn`);
+  const selected = multiState[id];
+  const base = multiFilterMeta[id];
+  if(selected.length === 0){
+    btn.textContent = `${base}: ทั้งหมด`;
+    btn.classList.remove('active');
+  } else if(selected.length === 1){
+    btn.textContent = `${base}: ${multiOptionLabels[id][selected[0]]}`;
+    btn.classList.add('active');
+  } else {
+    btn.textContent = `${base} (${selected.length} เลือก)`;
+    btn.classList.add('active');
   }
-
-  checkboxes.forEach(cb=> cb.addEventListener('change', ()=>{ updateLabel(); render(); }));
-
+}
+function closeAllMselPanels(except){
+  document.querySelectorAll('.msel-panel.open').forEach(p=>{
+    if(p !== except) p.classList.remove('open');
+  });
+}
+multiIds.forEach(id=>{
+  const btn = document.getElementById(`${id}Btn`);
+  const panel = document.getElementById(`${id}Panel`);
   btn.addEventListener('click', (e)=>{
     e.stopPropagation();
-    const wasOpen = root.classList.contains('open');
-    closeAllMultiSelects();
-    if(!wasOpen){
-      root.classList.add('open');
-      btn.setAttribute('aria-expanded','true');
+    const willOpen = !panel.classList.contains('open');
+    closeAllMselPanels(willOpen ? panel : null);
+    panel.classList.toggle('open', willOpen);
+  });
+  panel.addEventListener('change', (e)=>{
+    const input = e.target;
+    if(input.type !== 'checkbox') return;
+    if(input.checked){
+      if(!multiState[id].includes(input.value)) multiState[id].push(input.value);
+    } else {
+      multiState[id] = multiState[id].filter(v=> v !== input.value);
     }
+    updateMselButtonLabel(id);
+    render();
   });
-
-  const clearBtn = panel.querySelector('.ms-clear-btn');
-  if(clearBtn){
-    clearBtn.addEventListener('click', (e)=>{
-      e.stopPropagation();
-      checkboxes.forEach(cb=> cb.checked = false);
-      updateLabel();
-      render();
-    });
-  }
-
-  multiSelectResetters[id] = ()=>{
-    checkboxes.forEach(cb=> cb.checked = false);
-    updateLabel();
-  };
-
-  updateLabel();
-}
-function closeAllMultiSelects(){
-  document.querySelectorAll('.multiselect.open').forEach(el=>{
-    el.classList.remove('open');
-    const b = el.querySelector('.multiselect-btn');
-    if(b) b.setAttribute('aria-expanded','false');
-  });
-}
-document.addEventListener('click', (e)=>{
-  if(!e.target.closest('.multiselect')) closeAllMultiSelects();
 });
-multiFilterIds.forEach(initMultiSelect);
+document.addEventListener('click', (e)=>{
+  if(!e.target.closest('.msel')) closeAllMselPanels();
+});
+function resetMultiFilters(){
+  multiIds.forEach(id=>{
+    multiState[id] = [];
+    document.querySelectorAll(`#${id}Panel input[type="checkbox"]`).forEach(cb=> cb.checked = false);
+    updateMselButtonLabel(id);
+  });
+}
+const searchEl = document.getElementById('fSearch');
+
+// เวลาพิมพ์ในช่องค้นหา/งบลงทุน การกรองผลลัพธ์ใหม่ทั้งหมด (สร้างการ์ดทุกใบใหม่) ทำงานหนักพอสมควร
+// ถ้าเรียก render() ทุกตัวอักษรที่พิมพ์จะรู้สึกหน่วง จึงหน่วงเวลาการกรอง/สร้างการ์ดใหม่ไว้เล็กน้อย (debounce)
+// ส่วนสิ่งที่ต้องเห็นผลทันที (ใส่ลูกน้ำในตัวเลข, ข้อความเตือนสีแดง) ยังคงทำงานทันทีทุกครั้งที่พิมพ์
+function debounce(fn, wait){
+  let t;
+  const debounced = (...args)=>{ clearTimeout(t); t = setTimeout(()=> fn(...args), wait); };
+  debounced.flush = (...args)=>{ clearTimeout(t); fn(...args); };
+  return debounced;
+}
+const debouncedRender = debounce(()=> render(), 200);
+
+// ---------- งบลงทุน (ช่วงยอด "ซื้อขั้นต่ำ" ของหุ้นกู้) ----------
+// ช่องขั้นต่ำ/ขั้นสูง กรอกหรือไม่กรอกก็ได้ (ว่าง = ไม่จำกัดด้านนั้น)
+// เทียบกับตัวเลข "ซื้อขั้นต่ำ" ของหุ้นกู้เท่านั้น — ไม่เกี่ยวกับวงเงิน "เสนอขาย"
+const budgetMinEl = document.getElementById('fBudgetMin');
+const budgetMaxEl = document.getElementById('fBudgetMax');
+const budgetMinHintEl = document.getElementById('budgetMinHint');
+const budgetMaxHintEl = document.getElementById('budgetMaxHint');
+function readBudget(){
+  const parse = el => {
+    const raw = el.value.replace(/[^\d]/g, '');
+    return raw === '' ? null : Number(raw);
+  };
+  let min = parse(budgetMinEl);
+  const max = parse(budgetMaxEl);
+  if(min === 0) min = null; // 0 = ไม่จำกัดขั้นต่ำ
+  return { min, max };
+}
+function budgetActive(){
+  const { min, max } = readBudget();
+  return min !== null || max !== null;
+}
+function minPurchaseNum(b){
+  return Number(String(b.minPurchase).replace(/,/g, '')) || 0;
+}
+function budgetChipText(){
+  const { min, max } = readBudget();
+  const f = n => n.toLocaleString('en-US');
+  if(min !== null && max !== null) return `${f(min)} - ${f(max)} บาท`;
+  if(min !== null) return `ตั้งแต่ ${f(min)} บาท`;
+  return `ไม่เกิน ${f(max)} บาท`;
+}
+// คำแนะนำใต้ช่อง: แสดงเป็นสีปกติตอนช่องว่าง, ขึ้นตัวอักษรสีแดงระหว่างกำลังโฟกัส/พิมพ์อยู่ในช่องนั้น
+// แล้วซ่อนไปเมื่อออกจากช่อง (blur) พร้อมมีตัวเลขอยู่แล้ว (กรอกเสร็จ)
+let minFieldFocused = false, maxFieldFocused = false;
+function budgetNum(el){ return Number(el.value.replace(/[^\d]/g, '')) || 0; }
+// ตอนยังไม่ได้แตะช่อง (ว่างเปล่า) ไม่ขึ้นข้อความ — ขึ้นสีแดงเฉพาะตอนพิมพ์อยู่ในช่องนั้น
+// และยังไม่ผ่านเงื่อนไข: ขั้นต่ำ ต้องมากกว่า 100,000 / สูงสุด ต้องมากกว่าหรือเท่ากับขั้นต่ำ (หรือ 100,000 ถ้ายังไม่กรอกขั้นต่ำ)
+function updateBudgetHints(){
+  if(budgetMinHintEl){
+    const n = budgetNum(budgetMinEl);
+    const show = minFieldFocused && budgetMinEl.value !== '' && n < 100000;
+    budgetMinHintEl.classList.toggle('hint-show', show);
+  }
+  if(budgetMaxHintEl){
+    const n = budgetNum(budgetMaxEl);
+    const floor = Math.max(100000, budgetNum(budgetMinEl));
+    const show = maxFieldFocused && budgetMaxEl.value !== '' && n < floor;
+    budgetMaxHintEl.classList.toggle('hint-show', show);
+  }
+}
+budgetMinEl.addEventListener('focus', ()=>{ minFieldFocused = true; updateBudgetHints(); });
+budgetMaxEl.addEventListener('focus', ()=>{ maxFieldFocused = true; updateBudgetHints(); });
+[budgetMinEl, budgetMaxEl].forEach(el=>{
+  el.addEventListener('input', ()=>{
+    formatNumberInput(el);   // ใส่ลูกน้ำในตัวเลข — ต้องเห็นผลทันที ไม่หน่วง
+    updateBudgetHints();     // ข้อความเตือนสีแดง — ต้องเห็นผลทันที ไม่หน่วง
+    debouncedRender();       // กรองรายการ/สร้างการ์ดใหม่ทั้งหมด — งานหนัก ปล่อยให้หน่วงเล็กน้อยได้
+  });
+});
+// ช่องขั้นต่ำ: ถ้ากรอกตัวเลขต่ำกว่า 100,000 ให้ปรับเป็น 100,000 อัตโนมัติเมื่อออกจากช่อง
+budgetMinEl.addEventListener('blur', ()=>{
+  const n = Number(budgetMinEl.value.replace(/[^\d]/g, ''));
+  if(budgetMinEl.value !== '' && n > 0 && n < 100000){
+    budgetMinEl.value = '100,000';
+  }
+  minFieldFocused = false;
+  updateBudgetHints();
+  debouncedRender.flush(); // ออกจากช่องแล้ว ให้แสดงผลล่าสุดทันที ไม่ต้องรอหน่วงเวลา
+});
+// ช่องสูงสุด: ถ้ากรอกตัวเลขต่ำกว่า 100,000 หรือต่ำกว่าช่องขั้นต่ำ ให้ปรับเป็น 100,000
+// หรือตัวเลขตามช่องขั้นต่ำ แล้วแต่ค่าไหนมากกว่า (ปรับเมื่อออกจากช่อง)
+budgetMaxEl.addEventListener('blur', ()=>{
+  const n = Number(budgetMaxEl.value.replace(/[^\d]/g, ''));
+  if(budgetMaxEl.value !== '' && n > 0){
+    const minRaw = Number(budgetMinEl.value.replace(/[^\d]/g, '')) || 0;
+    const floor = Math.max(100000, minRaw);
+    if(n < floor){
+      budgetMaxEl.value = floor.toLocaleString('en-US');
+    }
+  }
+  maxFieldFocused = false;
+  updateBudgetHints();
+  debouncedRender.flush(); // ออกจากช่องแล้ว ให้แสดงผลล่าสุดทันที ไม่ต้องรอหน่วงเวลา
+});
+
+// ---------- เรียงลำดับตามตัวกรองที่เลือก (งบลงทุน / YTM / อายุคงเหลือ / เครดิต / ความเสี่ยง) ----------
+// Filter Chip ของแต่ละหัวข้อมีปุ่มเรียงลำดับปุ่มเดียว สลับ "มากไปน้อย↓" / "น้อยไปมาก↑"
+// ค่าเริ่มต้นของปุ่ม (dflt): งบลงทุน/YTM/เครดิต = มากไปน้อย, อายุคงเหลือ/ความเสี่ยง = น้อยไปมาก
+// เครดิต: มาก = อันดับดีกว่า (AAA มากที่สุด ... Unrated น้อยที่สุด)
+const sortConfig = {
+  fYtm:           { val: b=> b.ytm,                          dflt:'desc' },
+  fLife:          { val: b=> lifeNum(b),                     dflt:'asc'  },
+  fRating:        { val: b=> ratingRank(b.ratingLabel),      dflt:'desc' },
+  fRatingCompany: { val: b=> ratingRank(b.ratingCompanyLabel), dflt:'desc' },
+  fRisk:          { val: b=> b.risk,                         dflt:'asc'  },
+  fBudget:        { val: b=> minPurchaseNum(b),              dflt:'desc' },
+};
+// ลำดับตัดสินเมื่อค่าเท่ากัน: YTM → อายุคงเหลือ → เครดิต(ตราสาร) → เครดิต(บริษัท) → ความเสี่ยง → งบลงทุน
+const defaultSortCascade = ['fYtm','fLife','fRating','fRatingCompany','fRisk','fBudget'];
+let sortPrefs = {};  // id -> 'asc' | 'desc' (ไม่มีค่า = ใช้ dflt ของหัวข้อนั้น)
+let sortOrder = [];  // id ที่ผู้ใช้กดปุ่มเรียง เรียงจากกดล่าสุดไปเก่าสุด
+function isSortChipActive(id){
+  if(id === 'fBudget') return budgetActive();
+  return !!(multiState[id] && multiState[id].length > 0);
+}
+function sortDirOf(id){ return sortPrefs[id] || sortConfig[id].dflt; }
+function toggleSortPref(id){
+  sortPrefs[id] = sortDirOf(id) === 'desc' ? 'asc' : 'desc';
+  sortOrder = [id, ...sortOrder.filter(k=> k !== id)]; // หัวข้อที่กดล่าสุดเรียงก่อน
+}
+// ถ้าเลิกใช้ตัวกรองหัวข้อนั้น ให้ทิ้งทิศทางการเรียงของหัวข้อนั้นด้วย (กลับเป็นค่าเริ่มต้น)
+function pruneSortPrefs(){
+  Object.keys(sortPrefs).forEach(id=>{
+    if(!isSortChipActive(id)) delete sortPrefs[id];
+  });
+  sortOrder = sortOrder.filter(k=> sortPrefs[k]);
+}
+// ลำดับการเรียง:
+//  1) หัวข้อที่ผู้ใช้กดปุ่มล่าสุด (ถ้ามี)
+//  2) งบลงทุน (ถ้ามีการกรอก) — เรียงตามทิศทางของปุ่มงบลงทุน
+//  3) ถ้าค่าเท่ากัน: YTM → อายุคงเหลือ → เครดิต(ตราสาร) → เครดิต(บริษัท) → ความเสี่ยง → งบลงทุน
+//     (หัวข้อที่เลือกไว้ใช้ทิศทางของปุ่มตัวเอง หัวข้อที่ไม่ได้เลือกใช้ค่าเริ่มต้น)
+function buildSortKeys(){
+  const keys = [];
+  const seen = new Set();
+  const push = (id, dir)=>{ if(!seen.has(id)){ seen.add(id); keys.push({ id, dir }); } };
+  sortOrder.forEach(id=>{ if(isSortChipActive(id)) push(id, sortDirOf(id)); });
+  if(isSortChipActive('fBudget')) push('fBudget', sortDirOf('fBudget'));
+  defaultSortCascade.forEach(id=>{ if(isSortChipActive(id)) push(id, sortDirOf(id)); });
+  defaultSortCascade.forEach(id=>{
+    if(id === 'fBudget') return; // ไม่ได้ใช้งบลงทุน = ไม่นำมาเรียง
+    push(id, sortConfig[id].dflt);
+  });
+  return keys;
+}
+function compareBonds(a, b, keys){
+  for(const { id, dir } of keys){
+    const va = sortConfig[id].val(a), vb = sortConfig[id].val(b);
+    const cmp = va < vb ? -1 : (va > vb ? 1 : 0); // เทียบแบบนี้เพื่อรองรับ PERP (Infinity)
+    if(cmp !== 0) return dir === 'desc' ? -cmp : cmp;
+  }
+  return 0;
+}
 
 // ---------- Cart (ตะกร้าหุ้นกู้ที่สนใจ) ----------
 // Persisted client-side (per browser) with localStorage, keyed by the
@@ -865,6 +1287,7 @@ function updateCartFabBadge(){
 function renderCartPanel(){
   const wrap = document.getElementById('cartListWrap');
   if(!wrap) return;
+  resetCartScrollRoom();
   const items = BONDS.filter(b=> cartIds.includes(b._id));
   if(items.length === 0){
     wrap.innerHTML = `<div class="cart-empty">ยังไม่มีหุ้นกู้ในตะกร้า</div>`;
@@ -889,6 +1312,7 @@ function renderCartCheckout(){
   if(!wrap) return;
   const items = BONDS.filter(b=> cartIds.includes(b._id));
   if(items.length === 0){ renderCartPanel(); return; }
+  resetCartScrollRoom();
 
   wrap.innerHTML = `
     <div class="checkout-header">
@@ -923,66 +1347,99 @@ function renderCartCheckout(){
       }).join('')}
     </div>
 
-    <textarea class="buy-input comment-box" id="comment-checkoutGlobal" placeholder="ข้อความเพิ่มเติม (ถ้ามี)" style="margin-top:14px;"></textarea>
-
-    <div class="type-select">
-      <button type="button" class="type-btn" data-type="existing" data-code="checkoutGlobal">ลูกค้า บล. กรุงศรี</button>
-      <button type="button" class="type-btn" data-type="new" data-code="checkoutGlobal">ลูกค้าใหม่</button>
-    </div>
-
-    <div class="login-box" id="login-checkoutGlobal">
-      <input type="text" class="buy-input" placeholder="ชื่อผู้ใช้งาน (Username)">
-      <input type="password" class="buy-input" placeholder="รหัสผ่าน (Password)">
-      <button type="button" class="login-btn" data-code="checkoutGlobal">Log in</button>
-    </div>
-
-    <div class="email-box" id="email-checkoutGlobal">
-      <div class="email-notice" id="emailNotice-checkoutGlobal">กรุณากรอกอีเมลให้ถูกต้อง</div>
-      <input type="email" class="buy-input email-input" data-code="checkoutGlobal" pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\\.[A-Za-z]{2,}$" placeholder="กรอกอีเมลของท่าน">
-    </div>
+    <textarea class="buy-input comment-box" id="comment-checkoutGlobal" placeholder="ข้อมูลติดต่อกลับ (ชื่อ เบอร์โทรศัพท์ หรืออีเมล)" style="margin-top:14px;"></textarea>
 
     <div class="min-notice" id="formNotice-checkoutGlobal"></div>
     <button type="button" class="checkout-submit-btn" id="checkoutSubmitBtn">ส่ง</button>
+
+    ${privacyNoticeHTML('checkoutGlobal')}
+
     <div class="thank-you-msg" id="checkoutThankYou">ขอบคุณที่สนใจลงทุน เราได้รับความต้องการจากท่านแล้ว จะรีบติดต่อท่านกลับโดยเร็วที่สุด</div>
   `;
 }
 
-// หลังเลือกตัวกรองเหล่านี้แล้ว ให้แสดงข้อความหัวข้อกำกับ เช่น "เครดิต(ตราสาร): AAA"
+// Shared HTML for the privacy-consent block shown after "ส่ง" is pressed:
+// the consent text + checkbox — the "Submit" button is visible right away;
+// see the 'change' listener further down for the (optional) checkbox error.
+function privacyNoticeHTML(code){
+  return `
+    <div class="privacy-notice" id="privacy-${code}">
+      <p class="privacy-notice-text">เรามุ่งมั่นที่จะปกป้องและเคารพความเป็นส่วนตัวของคุณ โดยเราจะใช้ข้อมูลส่วนบุคคลของคุณเพื่อให้บริการผลิตภัณฑ์หรือบริการที่คุณร้องขอเท่านั้น เราอาจต้องติดต่อคุณเพื่อแจ้งข้อมูลเกี่ยวกับผลิตภัณฑ์และบริการของเรา รวมถึงเนื้อหาอื่นๆ ที่คุณอาจสนใจ และเพื่อให้สามารถจัดส่งเนื้อหาที่คุณร้องขอได้ เราจำเป็นต้องจัดเก็บและประมวลผลข้อมูลส่วนบุคคลของคุณ</p>
+      <p class="privacy-notice-text">หากคุณยินดีให้เราติดต่อคุณเพื่อวัตถุประสงค์ดังกล่าว</p>
+      <p class="privacy-notice-emphasis">โปรดทำเครื่องหมายในช่องด้านล่างเพื่อยินยอมให้เราติดต่อ:</p>
+      <label class="privacy-check-label">
+        <input type="checkbox" class="privacy-checkbox" data-code="${code}">
+        <span>ข้าพเจ้ายินดีรับข้อมูลข่าวสารตามที่ร้องขอ ยินยอมให้จัดเก็บและประมวลผลข้อมูลส่วนบุคคลของข้าพเจ้า</span>
+      </label>
+      <p class="privacy-footnote">คุณสามารถยกเลิกการรับข้อมูลข่าวสารเหล่านี้ได้ทุกเมื่อ</p>
+      <div class="privacy-error" id="privacyError-${code}"></div>
+      <div class="privacy-btn-row">
+        <button type="button" class="privacy-prev-btn" data-code="${code}">Previous</button>
+        <button type="button" class="final-submit-btn show" id="finalSubmit-${code}">Submit</button>
+      </div>
+    </div>
+  `;
+}
+
+// หลังเลือกตัวกรองแล้ว ให้แสดงเป็น Filter Chip (แถวละ 2 ตัวกรอง) เช่น "เครดิต(ตราสาร): AAA"
+// ตัวกรองที่เรียงลำดับได้จะมีปุ่มสลับ "มากไปน้อย↓" / "น้อยไปมาก↑" ในการ์ดของตัวเอง
 const chipFilterLabels = {
   fInvestor: 'นักลงทุน',
-  fRating: 'เครดิต(ตราสาร)',
-  fRatingCompany: 'เครดิต(บริษัท)',
-  fRisk: 'ความเสี่ยง',
   fFeature: 'คุณลักษณะ',
-  fYtm: 'YTM',
-  fLife: 'อายุคงเหลือ',
   fPrice: 'ราคา',
 };
+// ลำดับการแสดงผลให้ตรงกับลำดับฟิลด์บนหน้าจอ
+const chipOrder = ['fBudget','fYtm','fLife','fRatingCompany','fRating','fRisk'];
+function sortToggleLabel(dir){ return dir === 'asc' ? 'น้อยไปมาก' : 'มากไปน้อย'; }
+function sortToggleArrow(dir){ return dir === 'asc' ? '↑' : '↓'; }
 function updateActiveFilterChips(){
   if(!activeFiltersEl) return;
-  const chips = [];
-  // ตัวกรองแบบ dropdown เดี่ยว (นักลงทุน / คุณลักษณะ / ราคา)
-  ids.forEach(id=>{
-    const el = els[id];
-    if(!el || !el.value) return;
-    const opt = el.options[el.selectedIndex];
-    const text = opt ? opt.textContent : el.value;
-    chips.push(`<span class="filter-chip">${chipFilterLabels[id]}: ${text}</span>`);
-  });
-  // ตัวกรองแบบ checkbox หลายตัวเลือก (YTM / เครดิต(ตราสาร) / เครดิต(บริษัท) / ความเสี่ยง / อายุคงเหลือ)
-  multiFilterIds.forEach(id=>{
-    const values = multiFilterState[id];
-    if(!values.length) return;
-    const root = document.querySelector(`.multiselect[data-id="${id}"]`);
-    const texts = values.map(v=>{
-      const cb = root && root.querySelector(`input[value="${CSS.escape(v)}"]`);
-      const textEl = cb && cb.closest('.ms-option').querySelector('.ms-option-text');
-      return textEl ? textEl.textContent : v;
-    });
-    chips.push(`<span class="filter-chip">${chipFilterLabels[id]}: ${texts.join(', ')}</span>`);
-  });
-  activeFiltersEl.innerHTML = chips.join('');
+  const keys = buildSortKeys();
+  const primaryId = (keys[0] && isSortChipActive(keys[0].id)) ? keys[0].id : null;
+
+  const cards = chipOrder.map(id=>{
+    let title = '';
+    let sortable = false;
+    if(id === 'fBudget'){
+      if(!budgetActive()) return '';
+      title = `งบลงทุน: ${budgetChipText()}`;
+      sortable = true;
+    } else if(multiFilterMeta[id]){
+      const selected = multiState[id];
+      if(selected.length === 0) return '';
+      title = `${multiFilterMeta[id]}: ${selected.map(v=> multiOptionLabels[id][v]).join(', ')}`;
+      sortable = true;
+    } else {
+      const el = els[id];
+      if(!el || !el.value) return '';
+      const opt = el.options[el.selectedIndex];
+      title = `${chipFilterLabels[id]}: ${opt ? opt.textContent : el.value}`;
+    }
+    if(!sortable){
+      return `<div class="chip-card"><div class="chip-title">${title}</div></div>`;
+    }
+    const dir = sortDirOf(id);
+    const nameForAria = title.split(':')[0];
+    return `
+      <div class="chip-card${id === primaryId ? ' sorted' : ''}">
+        <div class="chip-title">${title}</div>
+        <button type="button" class="sort-toggle" data-sort-id="${id}" aria-label="เรียงลำดับ ${nameForAria} ${dir === 'asc' ? 'จากน้อยไปมาก' : 'จากมากไปน้อย'} (กดเพื่อสลับ)"><span class="sort-toggle-text">${sortToggleLabel(dir)}</span><span class="sort-toggle-arrow" aria-hidden="true">${sortToggleArrow(dir)}</span></button>
+      </div>`;
+  }).filter(Boolean);
+
+  activeFiltersEl.innerHTML = cards.length ? `<div class="chip-grid">${cards.join('')}</div>` : '';
 }
+// กดปุ่มเรียงลำดับใน Filter Chip = สลับ มากไปน้อย / น้อยไปมาก
+activeFiltersEl.addEventListener('click', (e)=>{
+  const btn = e.target.closest('.sort-toggle');
+  if(!btn) return;
+  const id = btn.dataset.sortId;
+  toggleSortPref(id);
+  render();
+  // render() สร้างปุ่มใหม่ — คืนโฟกัสให้ปุ่มเดิม (สำหรับการใช้คีย์บอร์ด)
+  const again = activeFiltersEl.querySelector(`.sort-toggle[data-sort-id="${id}"]`);
+  if(again) again.focus({ preventScroll:true });
+});
 
 /* ---------- Bond Warehouse -> Bond Screener field mapping ----------
    Field names between the two files don't always match, e.g.:
@@ -1024,6 +1481,7 @@ function mapWarehouseBond(w){
     _id: w.id || '', // stable Supabase row id — persists across reloads, used as the cart's item key
     code: w.code || '',
     issuer: w.issuerName || '',
+    bondName: w.instrumentName || '',
     investor: investorNorm(w.investorType) || 'PO',
     ytm: Number(w.ytmSell) || 0,               // YTM = "YTM ขาย (%)"
     ratingLabel: w.ratingInstrument || '',       // เครดิต(ตราสาร) = "อันดับความน่าเชื่อถือ (ตราสาร)"
@@ -1050,6 +1508,7 @@ function rowToWarehouseShape(r){
     id: r.id,
     code: r.code,
     issuerName: r.issuer_name,
+    instrumentName: r.instrument_name,
     investorType: r.investor_type,
     ytmSell: r.ytm_sell,
     ratingCompany: r.rating_company,
@@ -1135,6 +1594,16 @@ function ratingNotch(label){
 function lifeNum(b){
   return b.life === 'PERP' ? Infinity : parseFloat(b.life);
 }
+// Overall credit-quality rank used by the unified result sort below:
+// AAA > AA > A > BBB > lower grades > Unrated (worst), with +/- notches
+// breaking ties within the same base grade. Higher number = better credit.
+function ratingRank(label){
+  if(isUnrated(label)) return -1;
+  const gradeOrder = { AAA:5, AA:4, A:3, BBB:2 };
+  const base = ratingBase(label);
+  const grade = gradeOrder[base] !== undefined ? gradeOrder[base] : 1; // "ต่ำกว่า BBB"
+  return grade * 10 + ratingNotch(label);
+}
 function ytmMatch(range, ytm){
   if(range==='gt5') return ytm>5;
   if(range==='4-5') return ytm>=4 && ytm<=5;
@@ -1181,19 +1650,35 @@ function featureTag(f){
 }
 
 function render(){
+  pruneSortPrefs();
   const inv = els.fInvestor.value;
-  const rat = multiFilterState.fRating;             // array — เครดิต(ตราสาร)
-  const ratCo = multiFilterState.fRatingCompany;     // array — เครดิต(บริษัท)
-  const risk = multiFilterState.fRisk;               // array — ความเสี่ยง
+  const ratArr = multiState.fRating;
+  const ratCoArr = multiState.fRatingCompany;
+  const riskArr = multiState.fRisk;
   const feat = els.fFeature.value;
-  const ytmRange = multiFilterState.fYtm;            // array — YTM
-  const lifeRange = multiFilterState.fLife;          // array — อายุคงเหลือ
+  const ytmArr = multiState.fYtm;
+  const lifeArr = multiState.fLife;
   const price = els.fPrice.value;
+  // ราคา / คุณลักษณะ / นักลงทุน: ไม่ขึ้นใน Filter Chip แต่ถ้าถูกเลือก ให้ตัวกล่องขึ้นสีแดงเข้ม (เหมือนตัวกรองอื่น)
+  ids.forEach(id=> els[id].classList.toggle('active', !!els[id].value));
   const searchTerm = (searchEl && searchEl.value || '').trim().toLowerCase();
+  const budget = readBudget();
+  const hasBudget = budget.min !== null || budget.max !== null;
+  // แสดงหน่วย "บาท" ท้ายช่องทันทีที่มีตัวเลข (รวมกรณีพิมพ์ 0)
+  budgetMinEl.parentElement.classList.toggle('has-value', budgetMinEl.value !== '');
+  budgetMaxEl.parentElement.classList.toggle('has-value', budgetMaxEl.value !== '');
 
-  // Filters (dropdowns/checkboxes) that determine whether we keep the "highlight first"
-  // order or instead order results by the criteria the user filtered on.
-  const filtersActive = !!(inv || rat.length || ratCo.length || risk.length || feat || ytmRange.length || lifeRange.length || price || searchTerm);
+  // Filters (dropdowns/multi-selects) that determine whether we keep the
+  // "highlight first" order or instead order results by the criteria the
+  // user filtered on.
+  const filtersActive = !!(inv || ratArr.length || ratCoArr.length || riskArr.length || feat || ytmArr.length || lifeArr.length || price || searchTerm || hasBudget);
+
+  // ตรวจสอบว่า rating ของ bond ตรงกับ "ค่าตัวกรองหนึ่งค่า" หรือไม่ (ใช้ร่วมกันทั้ง
+  // เครดิต(ตราสาร) และเครดิต(บริษัท))
+  function ratingMatchesValue(label, val){
+    if(val === 'Unrated') return isUnrated(label);
+    return !isUnrated(label) && ratingBase(label) === val;
+  }
 
   let filtered = BONDS.filter(b=>{
     if(inv){
@@ -1202,24 +1687,13 @@ function render(){
       if(!bTokens.some(t => invTokens.includes(t))) return false;
     }
 
-    // เครดิต(ตราสาร): เลือกได้หลายรายการ (OR) — "Unrated" = ไม่ได้ใส่เรตติ้ง (ว่าง หรือ "-")
-    if(rat.length){
-      const matches = rat.some(r=> r === 'Unrated'
-        ? isUnrated(b.ratingLabel)
-        : (!isUnrated(b.ratingLabel) && ratingBase(b.ratingLabel) === r));
-      if(!matches) return false;
-    }
+    // เครดิต(ตราสาร): เลือกได้หลายค่า — ผ่านถ้าตรงกับค่าใดค่าหนึ่งที่เลือกไว้ (OR)
+    if(ratArr.length && !ratArr.some(v=> ratingMatchesValue(b.ratingLabel, v))) return false;
 
     // เครดิต(บริษัท): เดียวกันกับข้างต้น
-    if(ratCo.length){
-      const matches = ratCo.some(r=> r === 'Unrated'
-        ? isUnrated(b.ratingCompanyLabel)
-        : (!isUnrated(b.ratingCompanyLabel) && ratingBase(b.ratingCompanyLabel) === r));
-      if(!matches) return false;
-    }
+    if(ratCoArr.length && !ratCoArr.some(v=> ratingMatchesValue(b.ratingCompanyLabel, v))) return false;
 
-    // ความเสี่ยง: เลือกได้หลายระดับ (OR)
-    if(risk.length && !risk.some(r=> b.risk === parseInt(r))) return false;
+    if(riskArr.length && !riskArr.some(v=> b.risk === parseInt(v))) return false;
 
     // คุณลักษณะ: "หุ้นกู้ปกติ" = ไม่มีทั้ง "สิทธิ" และ perpetual bond
     //            "Call Option" = ดูจากข้อความใน "สิทธิ" ว่ามีคำว่า call หรือไม่
@@ -1233,36 +1707,32 @@ function render(){
       if(feat === 'perp' && !isPerp) return false;
     }
 
-    // YTM / อายุคงเหลือ: เลือกได้หลายช่วง (OR)
-    if(ytmRange.length && !ytmRange.some(r=> ytmMatch(r, b.ytm))) return false;
-    if(lifeRange.length && !lifeRange.some(r=> lifeMatch(r, lifeNum(b)))) return false;
+    if(ytmArr.length && !ytmArr.some(range=> ytmMatch(range, b.ytm))) return false;
+    if(lifeArr.length && !lifeArr.some(range=> lifeMatch(range, lifeNum(b)))) return false;
     if(price && priceCategory(b)!==price) return false;
+
+    // งบลงทุน: เทียบกับ "ซื้อขั้นต่ำ" ของหุ้นกู้ (รวมค่าขอบ) — ไม่สนวงเงิน "เสนอขาย"
+    if(hasBudget){
+      const minBuy = minPurchaseNum(b);
+      if(budget.min !== null && minBuy < budget.min) return false;
+      if(budget.max !== null && minBuy > budget.max) return false;
+    }
     if(searchTerm && !(String(b.code).toLowerCase().includes(searchTerm) || String(b.issuer).toLowerCase().includes(searchTerm))) return false;
     return true;
   });
 
   if(filtersActive){
-    // A filter is in use: order results by the filter's own criteria
-    // instead of forcing highlighted bonds to the top.
-    const activeFilterCount = [inv, rat.length, ratCo.length, risk.length, feat, ytmRange.length, lifeRange.length, price].filter(Boolean).length;
-    filtered = filtered.slice().sort((a,b)=>{
-      // ช่องค้นหา (รหัสหุ้นกู้/ผู้ออก): เรียงตามอายุคงเหลือน้อยไปมาก แล้วตามด้วย
-      // YTM มากไปน้อย เสมอ ไม่ว่าจะใช้ร่วมกับตัวกรองอื่นด้วยหรือไม่ก็ตาม
-      if(searchTerm){
-        const lifeDiff = lifeNum(a) - lifeNum(b);
-        if(lifeDiff !== 0) return lifeDiff;
-        return b.ytm - a.ytm;
-      }
-      // เลือกหลายตัวกรองพร้อมกัน: ให้ YTM มากสุดขึ้นก่อนเสมอ ไม่ว่าจะเลือกตัวกรองอะไรร่วมกันบ้าง
-      if(activeFilterCount > 1) return b.ytm - a.ytm;
-      // เลือกตัวกรองเดียว: เรียงตามเกณฑ์ของตัวกรองนั้นโดยเฉพาะ
-      // เครดิต(ตราสาร)/เครดิต(บริษัท): หลังกรองแล้ว เรียงตามสัญลักษณ์จากมากไปน้อย เช่น A+ > A > A-
-      if(rat.length) return ratingNotch(b.ratingLabel) - ratingNotch(a.ratingLabel);
-      if(ratCo.length) return ratingNotch(b.ratingCompanyLabel) - ratingNotch(a.ratingCompanyLabel);
-      if(lifeRange.length) return lifeNum(a) - lifeNum(b);
-      // ytmRange, risk, inv, feat, price: เรียงตาม YTM มากไปน้อยเป็นค่าเริ่มต้น
-      return b.ytm - a.ytm;
-    });
+    // A filter (or search) is in use: order results with one consistent
+    // cascade of tie-breakers, applied no matter which filter(s) — including
+    // any combination of นักลงทุน/ความเสี่ยง/คุณลักษณะ — triggered it:
+    //   1) YTM สูงสุดก่อน
+    //   2) อายุคงเหลือน้อยสุดก่อน
+    //   3) เครดิต(ตราสาร) AAA → BBB → ต่ำกว่า (Unrated ท้ายสุด)
+    //   4) เครดิต(บริษัท) เช่นเดียวกัน
+    //   ถ้าผู้ใช้เลือกเรียงลำดับตัวกรองหัวข้อใด (จากมากไปน้อย / จากน้อยไปมาก)
+    //   หัวข้อนั้นจะถูกนำมาเรียงก่อน ตามด้วยลำดับเริ่มต้นข้างต้น — ดู buildSortKeys()
+    const sortKeys = buildSortKeys();
+    filtered = filtered.slice().sort((a,b)=> compareBonds(a, b, sortKeys));
   }
   // When no filter is active, BONDS is already ordered highlight-first
   // (see loadBondsFromWarehouse), so we leave that order untouched.
@@ -1295,7 +1765,7 @@ function bondCardHTML(b, instanceCode, opts){
       <div class="card-head">
         <div>
           <div class="bond-name">${isNewBond(b) ? '<span class="new-badge">NEW</span>' : ''}${b.highlight ? '<span class="star">★</span>' : ''}${b.code}</div>
-          <div class="bond-issuer">${b.issuer}</div>
+          <div class="bond-issuer">${b.bondName || b.issuer}</div>
           ${b.rights ? `<div class="bond-rights">${b.rights}</div>` : ''}
           ${featureTag(b.feature)}
         </div>
@@ -1359,7 +1829,7 @@ function bondCardHTML(b, instanceCode, opts){
 
         <div class="email-box" id="email-${instanceCode}">
           <div class="email-notice" id="emailNotice-${instanceCode}">กรุณากรอกอีเมลให้ถูกต้อง</div>
-          <input type="email" class="buy-input email-input" data-code="${instanceCode}" pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\\.[A-Za-z]{2,}$" placeholder="กรอกอีเมลของท่าน">
+          <input type="email" class="buy-input email-input" data-code="${instanceCode}" placeholder="กรอกอีเมลของท่าน">
         </div>
 
         <div class="min-notice" id="minNotice-${instanceCode}">โปรดซื้อด้วยจำนวนขั้นต่ำ</div>
@@ -1374,10 +1844,12 @@ function bondCardHTML(b, instanceCode, opts){
           </div>
         </div>
 
-        <textarea class="buy-input comment-box" placeholder="Comment"></textarea>
+        <textarea class="buy-input comment-box" id="comment-${instanceCode}" placeholder="Comment"></textarea>
 
         <div class="min-notice" id="formNotice-${instanceCode}"></div>
         <button type="button" class="submit-btn" data-code="${instanceCode}">ส่ง</button>
+
+        ${privacyNoticeHTML(instanceCode)}
 
         <div class="thank-you-msg" id="thankyou-${instanceCode}">ขอบคุณที่สนใจลงทุน เราได้รับความต้องการจากท่านแล้ว จะรีบติดต่อท่านกลับโดยเร็วที่สุด</div>
       </div>
@@ -1400,11 +1872,13 @@ function updateDatePill(){
   document.getElementById('datePill').textContent = `${day} ${month} ${buddhistYear}`;
 }
 
-// "โปรดซื้อด้วยจำนวนขั้นต่ำ" แสดงเฉพาะกล่องสนใจซื้อของหุ้นกู้นั้นๆ เหนือฟิลด์จำนวน เป็นเวลา 4 วินาที
+// "โปรดซื้อด้วยจำนวนขั้นต่ำ" / "เกินวงเงินเสนอขาย" แสดงเฉพาะกล่องสนใจซื้อของ
+// หุ้นกู้นั้นๆ เหนือฟิลด์จำนวน เป็นเวลา 3 วินาที — ข้อความเปลี่ยนได้ตามสถานการณ์
 const minNoticeTimers = {};
-function showMinNotice(code){
+function showMinNotice(code, message){
   const el = document.getElementById(`minNotice-${code}`);
   if(!el) return;
+  if(message) el.textContent = message;
   el.classList.add('show');
   clearTimeout(minNoticeTimers[code]);
   minNoticeTimers[code] = setTimeout(()=> el.classList.remove('show'), 3000);
@@ -1420,6 +1894,84 @@ function ensureVisible(el){
     el.scrollIntoView({ behavior:'smooth', block: rect.top < 0 ? 'start' : 'end' });
   }
 }
+
+// เลื่อนให้ element มาอยู่กลางจอ (ทำงานทั้งหน้าหลักและใน overlay ตะกร้า)
+// keepEl: element ที่ต้องไม่หลุดขอบล่างของจอ (เช่น ปุ่ม "ส่ง") กรณี element ใหญ่กว่าจอ
+// เลื่อนหน้าจอ (หน้าหลัก หรือ overlay ตะกร้า) ด้วยระยะ delta
+// ใน overlay ตะกร้า: จะเพิ่มพื้นที่ว่างด้านล่าง "เฉพาะเท่าที่จำเป็น" ตอนที่ต้องเลื่อนเลยจุดสุดท้ายเท่านั้น
+// (เช่น ให้ช่องล่างสุดมาอยู่กลางจอได้) ปกติหน้าจึงไม่มีที่ว่างเกินมา
+function resetCartScrollRoom(){
+  const o = document.getElementById('cartOverlay');
+  if(!o) return;
+  o.style.paddingBottom = '';
+  delete o.dataset.extra;
+}
+function scrollWithRoom(el, delta){
+  const scroller = el.closest('.cart-overlay');
+  if(!scroller){ window.scrollBy({ top: delta, behavior:'smooth' }); return; }
+  if(delta > 0){
+    const need = scroller.scrollTop + delta - (scroller.scrollHeight - scroller.clientHeight);
+    if(need > 0){
+      const extra = (parseFloat(scroller.dataset.extra) || 0) + need;
+      scroller.dataset.extra = String(extra);
+      scroller.style.paddingBottom = `${16 + extra}px`;
+    }
+  }
+  scroller.scrollBy({ top: delta, behavior:'smooth' });
+}
+
+function centerInView(el, keepEl){
+  if(!el) return;
+  const viewH = window.innerHeight || document.documentElement.clientHeight;
+  const rect = el.getBoundingClientRect();
+  let delta = (rect.top + rect.height / 2) - viewH / 2;
+  if(keepEl){
+    const keepBottom = keepEl.getBoundingClientRect().bottom - delta;
+    const limit = viewH - 20;
+    if(keepBottom > limit) delta += keepBottom - limit;
+  }
+  if(Math.abs(delta) < 2) return;
+  scrollWithRoom(el, delta);
+}
+
+// ขอบไฟวนของการ์ดความเป็นส่วนตัว: วนอยู่ตราบที่ยังไม่ติ๊กช่องยินยอม
+function syncPrivacyGlow(privacy){
+  if(!privacy) return;
+  const cb = privacy.querySelector('.privacy-checkbox');
+  privacy.classList.toggle('glow-run', !(cb && cb.checked));
+}
+
+// เลื่อนแถวปุ่ม Previous / Submit ให้เห็นทั้งสองปุ่มโดยอัตโนมัติ ถ้าอยู่นอกจอ:
+// ยกขึ้นมาให้ขอบล่างของแถวปุ่มอยู่เหนือขอบจอล่าง 20% ของความสูงจอ
+// (ถ้าเห็นปุ่มครบอยู่แล้วจะไม่เลื่อน)
+function scrollButtonsIntoView(row){
+  if(!row) return;
+  const rect = row.getBoundingClientRect();
+  const viewH = window.innerHeight || document.documentElement.clientHeight;
+  if(rect.top >= 0 && rect.bottom <= viewH) return;
+  const delta = rect.bottom - viewH * 0.8;
+  scrollWithRoom(row, delta);
+}
+
+// ---------- Warning popup: แสดงก่อนให้กรอกจำนวนสนใจซื้อ ต้องกด "รับทราบ" จึงไปต่อได้ ----------
+const warnOverlayEl = document.getElementById('warnOverlay');
+const warnAckBtnEl = document.getElementById('warnAckBtn');
+let warnPendingAction = null;
+function showBondWarning(onAcknowledge){
+  warnPendingAction = onAcknowledge;
+  warnOverlayEl.classList.add('open');
+  document.documentElement.style.overflow = 'hidden'; // กันหน้าจอด้านหลังเลื่อนขณะแสดง popup
+  const body = warnOverlayEl.querySelector('.warn-body');
+  if(body) body.scrollTop = 0;
+  warnAckBtnEl.focus({ preventScroll:true });
+}
+warnAckBtnEl.addEventListener('click', ()=>{
+  warnOverlayEl.classList.remove('open');
+  document.documentElement.style.overflow = '';
+  const action = warnPendingAction;
+  warnPendingAction = null;
+  if(action) action();
+});
 
 // เช็คความถูกต้องของอีเมล พร้อมแสดง/ซ่อนข้อความเตือนเหนือช่องกรอกอีเมลของบอนด์นั้นๆ
 // forceShowEmpty: true เมื่อกดปุ่ม "ส่ง" (บังคับเช็คแม้ยังไม่ได้พิมพ์อะไร)
@@ -1485,7 +2037,11 @@ document.addEventListener('click', (e)=>{
   // Open the checkout summary (one screen listing every cart item)
   const cartBuyBtn = e.target.closest('#cartBuyBtn');
   if(cartBuyBtn){
-    renderCartCheckout();
+    showBondWarning(()=>{
+      renderCartCheckout();
+      const overlay = document.getElementById('cartOverlay');
+      if(overlay) overlay.scrollTop = 0; // แสดงหน้าสรุปคำสั่งซื้อตั้งแต่ต้นหน้า
+    });
     return;
   }
 
@@ -1497,7 +2053,10 @@ document.addEventListener('click', (e)=>{
   }
 
   // Submit the checkout summary — every cart item must have either
-  // "จำนวนเงิน" or "จำนวนหน่วย" filled in before it goes through.
+  // "จำนวนเงิน" or "จำนวนหน่วย" filled in, and the shared comment field must
+  // be filled in, before it goes through. Once valid, hide the form and
+  // reveal the privacy-consent block (final send happens from the "Submit"
+  // button inside it).
   const checkoutSubmitBtn = e.target.closest('#checkoutSubmitBtn');
   if(checkoutSubmitBtn){
     const items = BONDS.filter(b=> cartIds.includes(b._id));
@@ -1510,44 +2069,43 @@ document.addEventListener('click', (e)=>{
       const itemNotice = document.getElementById(`itemNotice-${code}`);
       const hasAmount = (moneyField && moneyField.value.trim() !== '') || (unitField && unitField.value.trim() !== '');
       if(itemNotice) itemNotice.classList.toggle('show', !hasAmount);
-      if(!hasAmount && !firstInvalid) firstInvalid = itemNotice;
+      [moneyField, unitField].forEach(f=>{ if(f) f.classList.toggle('input-error', !hasAmount); });
+      if(!hasAmount && !firstInvalid) firstInvalid = moneyField ? moneyField.closest('.amount-fields') : itemNotice;
     });
+    // ช่องข้อมูลติดต่อกลับที่ยังว่าง ขึ้นขอบสีแดงเหมือนช่องจำนวน (แสดงพร้อมกันแม้ช่องจำนวนยังไม่ครบ)
+    const commentEl = document.getElementById('comment-checkoutGlobal');
+    if(commentEl) commentEl.classList.toggle('input-error', commentEl.value.trim() === '');
+
     if(firstInvalid){
       if(globalNotice) globalNotice.classList.remove('show');
-      requestAnimationFrame(()=> ensureVisible(firstInvalid));
+      requestAnimationFrame(()=> centerInView(firstInvalid)); // ฟิลด์ที่ยังไม่กรอกมาอยู่กลางจอ
       return;
     }
 
-    // ต้องเลือกประเภทลูกค้าก่อน ("ลูกค้า บล. กรุงศรี" หรือ "ลูกค้าใหม่") ปุ่ม "ส่ง" กดไม่ผ่านถ้ายังไม่เลือก
-    const typeSelect = document.querySelector('#cartListWrap .type-select');
-    const typeChosen = typeSelect && typeSelect.querySelector('.type-btn.active');
-    if(!typeChosen){
+    // ต้องกรอกฟิลด์ comment (ข้อมูลติดต่อกลับ) ก่อนจึงจะกดส่งได้
+    const commentBox = document.getElementById('comment-checkoutGlobal');
+    if(!commentBox || commentBox.value.trim() === ''){
       if(globalNotice){
-        globalNotice.textContent = 'กรุณาเลือกประเภทลูกค้าก่อนส่งคำขอ';
+        globalNotice.textContent = 'กรุณากรอกข้อมูลติดต่อกลับก่อนกดส่ง';
         globalNotice.classList.add('show');
       }
-      requestAnimationFrame(()=> ensureVisible(typeSelect));
+      requestAnimationFrame(()=> centerInView(commentBox)); // ช่องข้อมูลติดต่อกลับมาอยู่กลางจอ
       return;
     }
 
     if(globalNotice) globalNotice.classList.remove('show');
 
-    // Validate email (only when the "ลูกค้าใหม่" email box is the active one)
-    const emailBox = document.getElementById('email-checkoutGlobal');
-    if(emailBox && emailBox.classList.contains('show')){
-      if(!validateEmailField('checkoutGlobal', true)) return;
-    }
-
     const list = document.querySelector('#cartListWrap .checkout-list');
-    const commentBox = document.getElementById('comment-checkoutGlobal');
     const submitBtn = document.getElementById('checkoutSubmitBtn');
-    const thankYou = document.getElementById('checkoutThankYou');
+    const privacy = document.getElementById('privacy-checkoutGlobal');
     if(list) list.style.display = 'none';
     if(commentBox) commentBox.style.display = 'none';
-    if(typeSelect) typeSelect.style.display = 'none';
-    document.querySelectorAll('#cartListWrap .login-box, #cartListWrap .email-box').forEach(el=> el.style.display = 'none');
     if(submitBtn) submitBtn.style.display = 'none';
-    if(thankYou) thankYou.classList.add('show');
+    if(privacy){
+      privacy.classList.add('show');
+      syncPrivacyGlow(privacy);
+      requestAnimationFrame(()=> scrollButtonsIntoView(privacy.querySelector('.privacy-btn-row')));
+    }
     return;
   }
 
@@ -1557,13 +2115,23 @@ document.addEventListener('click', (e)=>{
     const code = buyBtn.dataset.code;
     const panel = document.getElementById(`expand-${code}`);
     if(panel){
-      const wasOpen = panel.classList.contains('open');
-      document.querySelectorAll('.buy-expand.open').forEach(p=>{
-        if(p !== panel) p.classList.remove('open');
-      });
-      panel.classList.toggle('open', !wasOpen);
       if(panel.classList.contains('open')){
-        requestAnimationFrame(()=> ensureVisible(panel));
+        panel.classList.remove('open'); // พับเก็บกล่อง ไม่ต้องขึ้นคำเตือน
+        const oldCard = panel.closest('.card');
+        if(oldCard) oldCard.classList.remove('glow-run');
+      } else {
+        // ขึ้นกล่องคำเตือนก่อน กด "รับทราบ" แล้วจึงเปิดช่องกรอกจำนวน
+        showBondWarning(()=>{
+          document.querySelectorAll('.buy-expand.open').forEach(p=>{
+            if(p !== panel) p.classList.remove('open');
+          });
+          document.querySelectorAll('.card.glow-run').forEach(c=> c.classList.remove('glow-run'));
+          panel.classList.add('open');
+          const card = panel.closest('.card');
+          if(card) card.classList.add('glow-run'); // ขอบไฟวน จนกว่าจะเริ่มกรอกข้อมูล
+          // การ์ดเลื่อนมาอยู่กลางจอ แต่ปุ่ม "ส่ง" ต้องไม่หลุดขอบล่างถ้าการ์ดสูงเกินจอ
+          requestAnimationFrame(()=> centerInView(card || panel, panel.querySelector('.submit-btn')));
+        });
       }
     }
     return;
@@ -1576,10 +2144,8 @@ document.addEventListener('click', (e)=>{
     const type = typeBtn.dataset.type;
     const parent = typeBtn.closest('.type-select');
     parent.querySelectorAll('.type-btn').forEach(b=> b.classList.toggle('active', b===typeBtn));
-
     const formNotice = document.getElementById(`formNotice-${code}`);
     if(formNotice) formNotice.classList.remove('show');
-
     const loginBox = document.getElementById(`login-${code}`);
     const emailBox = document.getElementById(`email-${code}`);
     if(type === 'existing'){
@@ -1594,7 +2160,9 @@ document.addEventListener('click', (e)=>{
     return;
   }
 
-  // Submit the interest form
+  // Submit the interest form — validate the amount and require the comment
+  // field, then reveal the privacy-consent block (the actual send happens
+  // from its "Submit" button).
   const submitBtn = e.target.closest('.submit-btn');
   if(submitBtn){
     const code = submitBtn.dataset.code;
@@ -1616,6 +2184,9 @@ document.addEventListener('click', (e)=>{
     const moneyField = document.getElementById(`money-${code}`);
     const unitField = document.getElementById(`unit-${code}`);
     const hasAmount = (moneyField && moneyField.value.trim() !== '') || (unitField && unitField.value.trim() !== '');
+    [moneyField, unitField].forEach(f=>{ if(f) f.classList.toggle('input-error', !hasAmount); });
+    const commentEl = document.getElementById(`comment-${code}`);
+    if(commentEl) commentEl.classList.toggle('input-error', commentEl.value.trim() === '');
     if(!hasAmount){
       if(formNotice){
         formNotice.textContent = 'กรุณากรอกจำนวนเงินหรือจำนวนหน่วย';
@@ -1625,24 +2196,209 @@ document.addEventListener('click', (e)=>{
       return;
     }
 
+    // ต้องกรอกฟิลด์ comment (ข้อมูลติดต่อกลับ) ก่อนจึงจะกดส่งได้
+    const commentBox = document.getElementById(`comment-${code}`);
+    if(!commentBox || commentBox.value.trim() === ''){
+      if(formNotice){
+        formNotice.textContent = 'กรุณากรอกข้อมูลติดต่อกลับก่อนกดส่ง';
+        formNotice.classList.add('show');
+      }
+      requestAnimationFrame(()=> ensureVisible(commentBox));
+      return;
+    }
+
     if(formNotice) formNotice.classList.remove('show');
 
     // Validate email (only when the "ลูกค้าใหม่" email box is the active one)
-    const emailBox = document.getElementById(`email-${code}`);
-    if(emailBox && emailBox.classList.contains('show')){
-      if(!validateEmailField(code, true)) return;
+    const emailBoxEl = document.getElementById(`email-${code}`);
+    if(emailBoxEl && emailBoxEl.classList.contains('show')){
+      if(!validateEmailField(code, true)){
+        requestAnimationFrame(()=> ensureVisible(emailBoxEl));
+        return;
+      }
     }
 
-    const thankYou = document.getElementById(`thankyou-${code}`);
+    const privacy = document.getElementById(`privacy-${code}`);
     if(panel){
       panel.querySelectorAll('.type-select, .login-box, .email-box, .amount-fields, .comment-box, .submit-btn').forEach(el=>{
         el.style.display = 'none';
       });
     }
-    if(thankYou) thankYou.classList.add('show');
+    if(privacy){
+      privacy.classList.add('show');
+      syncPrivacyGlow(privacy);
+      requestAnimationFrame(()=> scrollButtonsIntoView(privacy.querySelector('.privacy-btn-row')));
+    }
+    return;
+  }
+
+  // "Previous": go back from the privacy-consent block to the amount/comment
+  // fields (reverses what the "ส่ง" click above did).
+  const prevBtn = e.target.closest('.privacy-prev-btn');
+  if(prevBtn){
+    const code = prevBtn.dataset.code;
+    const privacy = document.getElementById(`privacy-${code}`);
+    if(privacy) privacy.classList.remove('show');
+
+    if(code === 'checkoutGlobal'){
+      const list = document.querySelector('#cartListWrap .checkout-list');
+      const commentBox = document.getElementById('comment-checkoutGlobal');
+      const csBtn = document.getElementById('checkoutSubmitBtn');
+      if(list) list.style.display = '';
+      if(commentBox) commentBox.style.display = '';
+      if(csBtn) csBtn.style.display = '';
+      requestAnimationFrame(()=> ensureVisible(csBtn));
+    } else {
+      const panel = document.getElementById(`expand-${code}`);
+      if(panel){
+        panel.querySelectorAll('.type-select, .login-box, .email-box, .amount-fields, .comment-box, .submit-btn').forEach(el=>{
+          el.style.display = '';
+        });
+        requestAnimationFrame(()=> ensureVisible(panel));
+      }
+    }
+    return;
+  }
+
+  // Final "Submit": requires the privacy checkbox to be checked. If it
+  // isn't, show an inline error instead of sending. Once checked, package
+  // this bond's (or the whole cart's) request and send it to
+  // naka_bird@hotmail.com via the send-bond-interest backend function;
+  // falls back to opening the user's own email client (mailto:) if the
+  // backend call fails or hasn't been deployed yet — see
+  // setup-guide-email-backend.md.
+  const finalSubmitBtn = e.target.closest('.final-submit-btn');
+  if(finalSubmitBtn){
+    const code = finalSubmitBtn.id.replace(/^finalSubmit-/, '');
+    const privacy = document.getElementById(`privacy-${code}`);
+    const checkbox = privacy ? privacy.querySelector('.privacy-checkbox') : null;
+    const err = document.getElementById(`privacyError-${code}`);
+    if(!checkbox || !checkbox.checked){
+      if(err){
+        err.textContent = 'กรุณาทำเครื่องหมายยินยอมก่อนกดส่ง';
+        err.classList.add('show');
+      }
+      requestAnimationFrame(()=> scrollButtonsIntoView(privacy.querySelector('.privacy-btn-row')));
+      return;
+    }
+    if(err) err.classList.remove('show');
+
+    let entries, comment;
+
+    if(code === 'checkoutGlobal'){
+      const items = BONDS.filter(b=> cartIds.includes(b._id));
+      comment = (document.getElementById('comment-checkoutGlobal') || {}).value || '';
+      entries = items.map(b=>{
+        const c = `${b._uid}_checkout`;
+        return {
+          bond: b,
+          money: (document.getElementById(`money-${c}`) || {}).value || '',
+          unit: (document.getElementById(`unit-${c}`) || {}).value || '',
+        };
+      });
+    } else {
+      const bond = BONDS.find(b=> b._uid === code.replace(/_cart$/, ''));
+      comment = (document.getElementById(`comment-${code}`) || {}).value || '';
+      entries = bond ? [{
+        bond,
+        money: (document.getElementById(`money-${code}`) || {}).value || '',
+        unit: (document.getElementById(`unit-${code}`) || {}).value || '',
+      }] : [];
+    }
+
+    finalSubmitBtn.disabled = true;
+    const originalLabel = finalSubmitBtn.textContent;
+    finalSubmitBtn.textContent = 'กำลังส่ง...';
+
+    // ระบบทดลอง: ไม่ส่งอีเมล/ข้อมูลจริง
+    const backendFailed = false;
+    Promise.resolve()
+      .finally(()=>{
+        finalSubmitBtn.disabled = false;
+        finalSubmitBtn.textContent = originalLabel;
+        const thankYouExtra = backendFailed
+          ? '<br><br><b>หมายเหตุ:</b> ระบบส่งอีเมลอัตโนมัติขัดข้องชั่วคราว เราได้เปิดโปรแกรมอีเมลของท่านขึ้นมาแทน กรุณากดส่งอีเมลนั้นอีกครั้งเพื่อยืนยันคำขอ'
+          : '';
+        if(code === 'checkoutGlobal'){
+          const privacyEl = document.getElementById('privacy-checkoutGlobal');
+          const thankYou = document.getElementById('checkoutThankYou');
+          if(privacyEl) privacyEl.classList.remove('show');
+          if(thankYou){
+            thankYou.textContent = 'ระบบทดลอง ไม่มีการส่งข้อมูลจริง';
+            thankYou.classList.add('show');
+            requestAnimationFrame(()=> ensureVisible(thankYou));
+          }
+          // ส่งคำสั่งซื้อจากตะกร้าสำเร็จแล้ว — ล้างหุ้นกู้ที่เพิ่งส่งออกจากตะกร้า
+          // ทั้งหมด (ทั้งค่าที่เก็บใน localStorage และปุ่ม/badge ที่แสดงผลอยู่)
+          entries.forEach(({bond})=>{
+            removeFromCart(bond._id);
+            document.querySelectorAll(`.cart-toggle-btn[data-id="${CSS.escape(bond._id)}"]`).forEach(btn=>{
+              btn.classList.remove('in-cart');
+            });
+          });
+          updateCartFabBadge();
+        } else {
+          const privacyEl = document.getElementById(`privacy-${code}`);
+          const thankYou = document.getElementById(`thankyou-${code}`);
+          if(privacyEl) privacyEl.classList.remove('show');
+          if(thankYou){
+            thankYou.textContent = 'ระบบทดลอง ไม่มีการส่งข้อมูลจริง';
+            thankYou.classList.add('show');
+            requestAnimationFrame(()=> ensureVisible(thankYou));
+          }
+        }
+      });
     return;
   }
 });
+
+// Build the plain-text summary (bond details + amount + comment) shared by
+// both the backend call and the mailto fallback.
+function buildInterestSummary(entries, comment){
+  const lines = entries.map(({bond:b, money, unit})=>
+    `รหัสหุ้นกู้: ${b.code}\nผู้ออก: ${b.issuer}\nYTM: ${b.ytm.toFixed(2)}%\nอายุคงเหลือ: ${b.life} ปี\nจำนวนเงิน: ${money || '-'}\nจำนวนหน่วย: ${unit || '-'}`
+  );
+  const body = `รายการที่สนใจซื้อ:\n\n${lines.join('\n\n')}\n\n${comment.trim() ? 'ข้อมูลติดต่อกลับ / Comment:\n' + comment.trim() : ''}`;
+  const subject = entries.length > 1 ? `สนใจซื้อหุ้นกู้ (${entries.length} รายการ)` : `สนใจซื้อหุ้นกู้ ${entries[0].bond.code}`;
+  return { subject, body };
+}
+
+// Primary path: POST to the Supabase Edge Function, which sends the email
+// server-side via Brevo so it always reaches naka_bird@hotmail.com even if
+// the visitor has no email client configured on their device.
+async function sendInterestEmail(entries, comment){
+  if(!entries.length) throw new Error('No entries to send');
+  if(!SEND_INTEREST_FUNCTION_URL) throw new Error('SEND_INTEREST_FUNCTION_URL not configured');
+
+  const { subject, body } = buildInterestSummary(entries, comment);
+
+  const res = await fetch(SEND_INTEREST_FUNCTION_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      // ต้องแนบ anon key แม้ deploy ฟังก์ชันแบบ --no-verify-jwt แล้วก็ตาม
+      // เพราะ API Gateway ของ Supabase บางเวอร์ชันยังเช็ค header นี้อยู่
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+    },
+    body: JSON.stringify({ subject, body }),
+  });
+
+  if(!res.ok){
+    const detail = await res.text().catch(()=> '');
+    throw new Error(`send-bond-interest returned ${res.status}: ${detail}`);
+  }
+}
+
+// Fallback path: open the visitor's own email client with everything
+// pre-filled, addressed to naka_bird@hotmail.com. Used only if the backend
+// function call above fails (not deployed yet, offline, etc.).
+function openMailtoFallback(entries, comment){
+  if(!entries.length) return;
+  const { subject, body } = buildInterestSummary(entries, comment);
+  const mailto = `mailto:naka_bird@hotmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.location.href = mailto;
+}
 
 // Format a numeric text input with thousands separators as the user types.
 // Returns the raw (unformatted) digit string.
@@ -1663,15 +2419,23 @@ function formatNumberInput(el){
 // "จำนวนเงิน" / "จำนวนหน่วย" เป็นฟิลด์คู่ที่ mutually exclusive กัน (กรอกอย่างใดอย่างหนึ่ง)
 // เก็บ config ของแต่ละฝั่งไว้ที่เดียว เพื่อให้ input/blur handler ด้านล่างใช้ร่วมกันได้
 // แทนที่จะเขียนตรรกะซ้ำสำหรับ money และ unit แยกกัน
+// - หน่วย 1 หน่วย = 1,000 บาท (ตามธรรมเนียมตราสารหนี้ไทย) — ใช้แปลง
+//   ระหว่าง "จำนวนเงิน" (บาท) กับ "จำนวนหน่วย" ทั้งฝั่งขั้นต่ำและฝั่งเพดาน (เสนอขาย)
+const BAHT_PER_UNIT = 1000;
 const AMOUNT_FIELD_KINDS = {
-  'amount-money': { suffixPrefix:'moneySuffix', otherFieldPrefix:'unit', minAmount: minMoney => minMoney },
-  'amount-unit':  { suffixPrefix:'unitSuffix',  otherFieldPrefix:'money', minAmount: minMoney => Math.ceil(minMoney/1000) },
+  'amount-money': { suffixPrefix:'moneySuffix', otherFieldPrefix:'unit', minAmount: minMoney => minMoney, maxAmount: offerBaht => offerBaht },
+  'amount-unit':  { suffixPrefix:'unitSuffix',  otherFieldPrefix:'money', minAmount: minMoney => Math.ceil(minMoney/BAHT_PER_UNIT), maxAmount: offerBaht => Math.floor(offerBaht/BAHT_PER_UNIT) },
 };
 function amountFieldKindFor(el){
   for(const cls in AMOUNT_FIELD_KINDS){
     if(el.classList.contains(cls)) return AMOUNT_FIELD_KINDS[cls];
   }
   return null;
+}
+// "เสนอขาย" ของ bond (b.amount) เก็บเป็นข้อความหน่วยล้านบาท เช่น "50.00" — แปลงเป็นบาทเต็ม
+function offerAmountBaht(bond){
+  const n = Number(String(bond.amount).replace(/,/g,'')) || 0;
+  return n * 1000000;
 }
 
 document.addEventListener('input', (e)=>{
@@ -1702,9 +2466,10 @@ document.addEventListener('input', (e)=>{
   }
 });
 
-// Enforce ซื้อขั้นต่ำ (minimum purchase) once the user leaves the field.
-// - "จำนวนเงิน" must be >= ซื้อขั้นต่ำ (บาท)
-// - "จำนวนหน่วย" must be >= ซื้อขั้นต่ำ / 1,000 (หน่วย)
+// Enforce ซื้อขั้นต่ำ (minimum purchase) และเพดานตามวงเงิน "เสนอขาย" ที่เหลืออยู่
+// once the user leaves the field.
+// - "จำนวนเงิน" ต้องอยู่ระหว่าง ซื้อขั้นต่ำ (บาท) ถึง เสนอขาย (บาท)
+// - "จำนวนหน่วย" ต้องอยู่ระหว่าง ซื้อขั้นต่ำ/1,000 ถึง เสนอขาย/1,000 (หน่วย)
 document.addEventListener('blur', (e)=>{
   const t = e.target;
   if(!t.classList) return;
@@ -1726,23 +2491,102 @@ document.addEventListener('blur', (e)=>{
     if(!bond) return;
     const minMoney = Number(String(bond.minPurchase).replace(/[^\d]/g,'')) || 0;
     const minForThisField = kind.minAmount(minMoney);
+    const maxForThisField = kind.maxAmount(offerAmountBaht(bond));
     const raw = Number(t.value.replace(/[^\d]/g,'')) || 0;
     if(raw > 0 && raw < minForThisField){
       t.value = minForThisField.toLocaleString('en-US');
       const suffix = document.getElementById(`${kind.suffixPrefix}-${code}`);
       if(suffix) suffix.classList.add('show');
-      showMinNotice(code);
+      showMinNotice(code, 'โปรดซื้อด้วยจำนวนขั้นต่ำ');
+    } else if(maxForThisField > 0 && raw > maxForThisField){
+      t.value = maxForThisField.toLocaleString('en-US');
+      const suffix = document.getElementById(`${kind.suffixPrefix}-${code}`);
+      if(suffix) suffix.classList.add('show');
+      showMinNotice(code, 'จำนวนที่กรอกเกินจำนวนเสนอขาย\nระบบปรับให้เป็นจำนวนสูงสุดที่ซื้อได้');
     }
   }
 }, true); // capture: 'blur' doesn't bubble, so delegation needs the capture phase
 
+// Privacy-consent checkbox: "Submit" is visible right away (no need to wait
+// for the checkbox), but clicking it while unchecked shows an inline error
+// instead of sending — checking the box clears that error.
+// ล้างขอบสีแดงเมื่อเริ่มกรอกช่องนั้น (ช่องจำนวนเงิน/หน่วย: กรอกช่องใดช่องหนึ่งก็ล้างทั้งคู่)
+document.addEventListener('input', (e)=>{
+  const t = e.target;
+  if(!t || !t.classList || !t.classList.contains('input-error')) return;
+  if(t.classList.contains('amount-money') || t.classList.contains('amount-unit')){
+    const wrap = t.closest('.amount-fields');
+    if(wrap) wrap.querySelectorAll('.buy-input').forEach(i=> i.classList.remove('input-error'));
+  } else if(t.classList.contains('comment-box')){
+    t.classList.remove('input-error');
+  }
+});
+
+// ขอบไฟวนรอบการ์ดหุ้นกู้ หายเมื่อเริ่มใส่ข้อมูลในการ์ด
+document.addEventListener('input', (e)=>{
+  const t = e.target;
+  if(t && t.matches && t.matches('.buy-expand .buy-input')){
+    const card = t.closest('.card');
+    if(card) card.classList.remove('glow-run');
+  }
+});
+
+document.addEventListener('change', (e)=>{
+  if(e.target.classList && e.target.classList.contains('privacy-checkbox')){
+    syncPrivacyGlow(e.target.closest('.privacy-notice')); // ติ๊กแล้วไฟหาย
+    const code = e.target.dataset.code;
+    if(e.target.checked){
+      const err = document.getElementById(`privacyError-${code}`);
+      if(err) err.classList.remove('show');
+    }
+  }
+});
+
 ids.forEach(id=> els[id].addEventListener('change', render));
-if(searchEl) searchEl.addEventListener('input', render);
+if(searchEl) searchEl.addEventListener('input', debouncedRender);
+const searchClearEl = document.getElementById('fSearchClear');
+if(searchClearEl && searchEl){
+  searchClearEl.addEventListener('click', ()=>{
+    searchEl.value = "";
+    render();          // ล้างแล้วแสดงผลทันที
+    searchEl.focus();
+  });
+}
 document.getElementById('resetBtn').addEventListener('click', ()=>{
   ids.forEach(id=> els[id].value = "");
-  multiFilterIds.forEach(id=> multiSelectResetters[id] && multiSelectResetters[id]());
+  resetMultiFilters();
+  sortPrefs = {}; sortOrder = [];
+  budgetMinEl.value = ""; budgetMaxEl.value = ""; updateBudgetHints();
   if(searchEl) searchEl.value = "";
   render();
+});
+
+// ---------- ปุ่ม "ค้นหา" ----------
+// ตัวกรองทำงานทันทีที่เลือกอยู่แล้ว ปุ่มนี้จึงไม่ได้กรองใหม่ — แต่ทำให้ผู้ใช้รู้สึกว่า
+// "ค้นหา" จริง: เลื่อนมาที่จำนวนหุ้นกู้ที่พบทันที พร้อมไฮไลต์ตัวเลขสั้นๆ
+// (ไม่เรียก render() ซ้ำ เพื่อไม่ให้กล่องสนใจซื้อที่ผู้ใช้กำลังกรอกอยู่ถูกล้าง)
+const searchBtnEl = document.getElementById('searchBtn');
+const countLineEl = document.querySelector('.count-line');
+function runSearchButton(){
+  closeAllMselPanels();
+  if(document.activeElement && document.activeElement !== document.body && document.activeElement.blur){
+    document.activeElement.blur(); // เก็บคีย์บอร์ดบนมือถือ
+  }
+  debouncedRender.flush(); // กดค้นหาแล้วต้องเห็นผลทันที ไม่ต้องรอหน่วงเวลา
+  if(!countLineEl) return;
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  countLineEl.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block:'start' });
+  countLineEl.classList.remove('flash');
+  void countLineEl.offsetWidth; // รีสตาร์ทแอนิเมชัน
+  countLineEl.classList.add('flash');
+  clearTimeout(runSearchButton._t);
+  runSearchButton._t = setTimeout(()=> countLineEl.classList.remove('flash'), 1000);
+}
+if(searchBtnEl) searchBtnEl.addEventListener('click', runSearchButton);
+[searchEl, budgetMinEl, budgetMaxEl].forEach(el=>{
+  if(el) el.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){ e.preventDefault(); runSearchButton(); }
+  });
 });
 
 // ---------- Cart FAB / overlay wiring ----------
