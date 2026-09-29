@@ -539,6 +539,13 @@
     margin-bottom:12px;
   }
   .login-box.show, .email-box.show{display:flex;}
+  .login-msg{
+    display:none;
+    background:#EEF6EA; color:var(--green); font-weight:700; font-size:13px;
+    padding:12px 10px; border-radius:9px; text-align:center;
+    margin-bottom:12px;
+  }
+  .login-msg.show{display:block;}
   .email-notice{
     display:none;
     background:#FBEAEA; color:var(--red); font-weight:700; font-size:11.5px;
@@ -1826,6 +1833,7 @@ function bondCardHTML(b, instanceCode, opts){
           <input type="password" class="buy-input" placeholder="รหัสผ่าน (Password)">
           <button type="button" class="login-btn" data-code="${instanceCode}">Log in</button>
         </div>
+        <div class="login-msg" id="loginMsg-${instanceCode}">คุณทดสอบ ลองส่งดู</div>
 
         <div class="email-box" id="email-${instanceCode}">
           <div class="email-notice" id="emailNotice-${instanceCode}">กรุณากรอกอีเมลให้ถูกต้อง</div>
@@ -2072,9 +2080,6 @@ document.addEventListener('click', (e)=>{
       [moneyField, unitField].forEach(f=>{ if(f) f.classList.toggle('input-error', !hasAmount); });
       if(!hasAmount && !firstInvalid) firstInvalid = moneyField ? moneyField.closest('.amount-fields') : itemNotice;
     });
-    // ช่องข้อมูลติดต่อกลับที่ยังว่าง ขึ้นขอบสีแดงเหมือนช่องจำนวน (แสดงพร้อมกันแม้ช่องจำนวนยังไม่ครบ)
-    const commentEl = document.getElementById('comment-checkoutGlobal');
-    if(commentEl) commentEl.classList.toggle('input-error', commentEl.value.trim() === '');
 
     if(firstInvalid){
       if(globalNotice) globalNotice.classList.remove('show');
@@ -2082,16 +2087,8 @@ document.addEventListener('click', (e)=>{
       return;
     }
 
-    // ต้องกรอกฟิลด์ comment (ข้อมูลติดต่อกลับ) ก่อนจึงจะกดส่งได้
+    // ช่อง comment ไม่บังคับกรอก
     const commentBox = document.getElementById('comment-checkoutGlobal');
-    if(!commentBox || commentBox.value.trim() === ''){
-      if(globalNotice){
-        globalNotice.textContent = 'กรุณากรอกข้อมูลติดต่อกลับก่อนกดส่ง';
-        globalNotice.classList.add('show');
-      }
-      requestAnimationFrame(()=> centerInView(commentBox)); // ช่องข้อมูลติดต่อกลับมาอยู่กลางจอ
-      return;
-    }
 
     if(globalNotice) globalNotice.classList.remove('show');
 
@@ -2137,6 +2134,20 @@ document.addEventListener('click', (e)=>{
     return;
   }
 
+  // ปุ่ม Log in: กล่อง Log in หายไป แล้วแสดงข้อความแทน
+  const loginBtn = e.target.closest('.login-btn');
+  if(loginBtn){
+    const code = loginBtn.dataset.code;
+    const loginBoxEl = document.getElementById(`login-${code}`);
+    const loginMsgEl = document.getElementById(`loginMsg-${code}`);
+    if(loginBoxEl){ loginBoxEl.classList.remove('show'); loginBoxEl.dataset.done = '1'; }
+    if(loginMsgEl){
+      loginMsgEl.classList.add('show');
+      requestAnimationFrame(()=> ensureVisible(loginMsgEl));
+    }
+    return;
+  }
+
   // Choose customer type: existing (login) vs new (email)
   const typeBtn = e.target.closest('.type-btn');
   if(typeBtn){
@@ -2148,13 +2159,21 @@ document.addEventListener('click', (e)=>{
     if(formNotice) formNotice.classList.remove('show');
     const loginBox = document.getElementById(`login-${code}`);
     const emailBox = document.getElementById(`email-${code}`);
+    const loginMsg = document.getElementById(`loginMsg-${code}`);
     if(type === 'existing'){
-      loginBox.classList.add('show');
       emailBox.classList.remove('show');
-      requestAnimationFrame(()=> ensureVisible(loginBox));
+      if(loginBox.dataset.done === '1'){
+        // Log in ไปแล้ว → แสดงข้อความเดิม ไม่แสดงกล่อง Log in ซ้ำ
+        if(loginMsg) loginMsg.classList.add('show');
+        requestAnimationFrame(()=> ensureVisible(loginMsg));
+      } else {
+        loginBox.classList.add('show');
+        requestAnimationFrame(()=> ensureVisible(loginBox));
+      }
     } else {
       emailBox.classList.add('show');
       loginBox.classList.remove('show');
+      if(loginMsg) loginMsg.classList.remove('show');
       requestAnimationFrame(()=> ensureVisible(emailBox));
     }
     return;
@@ -2185,8 +2204,6 @@ document.addEventListener('click', (e)=>{
     const unitField = document.getElementById(`unit-${code}`);
     const hasAmount = (moneyField && moneyField.value.trim() !== '') || (unitField && unitField.value.trim() !== '');
     [moneyField, unitField].forEach(f=>{ if(f) f.classList.toggle('input-error', !hasAmount); });
-    const commentEl = document.getElementById(`comment-${code}`);
-    if(commentEl) commentEl.classList.toggle('input-error', commentEl.value.trim() === '');
     if(!hasAmount){
       if(formNotice){
         formNotice.textContent = 'กรุณากรอกจำนวนเงินหรือจำนวนหน่วย';
@@ -2196,16 +2213,7 @@ document.addEventListener('click', (e)=>{
       return;
     }
 
-    // ต้องกรอกฟิลด์ comment (ข้อมูลติดต่อกลับ) ก่อนจึงจะกดส่งได้
-    const commentBox = document.getElementById(`comment-${code}`);
-    if(!commentBox || commentBox.value.trim() === ''){
-      if(formNotice){
-        formNotice.textContent = 'กรุณากรอกข้อมูลติดต่อกลับก่อนกดส่ง';
-        formNotice.classList.add('show');
-      }
-      requestAnimationFrame(()=> ensureVisible(commentBox));
-      return;
-    }
+    // ช่อง comment ไม่บังคับกรอก
 
     if(formNotice) formNotice.classList.remove('show');
 
@@ -2220,7 +2228,7 @@ document.addEventListener('click', (e)=>{
 
     const privacy = document.getElementById(`privacy-${code}`);
     if(panel){
-      panel.querySelectorAll('.type-select, .login-box, .email-box, .amount-fields, .comment-box, .submit-btn').forEach(el=>{
+      panel.querySelectorAll('.type-select, .login-box, .login-msg, .email-box, .amount-fields, .comment-box, .submit-btn').forEach(el=>{
         el.style.display = 'none';
       });
     }
@@ -2251,7 +2259,7 @@ document.addEventListener('click', (e)=>{
     } else {
       const panel = document.getElementById(`expand-${code}`);
       if(panel){
-        panel.querySelectorAll('.type-select, .login-box, .email-box, .amount-fields, .comment-box, .submit-btn').forEach(el=>{
+        panel.querySelectorAll('.type-select, .login-box, .login-msg, .email-box, .amount-fields, .comment-box, .submit-btn').forEach(el=>{
           el.style.display = '';
         });
         requestAnimationFrame(()=> ensureVisible(panel));
