@@ -1,0 +1,2354 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>CISA 2.2 — การวิเคราะห์งบการเงินขั้นสูง บทที่ 3–5</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f8fa; --card:#ffffff; --ink:#1a1d24; --ink2:#475069; --ink3:#78819a;
+  --line:#e3e7ef; --brand:#1e5fbf; --brand-soft:#e8f0fd;
+  --gold:#b8860b; --gold-soft:#fdf6e3;
+  --green:#0f7b52; --green-soft:#e7f6ef;
+  --red:#b3261e; --red-soft:#fdecea;
+  --purple:#6b3fa0; --purple-soft:#f2ecfb;
+  --tutor:#c2410c; --tutor-soft:#fff2e9;
+  --radius:14px; --fs:16.5px;
+}
+html[data-theme="dark"]{
+  --bg:#0f1218; --card:#171b23; --ink:#e8ecf4; --ink2:#aab3c6; --ink3:#7b8499;
+  --line:#272d3a; --brand:#6ba3ff; --brand-soft:#16233a;
+  --gold:#e0b34a; --gold-soft:#2a2313;
+  --green:#4fd4a0; --green-soft:#10251d;
+  --red:#ff8a80; --red-soft:#2b1614;
+  --purple:#c0a3f0; --purple-soft:#211a2e;
+  --tutor:#ff9d6b; --tutor-soft:#2b1a11;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth;scroll-padding-top:16px;overflow-x:hidden}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:'IBM Plex Sans Thai','Sarabun',-apple-system,system-ui,sans-serif;
+  font-size:var(--fs);line-height:1.85;
+  -webkit-text-size-adjust:100%;
+  padding:0 0 90px;
+  overflow-x:hidden;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 6px}
+
+/* ---------- HEADER (ไม่ตรึง เลื่อนตามปกติ) ---------- */
+header.top{
+  position:static;
+  background:linear-gradient(140deg,#123a72,#1e5fbf 55%,#2b7fd4);
+  color:#fff;padding:26px 10px 22px;border-radius:0 0 22px 22px;
+  box-shadow:0 6px 22px rgba(20,50,110,.18);
+}
+header.top .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);
+  padding:3px 11px;border-radius:999px;font-size:12.5px;letter-spacing:.3px;margin-bottom:10px}
+header.top h1{margin:0 0 6px;font-size:22px;line-height:1.45;font-weight:700}
+header.top p{margin:0;font-size:13.5px;opacity:.9;line-height:1.7}
+
+/* ---------- CONTROL BAR ---------- */
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 4px}
+.ctrl button{
+  flex:1 1 auto;min-width:0;background:var(--card);color:var(--ink2);border:1px solid var(--line);
+  padding:9px 10px;border-radius:10px;font-size:13px;font-family:inherit;font-weight:600;cursor:pointer;
+}
+.ctrl button:active{transform:scale(.97)}
+
+/* ---------- READ PROGRESS ---------- */
+#readbar{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:11px 13px;margin:12px 0}
+#readbar .rb-t{font-size:13px;font-weight:700;color:var(--ink2);margin-bottom:7px;display:flex;justify-content:space-between}
+#readbar .rb-t b{color:var(--green)}
+.rb-track{height:7px;background:var(--line);border-radius:999px;overflow:hidden}
+#rbFill{height:100%;width:0;background:linear-gradient(90deg,var(--green),#3bbd8a);border-radius:999px;transition:width .35s}
+
+/* ---------- RESUME BANNER ---------- */
+#resume{
+  display:none;margin:14px 0;background:var(--gold-soft);border:1px solid var(--gold);
+  border-radius:var(--radius);padding:13px 14px;
+}
+#resume .r-t{font-weight:700;font-size:14px;color:var(--gold);margin-bottom:3px}
+#resume .r-s{font-size:12.5px;color:var(--ink2);line-height:1.6;margin-bottom:10px}
+#resume .r-b{display:flex;gap:8px}
+#resume button{flex:1;padding:9px;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:700;border:none;cursor:pointer}
+#rGo{background:var(--gold);color:#fff}
+#rNo{background:transparent;color:var(--ink3);border:1px solid var(--line)}
+
+/* ---------- TOC ---------- */
+nav.toc{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);margin:14px 0;overflow:hidden}
+nav.toc>.h{padding:13px 15px;font-weight:700;font-size:15px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+nav.toc>.h .ar{transition:.25s;color:var(--ink3);font-size:13px}
+nav.toc.open>.h .ar{transform:rotate(180deg)}
+nav.toc .body{display:none;border-top:1px solid var(--line);padding:6px 0 10px}
+nav.toc.open .body{display:block}
+nav.toc .grp{padding:9px 15px 4px;font-size:12px;font-weight:700;color:var(--brand);letter-spacing:.4px}
+nav.toc a{display:block;padding:7px 15px 7px 24px;color:var(--ink2);text-decoration:none;font-size:13.5px;line-height:1.55;border-left:2px solid transparent}
+nav.toc a:active{background:var(--brand-soft);border-left-color:var(--brand)}
+nav.toc a.done-link{color:var(--ink3);text-decoration:line-through}
+nav.toc a.done-link::after{content:' ✓';color:var(--green);font-weight:700;text-decoration:none}
+
+/* ---------- SECTIONS ---------- */
+section{margin:30px 0}
+section>*{transition:opacity .3s ease, filter .3s ease}
+section.read>*:not(.done-wrap){opacity:.24;filter:grayscale(.7)}
+section.read>h3.los{opacity:.45}
+h2.ch{
+  font-size:19px;font-weight:700;margin:34px 0 4px;padding:16px 15px;border-radius:var(--radius);
+  background:linear-gradient(135deg,var(--brand-soft),transparent);border-left:5px solid var(--brand);color:var(--ink);
+}
+h2.ch small{display:block;font-size:12px;font-weight:600;color:var(--brand);letter-spacing:.5px;margin-bottom:3px}
+h3.los{
+  font-size:16px;font-weight:700;margin:28px 0 10px;padding:11px 13px;border-radius:11px;
+  background:var(--card);border:1px solid var(--line);border-top:3px solid var(--brand);line-height:1.6;color:var(--ink);
+}
+h3.los .n{display:inline-block;background:var(--brand);color:#fff;font-size:12px;padding:2px 8px;border-radius:6px;margin-right:7px;vertical-align:2px}
+h4{font-size:15px;font-weight:700;margin:20px 0 8px;color:var(--ink);padding-left:10px;border-left:3px solid var(--ink3)}
+p{margin:9px 0}
+ul,ol{margin:9px 0;padding-left:21px}
+li{margin:5px 0}
+b,strong{font-weight:700;color:var(--ink)}
+code{background:var(--brand-soft);color:var(--brand);padding:1px 6px;border-radius:5px;font-size:.9em;font-family:ui-monospace,monospace;word-break:break-all}
+
+/* ---------- BOXES ---------- */
+.box{border-radius:var(--radius);padding:13px 14px;margin:14px 0;border:1px solid var(--line);background:var(--card)}
+.box .bt{font-size:12px;font-weight:700;letter-spacing:.4px;margin-bottom:7px;display:flex;align-items:center;gap:6px}
+.box p:first-of-type{margin-top:0}
+.box p:last-child,.box ul:last-child,.box ol:last-child{margin-bottom:0}
+.principle{background:var(--gold-soft);border-color:var(--gold)}
+.principle .bt{color:var(--gold)}
+.principle .quote{font-weight:600;line-height:1.9;color:var(--ink)}
+.explain{background:var(--brand-soft);border-color:var(--brand)}
+.explain .bt{color:var(--brand)}
+.ex{background:var(--green-soft);border-color:var(--green)}
+.ex .bt{color:var(--green)}
+.warn{background:var(--red-soft);border-color:var(--red)}
+.warn .bt{color:var(--red)}
+.exam{background:var(--purple-soft);border-color:var(--purple)}
+.exam .bt{color:var(--purple)}
+
+/* ---------- TUTOR BOX ---------- */
+.tutor{background:var(--tutor-soft);border:1.5px solid var(--tutor);border-radius:var(--radius);
+  padding:13px 14px;margin:16px 0;box-shadow:0 2px 10px rgba(194,65,12,.07)}
+.tutor .bt{color:var(--tutor);font-size:12.5px}
+.tutor .t-sec{margin:11px 0 0;padding-top:9px;border-top:1px dashed var(--tutor)}
+.tutor .t-sec:first-of-type{border-top:none;padding-top:0;margin-top:0}
+.tutor .t-lab{display:inline-block;background:var(--tutor);color:#fff;font-size:11px;font-weight:700;
+  padding:2px 9px;border-radius:6px;margin-bottom:5px}
+.tutor p{margin:5px 0}
+.tutor ul{margin:5px 0;padding-left:19px}
+.tutor .mnemo{background:var(--card);border:1px dashed var(--tutor);border-radius:9px;padding:9px 11px;
+  margin:7px 0;font-weight:700;text-align:center;line-height:1.75;color:var(--tutor)}
+
+/* ---------- DONE BUTTON ---------- */
+.done-wrap{margin:20px 0 4px}
+.done{width:100%;padding:13px 10px;border-radius:12px;border:1.5px dashed var(--green);
+  background:transparent;color:var(--green);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;
+  transition:.2s}
+.done:active{transform:scale(.98)}
+section.read .done{background:var(--green);color:#fff;border-style:solid}
+
+/* ---------- TABLE (คงที่ ไม่ล้นจอ ไม่มี scrollbar) ---------- */
+.tw{overflow:hidden;margin:14px 0;border:1px solid var(--line);border-radius:11px;background:var(--card)}
+table{border-collapse:collapse;width:100%;table-layout:fixed;font-size:9.5px}
+th,td{
+  padding:4px 3px;text-align:left;border-bottom:1px solid var(--line);border-right:1px solid var(--line);
+  vertical-align:top;line-height:1.42;
+  word-break:break-word;overflow-wrap:anywhere;
+}
+th:last-child,td:last-child{border-right:none}
+th{background:var(--brand-soft);color:var(--brand);font-weight:700;font-size:9.5px}
+tr:last-child td{border-bottom:none}
+td.c,th.c{text-align:center}
+
+/* ---------- FORMULA ---------- */
+.f{background:var(--card);border:1px dashed var(--brand);border-radius:11px;padding:13px 10px;margin:13px 0;
+  font-size:13px;line-height:2;text-align:center;color:var(--ink);overflow-wrap:anywhere}
+.f b{color:var(--brand)}
+
+/* ---------- MISC ---------- */
+.pill{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:999px;margin:2px 3px 2px 0}
+.p-b{background:var(--brand-soft);color:var(--brand)}
+.p-g{background:var(--green-soft);color:var(--green)}
+.p-r{background:var(--red-soft);color:var(--red)}
+hr.sep{border:none;border-top:1px dashed var(--line);margin:26px 0}
+
+/* ---------- PROGRESS + FAB ---------- */
+#bar{position:fixed;left:0;bottom:0;height:3px;background:var(--brand);width:0;z-index:99;transition:width .1s}
+#fab{position:fixed;right:14px;bottom:20px;z-index:98;display:flex;flex-direction:column;gap:8px}
+#fab button{width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:var(--card);
+  color:var(--ink2);font-size:17px;box-shadow:0 4px 14px rgba(0,0,0,.14);cursor:pointer}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:78px;background:#1a1d24;color:#fff;
+  padding:9px 17px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:.3s;z-index:100}
+#toast.on{opacity:.95}
+footer{text-align:center;color:var(--ink3);font-size:12px;padding:30px 14px 10px;line-height:1.8}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap" style="padding:0">
+    <span class="tag">CISA ระดับ 2 · วิชา 2.2</span>
+    <h1>การวิเคราะห์งบการเงินขั้นสูง<br>บทที่ 3 – 5</h1>
+    <p>สรุปครบทุก LOS · คงประโยคหลักการตามตัวบท · พร้อมคำอธิบายขยายความและตัวอย่าง</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div id="resume">
+    <div class="r-t">📖 อ่านค้างไว้</div>
+    <div class="r-s" id="rInfo"></div>
+    <div class="r-b">
+      <button id="rGo">อ่านต่อจากเดิม</button>
+      <button id="rNo">เริ่มใหม่</button>
+    </div>
+  </div>
+
+  <div id="readbar">
+    <div class="rb-t"><span>📗 ความคืบหน้าการอ่าน</span><span>อ่านแล้ว <b id="rbN">0</b> / 21 LOS</span></div>
+    <div class="rb-track"><div id="rbFill"></div></div>
+  </div>
+
+  <div class="ctrl">
+    <button onclick="tg()">🌓 ธีม</button>
+    <button onclick="fz(-1)">ก⁻ เล็ก</button>
+    <button onclick="fz(1)">ก⁺ ใหญ่</button>
+    <button onclick="clr()">🗑 ล้างตำแหน่ง</button>
+    <button onclick="clrRead()">↺ ล้างสถานะอ่านแล้ว</button>
+  </div>
+
+  <nav class="toc" id="toc">
+    <div class="h" onclick="document.getElementById('toc').classList.toggle('open')">
+      <span>📑 สารบัญ</span><span class="ar">▼</span>
+    </div>
+    <div class="body">
+      <div class="grp">บทที่ 3 · เงินลงทุนระหว่างกิจการ</div>
+      <a href="#los31">3.1 ประเภทของเงินลงทุนในตราสารทุน</a>
+      <a href="#los32">3.2 เลือกใช้ราคาทุน / ส่วนได้เสีย / งบรวม</a>
+      <a href="#los33">3.3 ผลกระทบต่องบการเงินและอัตราส่วน</a>
+      <a href="#los34">3.4 ส่วนงานดำเนินงาน ประโยชน์–ข้อจำกัด</a>
+      <a href="#los35">3.5 ข้อกำหนดการเปิดเผยส่วนงาน</a>
+      <div class="grp">บทที่ 4 · การรวมธุรกิจ</div>
+      <a href="#los41">4.1 วิธีซื้อ และวิธีรวมส่วนได้เสีย</a>
+      <a href="#los42">4.2 เปรียบเทียบความแตกต่าง 2 วิธี</a>
+      <a href="#los43">4.3 เมื่อใดต้องใช้วิธีรวมส่วนได้เสีย</a>
+      <a href="#los44">4.4 หลักการจัดทำงบรวมภายใต้วิธีซื้อ</a>
+      <a href="#los45">4.5 ผลกระทบต่องบและอัตราส่วน</a>
+      <a href="#los46">4.6 ค่าความนิยม</a>
+      <a href="#los47">4.7 การแต่งกำไรและการตรวจสอบ</a>
+      <a href="#los48">4.8 รายงานจำแนกตามส่วนงาน</a>
+      <div class="grp">บทที่ 5 · ธุรกิจข้ามชาติ</div>
+      <a href="#los51">5.1 ผลกระทบของอัตราแลกเปลี่ยน</a>
+      <a href="#los52">5.2 หลักการบัญชีและการเปิดเผย</a>
+      <a href="#los53">5.3 วิเคราะห์การเปลี่ยนแปลงยอดขาย</a>
+      <a href="#los54">5.4 ผลกระทบต่องบของบริษัทใหญ่</a>
+      <a href="#los55">5.5 คำนวณการแปลงค่า</a>
+      <a href="#los56">5.6 ผลต่อ EPS กระแสเงินสด อัตราส่วน</a>
+      <a href="#los57">5.7 เศรษฐกิจเงินเฟ้อรุนแรง</a>
+      <a href="#los58">5.8 ฐานะเปิดต่อความเสี่ยง</a>
+      <div class="grp">ภาคผนวก</div>
+      <a href="#drill">🎯 จุดออกสอบจากแบบฝึกหัด</a>
+      <a href="#note">⚠️ หมายเหตุการตรวจทาน</a>
+    </div>
+  </nav>
+
+  <div class="box explain">
+    <div class="bt">🔑 วิธีใช้ไฟล์นี้</div>
+    <p>กล่อง <span class="pill" style="background:var(--gold-soft);color:var(--gold)">หลักการ (คงประโยค)</span> คือถ้อยคำตามตัวบท/ตำรา <b>ให้ท่องให้เป๊ะ</b> เพราะข้อสอบมักตัดคำหรือสลับคำเพื่อหลอก ส่วนกล่องสีฟ้าคือคำอธิบายขยายความ กล่องสีเขียวคือตัวอย่าง และกล่องสีแดงคือกับดักข้อสอบ</p>
+    <p><b>กล่องสีส้ม 🧑‍🏫 ติวเตอร์สรุปให้</b> คือสรุปแบบเล่าให้ฟัง + สูตรจำ + แนวเก็งข้อสอบ อ่านกล่องนี้ก่อนนอนหรือก่อนเข้าห้องสอบได้เลย และเมื่ออ่านจบแต่ละ LOS ให้กดปุ่ม <b>"อ่านจบแล้ว"</b> ท้ายหัวข้อ ระบบจะทำให้หัวข้อนั้นจางลงและจำไว้ให้แม้ปิดไฟล์ไปแล้ว</p>
+  </div>
+
+<!-- ============ บทที่ 3 ============ -->
+<h2 class="ch" id="ch3"><small>CHAPTER 3</small>เงินลงทุนระหว่างกิจการ</h2>
+
+<section id="los31">
+<h3 class="los"><span class="n">LOS 3.1</span>อธิบายและจำแนกประเภทของเงินลงทุนระหว่างกิจการ ในส่วนของเงินลงทุนในตราสารทุนของกิจการอื่น</h3>
+
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค)</div>
+<p class="quote">เงินลงทุนในตราสารทุนของกิจการอื่นจำแนกตาม <b>ระดับของการเป็นเจ้าของและ/หรือการควบคุม</b> ออกเป็น 4 ประเภท ได้แก่ <b>สินทรัพย์ทางการเงิน (TFRS 9)</b> · <b>บริษัทร่วม (TAS 28)</b> · <b>การร่วมการงาน (TFRS 11)</b> · <b>บริษัทย่อย (TFRS 10)</b></p>
+</div>
+
+<div class="tw"><table>
+<tr><th>ประเภท</th><th>มาตรฐาน</th><th>ระดับความสัมพันธ์</th><th>วิธีบัญชี</th></tr>
+<tr><td><b>สินทรัพย์ทางการเงิน</b></td><td>TFRS 9</td><td>ไม่มีการควบคุม ไม่มีการควบคุมร่วม และไม่มีอิทธิพลอย่างมีนัยสำคัญ</td><td>มูลค่ายุติธรรม<br>(FVTPL หรือ FVOCI)</td></tr>
+<tr><td><b>บริษัทร่วม</b></td><td>TAS 28</td><td>มีอิทธิพลอย่างมีนัยสำคัญ</td><td>วิธีส่วนได้เสีย</td></tr>
+<tr><td><b>การร่วมการงาน</b></td><td>TFRS 11</td><td>มีการควบคุมร่วม</td><td>การดำเนินงานร่วมกัน → รับรู้ส่วนได้เสียของตน<br>การร่วมค้า → วิธีส่วนได้เสีย</td></tr>
+<tr><td><b>บริษัทย่อย</b></td><td>TFRS 10</td><td>มีการควบคุม</td><td>งบการเงินรวม<br>(วิธีรวมเต็มรูปแบบ)</td></tr>
+</table></div>
+
+<h4>การจัดประเภทตราสารทุนตาม TFRS 9</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค)</div>
+<p class="quote">เงินลงทุนในตราสารทุนวัดมูลค่าด้วย <b>มูลค่ายุติธรรมผ่านกำไรหรือขาดทุน (FVTPL)</b> หรือ <b>มูลค่ายุติธรรมผ่านกำไรขาดทุนเบ็ดเสร็จอื่น (FVOCI)</b></p>
+</div>
+<div class="box explain">
+<div class="bt">💡 ขยายความ</div>
+<ul>
+<li><b>FVTPL คือค่าตั้งต้น</b> — ตราสารทุนทุกตัวเริ่มต้นที่ FVTPL เสมอ การเปลี่ยนแปลงมูลค่ายุติธรรมวิ่งเข้า <b>กำไรขาดทุน</b> ทำให้กำไรผันผวนตามตลาด</li>
+<li><b>FVOCI เป็นทางเลือก</b> — เลือกได้เฉพาะตราสารทุนที่ <b>ไม่ได้ถือไว้เพื่อค้า</b> และเมื่อเลือกแล้ว <b>เพิกถอนไม่ได้ (irrevocable)</b> ต้องเลือกตั้งแต่วันรับรู้รายการเมื่อเริ่มแรก</li>
+<li><b>จุดหลอกสำคัญ:</b> ตราสารทุนที่เลือก FVOCI เมื่อขายออกไป <b>ห้ามจัดประเภทกำไร/ขาดทุนสะสมใน OCI กลับเข้ากำไรขาดทุน (no recycling)</b> ให้โอนไปกำไรสะสมแทน — ต่างจากตราสารหนี้ FVOCI ที่ต้อง recycle</li>
+<li><b>เงินปันผล</b> รับรู้ใน <b>กำไรขาดทุน</b> ทั้งสองทางเลือก (เว้นแต่ชัดเจนว่าเป็นการคืนทุน)</li>
+</ul>
+</div>
+
+<div class="box ex">
+<div class="bt">✅ ตัวอย่าง 3-1</div>
+<p>บริษัท ก. ซื้อหุ้นสามัญบริษัท ข. 5% ราคา 100 ล้านบาท สิ้นปีมูลค่ายุติธรรม 130 ล้านบาท ระหว่างปีได้เงินปันผล 4 ล้านบาท</p>
+<ul>
+<li><b>ถ้าเลือก FVTPL:</b> กำไรขาดทุน = กำไรจากมูลค่ายุติธรรม 30 + เงินปันผล 4 = <b>+34 ล้านบาท</b></li>
+<li><b>ถ้าเลือก FVOCI:</b> กำไรขาดทุน = เงินปันผล 4 ล้านบาทเท่านั้น ส่วน 30 ล้านบาทไปอยู่ใน <b>OCI</b></li>
+</ul>
+<p>ทั้งสองวิธี <b>สินทรัพย์รวมและส่วนของเจ้าของรวมเท่ากัน</b> (130 ล้านบาท) ต่างกันแค่ "ตำแหน่ง" ที่รับรู้กำไร → <b>ROE เท่ากัน แต่ Net Profit Margin ต่างกัน</b></p>
+</div>
+
+<div class="tutor">
+<div class="bt">🧑‍🏫 ติวเตอร์สรุปให้ — LOS 3.1</div>
+
+<div class="t-sec">
+<span class="t-lab">เล่าแบบบ้านๆ</span>
+<p>คิดว่าการถือหุ้นบริษัทอื่นก็เหมือน <b>"ระดับความสนิทกับเพื่อน"</b> ครับ</p>
+<ul>
+<li><b>คนรู้จักผ่านๆ</b> (ถือน้อย ไม่มีสิทธิ์พูดอะไร) → บันทึกแค่ "ราคาตลาดวันนี้เท่าไร" = <b>มูลค่ายุติธรรม TFRS 9</b></li>
+<li><b>เพื่อนที่เราออกความเห็นได้</b> (มีที่นั่งในบอร์ด) → ต้องรับรู้ส่วนแบ่งกำไรเขาด้วย = <b>บริษัทร่วม วิธีส่วนได้เสีย</b></li>
+<li><b>หุ้นส่วนที่ต้องตัดสินใจร่วมกันทุกเรื่อง</b> → <b>การร่วมการงาน TFRS 11</b></li>
+<li><b>ลูกน้องที่เราสั่งได้</b> → เอางบเขามารวมกับเราทั้งก้อน = <b>บริษัทย่อย งบการเงินรวม</b></li>
+</ul>
+<p>ส่วน FVTPL กับ FVOCI ต่างกันตรง <b>"กำไรจากราคาหุ้นที่ขึ้นลง จะโชว์ที่ไหน"</b> เท่านั้น — เงินในกระเป๋าเท่ากัน แต่ FVTPL โชว์ในกำไรสุทธิ (ทำให้กำไรเหวี่ยง) ส่วน FVOCI ซ่อนไว้ใน OCI (กำไรสุทธิเรียบ)</p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">สูตรจำ</span>
+<div class="mnemo">ไม่รู้จัก → ออกความเห็นได้ → ตัดสินใจร่วม → สั่งได้<br>FV · ส่วนได้เสีย · TFRS 11 · งบรวม</div>
+<p><b>จำ FVOCI ตราสารทุน:</b> <span style="color:var(--tutor)"><b>"เลือกแล้วเปลี่ยนไม่ได้ ขายแล้วไม่วนกลับ"</b></span> (irrevocable + no recycling)</p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">เก็งข้อสอบ &amp; วิธีทำ</span>
+<ul>
+<li><b>ข้อเก็งอันดับ 1:</b> ถามว่าขายตราสารทุน FVOCI แล้วกำไรสะสมใน OCI ไปไหน → ตอบ <b>โอนเข้ากำไรสะสม ไม่ผ่านกำไรขาดทุน</b> ตัวเลือกหลอกคือ "จัดประเภทใหม่เข้ากำไรขาดทุน" (อันนั้นคือตราสาร<b>หนี้</b>)</li>
+<li><b>ข้อเก็งอันดับ 2:</b> ให้ตัวเลขมูลค่ายุติธรรม + เงินปันผล แล้วถามกำไรสุทธิ → <b>FVOCI ให้บวกเฉพาะเงินปันผล</b> อย่าเผลอบวกกำไรจากราคาหุ้น</li>
+<li><b>เทคนิคตัดตัวเลือก:</b> ถ้าโจทย์ถามว่า "วิธีใดทำให้ ROE ต่างกัน" ระหว่าง FVTPL กับ FVOCI → ตอบ <b>ไม่ต่าง</b> เพราะส่วนของเจ้าของรวมเท่ากัน</li>
+</ul>
+</div>
+</div>
+
+<div class="done-wrap"><button class="done" data-id="los31">✓ อ่านจบ LOS 3.1 แล้ว</button></div>
+</section>
+
+<section id="los32">
+<h3 class="los"><span class="n">LOS 3.2</span>ระบุได้ว่ากิจการควรใช้วิธีราคาทุน วิธีส่วนได้เสีย หรือวิธีรวมเต็มรูปแบบ เมื่อพิจารณาถึงระดับของการเป็นเจ้าของ และ/หรือการควบคุม</h3>
+
+<h4>① นิยาม "การควบคุม" (TFRS 10)</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค) — ต้องครบทั้ง 3 องค์ประกอบ</div>
+<p class="quote">ผู้ลงทุนควบคุมผู้ได้รับการลงทุนเมื่อ<br>
+(1) ผู้ลงทุน<b>มีอำนาจเหนือผู้ได้รับการลงทุน</b><br>
+(2) ผู้ลงทุน<b>มีการเปิดรับหรือมีสิทธิในผลตอบแทนผันแปร</b>จากการเกี่ยวข้องกับผู้ได้รับการลงทุน<br>
+(3) ผู้ลงทุน<b>มีความสามารถในการใช้อำนาจเหนือผู้ได้รับการลงทุนเพื่อทำให้เกิดผลกระทบต่อจำนวนเงินผลตอบแทน</b>ของผู้ลงทุน</p>
+</div>
+<div class="box warn">
+<div class="bt">⚠️ กับดัก</div>
+<p>ต้องมี <b>ครบทั้ง 3 ข้อ</b> จึงจะเรียกว่าควบคุม — ถ้าข้อสอบให้มาแค่ 2 ข้อ หรือสลับคำว่า "อิทธิพล" มาแทน "อำนาจ" ให้ตอบว่า <b>ไม่ใช่การควบคุม</b> และสังเกตว่านิยามนี้ <b>ไม่ได้พูดถึงสัดส่วนหุ้น</b> เลย — ถือ 40% ก็อาจควบคุมได้ (de facto control) ถือ 60% ก็อาจไม่ควบคุมได้ถ้าอำนาจอยู่ที่คนอื่น</p>
+</div>
+
+<h4>② นิยาม "อิทธิพลอย่างมีนัยสำคัญ" (TAS 28)</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค)</div>
+<p class="quote">อิทธิพลอย่างมีนัยสำคัญ หมายถึง <b>อำนาจในการเข้าไปมีส่วนร่วมในการตัดสินใจเกี่ยวกับนโยบายทางการเงินและการดำเนินงานของผู้ได้รับการลงทุน แต่ไม่ถึงระดับที่จะควบคุมหรือควบคุมร่วมในนโยบายดังกล่าว</b></p>
+<p class="quote" style="margin-top:10px">หากผู้ลงทุนถือหุ้น<b>ตั้งแต่ร้อยละ 20 ขึ้นไป</b>ของสิทธิออกเสียง <b>ให้สันนิษฐานว่าผู้ลงทุนมีอิทธิพลอย่างมีนัยสำคัญ เว้นแต่จะแสดงให้เห็นอย่างชัดเจนว่าไม่มี</b> และหากถือ<b>น้อยกว่าร้อยละ 20 ให้สันนิษฐานว่าไม่มีอิทธิพลอย่างมีนัยสำคัญ เว้นแต่จะแสดงให้เห็นอย่างชัดเจนว่ามี</b></p>
+</div>
+
+<div class="box principle">
+<div class="bt">📌 หลักฐานที่แสดงว่ามีอิทธิพลอย่างมีนัยสำคัญ (5 ข้อ — ออกสอบบ่อย)</div>
+<p class="quote">
+(ก) การมีตัวแทนอยู่ในคณะกรรมการบริษัท หรือคณะผู้บริหารอื่นที่เทียบเท่าคณะกรรมการบริษัทของผู้ได้รับการลงทุน<br>
+(ข) การมีส่วนร่วมในการกำหนดนโยบาย รวมทั้งมีส่วนร่วมในการตัดสินใจเกี่ยวกับเงินปันผลหรือการแบ่งปันส่วนทุนอื่นๆ<br>
+(ค) มีรายการระหว่างกิจการกับผู้ได้รับการลงทุนอย่างเป็นสาระสำคัญ<br>
+(ง) มีการแลกเปลี่ยนบุคลากรระดับบริหาร<br>
+(จ) มีการให้ข้อมูลทางเทคนิคที่จำเป็นในการดำเนินการ
+</p>
+</div>
+<div class="box explain">
+<div class="bt">💡 เทคนิคจำ 5 ข้อ</div>
+<p><b>"กรรมการ – นโยบาย – ค้าขาย – คน – เทคโนโลยี"</b> → มีตัวแทนในบอร์ด / ร่วมกำหนดนโยบาย / มีรายการระหว่างกันมีสาระสำคัญ / แลกเปลี่ยนผู้บริหาร / ให้ข้อมูลทางเทคนิค</p>
+</div>
+
+<h4>③ แผนผังตัดสินใจ</h4>
+<div class="tw"><table>
+<tr><th>สถานการณ์</th><th class="c">สัดส่วนโดยประมาณ</th><th>วิธีในงบการเงินรวม</th></tr>
+<tr><td>ไม่มีอิทธิพล</td><td class="c">&lt; 20%</td><td>TFRS 9 — มูลค่ายุติธรรม</td></tr>
+<tr><td>มีอิทธิพลอย่างมีนัยสำคัญ</td><td class="c">20% – 50%</td><td>วิธีส่วนได้เสีย</td></tr>
+<tr><td>มีการควบคุมร่วม</td><td class="c">ตามสัญญา</td><td>TFRS 11</td></tr>
+<tr><td>มีการควบคุม</td><td class="c">&gt; 50%</td><td>งบการเงินรวม</td></tr>
+</table></div>
+<div class="box warn">
+<div class="bt">⚠️ สัดส่วนเป็นเพียง "ข้อสันนิษฐาน" ไม่ใช่กฎตายตัว</div>
+<p>มาตรฐานให้ดู <b>เนื้อหาเชิงเศรษฐกิจมากกว่ารูปแบบทางกฎหมาย (substance over form)</b> ต้องพิจารณา <b>สิทธิออกเสียงที่อาจเกิดขึ้น (potential voting rights)</b> เช่น warrant หรือหุ้นกู้แปลงสภาพที่ใช้สิทธิได้ในปัจจุบันด้วย</p>
+</div>
+
+<h4>④ งบการเงินเฉพาะกิจการ</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค)</div>
+<p class="quote">ในงบการเงินเฉพาะกิจการ กิจการต้องบันทึกเงินลงทุนในบริษัทย่อย การร่วมค้า และบริษัทร่วม ด้วย<b>วิธีราคาทุน</b> หรือ<b>วิธีส่วนได้เสีย</b> หรือตาม<b>มาตรฐานการรายงานทางการเงิน ฉบับที่ 9</b> โดยต้องใช้วิธีเดียวกันสำหรับเงินลงทุนแต่ละประเภท</p>
+</div>
+<div class="box explain">
+<div class="bt">💡 ขยายความ</div>
+<p><b>"วิธีราคาทุน" ใช้ในงบการเงินเฉพาะกิจการเท่านั้น</b> — ไม่ใช่ทางเลือกในงบการเงินรวม ภายใต้วิธีราคาทุน เงินลงทุนแสดงด้วยราคาทุนคงที่ตลอด และรับรู้รายได้เฉพาะ <b>เงินปันผลรับ</b> เมื่อมีสิทธิได้รับ</p>
+</div>
+
+<h4>⑤ ข้อยกเว้นที่ไม่ต้องใช้วิธีส่วนได้เสีย</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค)</div>
+<p class="quote">ผู้ลงทุน<b>ไม่จำเป็นต้องใช้วิธีส่วนได้เสีย</b> หากเป็นบริษัทใหญ่ที่ได้รับการยกเว้นไม่ต้องจัดทำงบการเงินรวม หรือเมื่อเข้าเงื่อนไข<b>ครบทุกข้อ</b>ดังนี้<br>
+(ก) ผู้ลงทุนเป็น<b>บริษัทย่อยที่ถูกควบคุมทั้งหมด</b>หรือถูกควบคุมบางส่วนโดยกิจการอื่น และผู้ถือหุ้นรายอื่น<b>รับทราบและไม่คัดค้าน</b><br>
+(ข) <b>ตราสารหนี้หรือตราสารทุนของผู้ลงทุนไม่มีการซื้อขายในตลาดสาธารณะ</b><br>
+(ค) ผู้ลงทุน<b>ไม่ได้นำส่งหรืออยู่ในกระบวนการนำส่งงบการเงินต่อสำนักงาน ก.ล.ต.</b> เพื่อวัตถุประสงค์ในการออกตราสารใดๆ ในตลาดสาธารณะ<br>
+(ง) <b>บริษัทใหญ่ในลำดับสูงสุดหรือบริษัทใหญ่ในลำดับใดก็ตามได้จัดทำงบการเงินรวมเผยแพร่ต่อสาธารณชน</b> ซึ่งเป็นไปตามมาตรฐานการรายงานทางการเงิน</p>
+</div>
+<div class="box warn">
+<div class="bt">⚠️ ต้องครบทุกข้อ</div>
+<p>คำว่า <b>"ครบทุกข้อ"</b> คือจุดหลอก ถ้าข้อสอบให้มาแค่ 3 ข้อจาก 4 ข้อ → <b>ยังต้องใช้วิธีส่วนได้เสีย</b></p>
+</div>
+
+<div class="tutor">
+<div class="bt">🧑‍🏫 ติวเตอร์สรุปให้ — LOS 3.2</div>
+
+<div class="t-sec">
+<span class="t-lab">เล่าแบบบ้านๆ</span>
+<p>ข้อนี้คือ <b>"ด่านตรวจ 2 ด่าน"</b> ครับ ให้ถามตัวเองเรียงกัน</p>
+<ul>
+<li><b>ด่านที่ 1 — ฉันสั่งเขาได้ไหม (ควบคุม)?</b> ถ้าได้ → งบการเงินรวม จบ</li>
+<li><b>ด่านที่ 2 — ฉันออกความเห็นได้ไหม (อิทธิพล)?</b> ถ้าได้ → วิธีส่วนได้เสีย</li>
+<li>ไม่เข้าทั้งสองด่าน → แค่สินทรัพย์ทางการเงินธรรมดา</li>
+</ul>
+<p>หัวใจที่คนสอบตกกันเยอะคือ <b>"เปอร์เซ็นต์หุ้นไม่ใช่คำตอบ"</b> มาตรฐานสนใจ <b>อำนาจจริง</b> มากกว่าตัวเลขบนทะเบียนผู้ถือหุ้น ถือ 45% แต่ผู้ถือหุ้นที่เหลือกระจัดกระจายจนเราคุมที่ประชุมได้ ก็ถือว่าควบคุม (de facto control) ในทางกลับกัน ถือ 55% แต่สัญญาระบุว่าต้องให้อีกฝ่ายเห็นชอบทุกเรื่อง ก็อาจไม่ใช่การควบคุม</p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">สูตรจำ</span>
+<div class="mnemo">การควบคุม 3 ขา = <b>"มีอำนาจ → ได้ผลตอบแทน → ใช้อำนาจงัดผลตอบแทนได้"</b></div>
+<div class="mnemo">หลักฐานอิทธิพล 5 ข้อ =<br><b>กรรมการ – นโยบาย – ค้าขาย – คน – เทคโนโลยี</b></div>
+<p><b>ข้อยกเว้นวิธีส่วนได้เสีย 4 ข้อ จำว่า</b> <span style="color:var(--tutor)"><b>"ลูกเขาเอง – ไม่ได้อยู่ในตลาด – ไม่ได้ยื่น ก.ล.ต. – แม่ใหญ่ทำงบรวมให้แล้ว"</b></span></p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">เก็งข้อสอบ &amp; วิธีทำ</span>
+<ul>
+<li><b>แนวข้อสอบคลาสสิก:</b> ให้สถานการณ์มาแล้วถามว่าใช้วิธีไหน → <b>อ่านหาคำว่า "มีตัวแทนในคณะกรรมการ" หรือ "ร่วมกำหนดนโยบาย"</b> เจอปุ๊บ = มีอิทธิพล = วิธีส่วนได้เสีย แม้ถือต่ำกว่า 20%</li>
+<li><b>คำที่ต้องวงกลม:</b> คำว่า <b>"สันนิษฐาน"</b> แปลว่าหักล้างได้ ถ้าโจทย์บอก "ถือ 25% แต่ศาลสั่งห้ามใช้สิทธิออกเสียง" → <b>ไม่มีอิทธิพล</b></li>
+<li><b>กับดักเงื่อนไข:</b> ข้อยกเว้น 4 ข้อใช้คำว่า <b>"ครบทุกข้อ (and)"</b> ส่วนเกณฑ์ 10% ของส่วนงานใช้ <b>"ข้อใดข้อหนึ่ง (or)"</b> — ข้อสอบชอบสลับสองคำนี้</li>
+<li><b>จุดที่คนตอบผิดบ่อย:</b> "วิธีราคาทุน" ใช้ได้<b>เฉพาะงบการเงินเฉพาะกิจการ</b> ถ้าโจทย์ถามถึง<b>งบการเงินรวม</b>แล้วมีตัวเลือกวิธีราคาทุน → ตัดทิ้งได้ทันที</li>
+</ul>
+</div>
+</div>
+
+<div class="done-wrap"><button class="done" data-id="los32">✓ อ่านจบ LOS 3.2 แล้ว</button></div>
+</section>
+
+<section id="los33">
+<h3 class="los"><span class="n">LOS 3.3</span>คำนวณและเปรียบเทียบผลกระทบของการใช้วิธีราคาทุน วิธีส่วนได้เสีย และวิธีรวมเต็มรูปแบบ ที่มีต่องบการเงินและอัตราส่วนทางการเงิน</h3>
+
+<h4>① กลไกของวิธีส่วนได้เสีย</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค)</div>
+<p class="quote">วิธีส่วนได้เสีย คือ วิธีการบัญชีซึ่ง<b>เงินลงทุนจะรับรู้เมื่อเริ่มแรกด้วยราคาทุน</b> และ<b>ปรับปรุงมูลค่าตามบัญชีของเงินลงทุนในภายหลังด้วยส่วนแบ่งกำไรหรือขาดทุนและส่วนแบ่งกำไรขาดทุนเบ็ดเสร็จอื่นของผู้ได้รับการลงทุนตามสัดส่วนที่ผู้ลงทุนมีส่วนได้เสีย</b> และ<b>ต้องปรับลดด้วยเงินปันผลที่ได้รับจากผู้ได้รับการลงทุน</b></p>
+</div>
+
+<div class="f">
+เงินลงทุนปลายงวด = <b>ราคาทุน</b> + (%ถือหุ้น × <b>กำไรสุทธิ</b>ของบริษัทร่วม)<br>
++ (%ถือหุ้น × <b>OCI</b>ของบริษัทร่วม) − <b>เงินปันผลรับ</b>
+</div>
+
+<div class="box ex">
+<div class="bt">✅ ตัวอย่าง 3-2 — เปรียบเทียบ 3 วิธี</div>
+<p><b>โจทย์:</b> บริษัท P ซื้อหุ้นบริษัท S จำนวน 30% ราคา 1,000 ล้านบาท (= มูลค่ายุติธรรมของสินทรัพย์สุทธิพอดี ไม่มีค่าความนิยม) ในปีนั้น S มีกำไรสุทธิ 200 ล้านบาท และประกาศจ่ายเงินปันผล 50 ล้านบาท</p>
+<div class="tw"><table>
+<tr><th>รายการ</th><th class="c">วิธีราคาทุน</th><th class="c">วิธีส่วนได้เสีย</th></tr>
+<tr><td>เงินลงทุนต้นงวด</td><td class="c">1,000</td><td class="c">1,000</td></tr>
+<tr><td>+ ส่วนแบ่งกำไร (30% × 200)</td><td class="c">—</td><td class="c">+60</td></tr>
+<tr><td>− เงินปันผลรับ (30% × 50)</td><td class="c">—</td><td class="c">−15</td></tr>
+<tr><td><b>เงินลงทุนปลายงวด</b></td><td class="c"><b>1,000</b></td><td class="c"><b>1,045</b></td></tr>
+<tr><td><b>รับรู้ในกำไรขาดทุน</b></td><td class="c">เงินปันผลรับ <b>15</b></td><td class="c">ส่วนแบ่งกำไร <b>60</b></td></tr>
+</table></div>
+<p><b>สังเกต:</b> วิธีส่วนได้เสียให้กำไรสูงกว่า 45 ล้านบาท และสินทรัพย์สูงกว่า 45 ล้านบาท → <b>ส่วนของเจ้าของสูงกว่า</b> ด้วย</p>
+</div>
+
+<div class="box warn">
+<div class="bt">⚠️ จุดหลอกที่ออกสอบซ้ำๆ</div>
+<p><b>เงินปันผลรับภายใต้วิธีส่วนได้เสียไม่ใช่รายได้</b> — เป็นการ "คืนทุน" จึงไปหักออกจากบัญชีเงินลงทุน ถ้าข้อสอบให้ตัวเลขเงินปันผลมาแล้วถามกำไรสุทธิภายใต้วิธีส่วนได้เสีย <b>อย่าเอาไปบวก</b> ให้ใช้เฉพาะส่วนแบ่งกำไรเท่านั้น</p>
+</div>
+
+<h4>② ส่วนต่างระหว่างต้นทุนกับมูลค่ายุติธรรม</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค)</div>
+<p class="quote">ผลต่างระหว่าง<b>ต้นทุนของเงินลงทุน</b>กับ<b>มูลค่ายุติธรรมของสินทรัพย์และหนี้สินที่ระบุได้ของผู้ได้รับการลงทุนเฉพาะส่วนที่เป็นของกิจการ</b> หาก<b>ต้นทุนสูงกว่า</b>ให้ถือเป็น<b>ค่าความนิยม</b>ซึ่ง<b>รวมอยู่ในมูลค่าตามบัญชีของเงินลงทุน</b> และ<b>ไม่อนุญาตให้ตัดจำหน่าย</b> หาก<b>ต้นทุนต่ำกว่า</b> ให้<b>รับรู้เป็นรายได้</b>ในการกำหนดส่วนแบ่งของผู้ลงทุนในกำไรหรือขาดทุนของผู้ได้รับการลงทุนในงวดที่ได้เงินลงทุนมา</p>
+</div>
+
+<h4>③ การด้อยค่าของเงินลงทุนในบริษัทร่วม</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค)</div>
+<p class="quote">เนื่องจาก<b>ค่าความนิยมที่รวมอยู่ในมูลค่าตามบัญชีของเงินลงทุนในบริษัทร่วมหรือการร่วมค้าไม่ได้ถูกรับรู้แยกต่างหาก จึงไม่ต้องทดสอบการด้อยค่าแยกต่างหาก</b> แต่ให้<b>ทดสอบการด้อยค่าของมูลค่าตามบัญชีของเงินลงทุนทั้งจำนวนตามมาตรฐานการบัญชี ฉบับที่ 36 เสมือนเป็นสินทรัพย์เดียว</b> โดยเปรียบเทียบ<b>มูลค่าที่คาดว่าจะได้รับคืน</b> (จำนวนที่สูงกว่าระหว่าง<b>มูลค่าจากการใช้</b>กับ<b>มูลค่ายุติธรรมหักต้นทุนในการขาย</b>) กับ<b>มูลค่าตามบัญชี</b></p>
+</div>
+<div class="box explain">
+<div class="bt">💡 ขยายความ</div>
+<p>ต่างจากงบการเงินรวมของบริษัทย่อย ที่ค่าความนิยมแยกแสดงเป็นบรรทัดหนึ่งและต้องปันส่วนเข้าหน่วยสินทรัพย์ที่ก่อให้เกิดเงินสด (CGU) เพื่อทดสอบด้อยค่า — แต่ในบริษัทร่วม <b>ค่าความนิยมซ่อนอยู่ในบัญชีเงินลงทุน ทดสอบรวมเป็นก้อนเดียว</b></p>
+</div>
+
+<h4>④ การตัดรายการระหว่างกัน (เฉพาะงบการเงินรวม)</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค)</div>
+<p class="quote">กิจการต้อง<b>ตัดรายการสินทรัพย์ หนี้สิน ส่วนของเจ้าของ รายได้ ค่าใช้จ่าย และกระแสเงินสดที่เกี่ยวข้องกับรายการระหว่างกันภายในกลุ่มกิจการแบบเต็มจำนวน</b> โดย<b>กำไรหรือขาดทุนที่เกิดจากรายการระหว่างกันที่รับรู้ในสินทรัพย์ เช่น สินค้าคงเหลือ และที่ดิน อาคารและอุปกรณ์ ต้องตัดรายการแบบเต็มจำนวน</b></p>
+</div>
+<div class="box explain">
+<div class="bt">💡 ขยายความ — Upstream vs Downstream</div>
+<ul>
+<li><b>Downstream</b> = บริษัทใหญ่ขายให้บริษัทย่อย/บริษัทร่วม</li>
+<li><b>Upstream</b> = บริษัทย่อย/บริษัทร่วมขายให้บริษัทใหญ่</li>
+<li>ใน<b>งบการเงินรวม</b> ตัดกำไรที่ยังไม่เกิดขึ้นจริง <b>เต็มจำนวน 100%</b></li>
+<li>ใน<b>วิธีส่วนได้เสีย</b> ตัดเฉพาะ<b>สัดส่วนที่ผู้ลงทุนมีส่วนได้เสีย</b> เท่านั้น</li>
+</ul>
+</div>
+
+<h4>⑤ การสูญเสียอิทธิพล / อำนาจควบคุม</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค)</div>
+<p class="quote">กิจการจะ<b>สูญเสียการมีอิทธิพลอย่างมีนัยสำคัญเมื่อกิจการสูญเสียอำนาจในการเข้าไปมีส่วนร่วมในการตัดสินใจเกี่ยวกับนโยบายทางการเงินและการดำเนินงานของผู้ได้รับการลงทุน ซึ่งสามารถเกิดขึ้นได้ไม่ว่าจะมีการเปลี่ยนแปลงในระดับความเป็นเจ้าของหรือไม่</b></p>
+<p class="quote" style="margin-top:10px">เมื่อเลิกใช้วิธีส่วนได้เสีย กิจการต้อง<b>วัดมูลค่าของเงินลงทุนส่วนที่คงเหลืออยู่ด้วยมูลค่ายุติธรรม</b> และ<b>รับรู้ผลต่างเป็นกำไรหรือขาดทุนในกำไรหรือขาดทุน</b> พร้อมทั้ง<b>จัดประเภทรายการกำไรขาดทุนเบ็ดเสร็จอื่นที่เคยรับรู้ไว้ใหม่ตามหลักเกณฑ์ที่กำหนด</b></p>
+</div>
+<div class="box warn">
+<div class="bt">⚠️ ประโยคทองที่ออกสอบ</div>
+<p><b>"ไม่ว่าจะมีการเปลี่ยนแปลงในระดับความเป็นเจ้าของหรือไม่"</b> → ถือหุ้นเท่าเดิม 25% แต่ถูกถอดออกจากบอร์ดและไม่ได้ร่วมกำหนดนโยบายแล้ว ก็ถือว่า <b>สูญเสียอิทธิพล</b> ต้องเลิกใช้วิธีส่วนได้เสีย</p>
+</div>
+
+<h4>⑥ ตารางเปรียบเทียบผลกระทบต่ออัตราส่วนทางการเงิน</h4>
+<div class="tw"><table>
+<tr><th>ประเด็น</th><th class="c">วิธีราคาทุน</th><th class="c">วิธีส่วนได้เสีย</th><th class="c">วิธีรวมเต็มรูปแบบ</th></tr>
+<tr><td>สินทรัพย์รวม</td><td class="c">ต่ำสุด</td><td class="c">กลาง (1 บรรทัด)</td><td class="c">สูงสุด (รวมทุกรายการ)</td></tr>
+<tr><td>หนี้สินรวม</td><td class="c">ไม่เพิ่ม</td><td class="c">ไม่เพิ่ม</td><td class="c">เพิ่ม (รวมหนี้บริษัทย่อย)</td></tr>
+<tr><td>รายได้รวม</td><td class="c">ไม่รวม</td><td class="c">ไม่รวม</td><td class="c">รวม 100%</td></tr>
+<tr><td>กำไรสุทธิส่วนบริษัทใหญ่</td><td class="c">เฉพาะปันผล</td><td class="c">ส่วนแบ่งกำไร</td><td class="c"><b>เท่ากับวิธีส่วนได้เสีย</b></td></tr>
+<tr><td>ส่วนของเจ้าของ (ของบริษัทใหญ่)</td><td class="c">ต่ำสุด</td><td class="c">เท่ากับงบรวม</td><td class="c"><b>เท่ากับวิธีส่วนได้เสีย</b></td></tr>
+<tr><td>อัตรากำไรสุทธิ</td><td class="c">—</td><td class="c"><b>สูงกว่า</b></td><td class="c">ต่ำกว่า (ฐานรายได้ใหญ่ขึ้น)</td></tr>
+<tr><td>ROA</td><td class="c">—</td><td class="c"><b>สูงกว่า</b></td><td class="c">ต่ำกว่า</td></tr>
+<tr><td>D/E</td><td class="c">ต่ำสุด</td><td class="c">ต่ำกว่า</td><td class="c"><b>สูงกว่า</b></td></tr>
+<tr><td>ROE</td><td class="c">ต่ำกว่า</td><td class="c" colspan="2"><b>เท่ากัน ทั้งสองวิธี</b></td></tr>
+</table></div>
+
+<div class="box explain">
+<div class="bt">💡 แก่นที่ต้องจำ — "One-line consolidation"</div>
+<p>วิธีส่วนได้เสียถูกเรียกว่า <b>"การรวมบัญชีแบบบรรทัดเดียว"</b> เพราะให้ <b>กำไรสุทธิและส่วนของเจ้าของเท่ากับงบการเงินรวมเป๊ะๆ</b> ต่างกันแค่การกระจายตัวของรายการ ดังนั้น:</p>
+<ul>
+<li><b>ROE เท่ากัน</b> (ทั้งเศษและส่วนเท่ากัน)</li>
+<li><b>ROA และ Net Margin ของวิธีส่วนได้เสียสูงกว่า</b> เพราะตัวส่วน (สินทรัพย์/รายได้) เล็กกว่า</li>
+<li><b>D/E ของงบรวมสูงกว่า</b> เพราะดึงหนี้สินบริษัทย่อยเข้ามาทั้งก้อน → ผู้บริหารที่อยากให้งบดูสวยจึงชอบโครงสร้างที่จบที่วิธีส่วนได้เสีย (ปัญหา <b>off-balance-sheet financing</b>)</li>
+</ul>
+</div>
+
+<div class="tutor">
+<div class="bt">🧑‍🏫 ติวเตอร์สรุปให้ — LOS 3.3</div>
+
+<div class="t-sec">
+<span class="t-lab">เล่าแบบบ้านๆ</span>
+<p>มองบัญชีเงินลงทุนภายใต้วิธีส่วนได้เสียเป็น <b>"กระปุกออมสิน"</b> ครับ</p>
+<ul>
+<li>เริ่มต้นหยอดเงินเข้าไป = <b>ราคาทุน</b></li>
+<li>บริษัทร่วมทำกำไร → <b>หยอดเพิ่มตามสัดส่วนที่เราถือ</b></li>
+<li>บริษัทร่วมจ่ายปันผลให้เรา → <b>ควักเงินออกจากกระปุก</b> (ไม่ใช่รายได้ เพราะมันคือเงินที่เรามีสิทธิ์อยู่แล้ว แค่ย้ายจากกระปุกมาเข้ากระเป๋า)</li>
+</ul>
+<p>ส่วนประโยคที่ทรงพลังที่สุดของข้อนี้คือ <b>วิธีส่วนได้เสีย = "งบรวมแบบบรรทัดเดียว"</b> แปลว่าถ้าเอาตัวเลขกำไรสุทธิและส่วนของเจ้าของมาเทียบกัน <b>จะเท่ากับงบรวมเป๊ะ</b> ต่างกันแค่ว่างบรวมกาง<b>รายละเอียด</b>ออกมาทุกบรรทัด ส่วนวิธีส่วนได้เสียยุบเหลือบรรทัดเดียว</p>
+<p>ผลที่ตามมาจึงตรงไปตรงมา: ตัวเศษเท่ากัน แต่งบรวมมีตัวส่วน (สินทรัพย์ รายได้ หนี้สิน) ใหญ่กว่า → <b>ROA ต่ำกว่า, Net Margin ต่ำกว่า, D/E สูงกว่า แต่ ROE เท่ากันเป๊ะ</b></p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">สูตรจำ</span>
+<div class="mnemo">เงินลงทุน = <b>ทุน + ส่วนแบ่งกำไร − ปันผล</b><br>(หยอดทุน → กำไรหยอดเพิ่ม → ปันผลควักออก)</div>
+<div class="mnemo">ส่วนได้เสีย vs งบรวม<br><b>"ROE เท่า · ROA ส่วนได้เสียชนะ · D/E งบรวมแพ้"</b></div>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">เก็งข้อสอบ &amp; วิธีทำ</span>
+<ul>
+<li><b>ข้อคำนวณที่ออกแทบทุกครั้ง:</b> ให้ราคาทุน % ถือหุ้น กำไรบริษัทร่วม และเงินปันผล แล้วถาม<b>ยอดเงินลงทุนปลายงวด</b> → เสียบสูตรตรงๆ ระวังอย่างเดียวคือ <b>เงินปันผลต้องคูณ % ถือหุ้นก่อน</b> แล้วค่อยหัก</li>
+<li><b>ข้อหลอกระดับเทพ:</b> ถามว่า "กำไรสุทธิที่รับรู้คือเท่าไร" ภายใต้วิธีส่วนได้เสีย → ตอบ <b>ส่วนแบ่งกำไรเท่านั้น</b> ตัวเลือกหลอกคือ "ส่วนแบ่งกำไร + เงินปันผล" และ "เงินปันผลอย่างเดียว" (อันหลังคือวิธีราคาทุน)</li>
+<li><b>ข้อเชิงแนวคิด:</b> ถามว่าอัตราส่วนใด<b>ไม่เปลี่ยน</b>เมื่อเปลี่ยนจากวิธีส่วนได้เสียเป็นงบรวม → ตอบ <b>ROE</b> ตัวเดียว</li>
+<li><b>จำสั้นๆ เรื่องตัดรายการระหว่างกัน:</b> <b>งบรวมตัด 100% · วิธีส่วนได้เสียตัดแค่สัดส่วนที่ถือ</b></li>
+<li><b>ประโยคทองที่มักยกมาถามตรงๆ:</b> "สูญเสียอิทธิพลได้<b>ไม่ว่าจะมีการเปลี่ยนแปลงในระดับความเป็นเจ้าของหรือไม่</b>" — ท่องประโยคนี้ให้ขึ้นใจ</li>
+</ul>
+</div>
+</div>
+
+<div class="done-wrap"><button class="done" data-id="los33">✓ อ่านจบ LOS 3.3 แล้ว</button></div>
+</section>
+
+<section id="los34">
+<h3 class="los"><span class="n">LOS 3.4</span>ระบุส่วนงานทางธุรกิจ และอธิบายประโยชน์และข้อจำกัดของข้อมูลทางการเงินแยกตามส่วนงาน</h3>
+
+<div class="box principle">
+<div class="bt">📌 นิยาม "ส่วนงานดำเนินงาน" (TFRS 8) — ต้องเข้าเงื่อนไขครบ 3 ข้อ</div>
+<p class="quote">ส่วนงานดำเนินงาน หมายถึง ส่วนงานของกิจการซึ่ง<br>
+(1) <b>ดำเนินกิจกรรมทางธุรกิจที่อาจก่อให้เกิดรายได้และค่าใช้จ่าย</b> รวมถึงรายได้และค่าใช้จ่ายที่เกี่ยวข้องกับรายการระหว่างส่วนงานภายในกิจการเดียวกัน<br>
+(2) <b>ผลการดำเนินงานของส่วนงานได้รับการสอบทานโดยผู้มีอำนาจตัดสินใจสูงสุดด้านการดำเนินงานของกิจการอย่างสม่ำเสมอ</b> เพื่อใช้ในการตัดสินใจเกี่ยวกับการจัดสรรทรัพยากรและประเมินผลการปฏิบัติงานของส่วนงาน<br>
+(3) <b>มีข้อมูลทางการเงินแยกต่างหากได้</b></p>
+</div>
+
+<div class="box explain">
+<div class="bt">💡 ขยายความ — CODM คือหัวใจ</div>
+<p><b>ผู้มีอำนาจตัดสินใจสูงสุดด้านการดำเนินงาน (CODM)</b> ไม่ใช่ตำแหน่ง แต่เป็น <b>หน้าที่</b> อาจเป็น CEO, COO หรือคณะกรรมการบริหาร — TFRS 8 ใช้ <b>"management approach"</b> คือรายงานส่วนงาน <b>ตามที่ผู้บริหารใช้ดูจริงภายใน</b> ไม่ใช่ตามที่มาตรฐานบัญชีกำหนดรูปแบบ นี่คือทั้งจุดแข็งและจุดอ่อนของ TFRS 8</p>
+</div>
+
+<h4>ประโยชน์ของข้อมูลจำแนกตามส่วนงาน</h4>
+<ul>
+<li><b>ประเมินความเสี่ยงและผลตอบแทนรายธุรกิจ</b> — บริษัทเดียวกันอาจมีธุรกิจที่โตเร็วกับธุรกิจที่กำลังถดถอยปนกัน ตัวเลขรวมจะกลบความจริง</li>
+<li><b>พยากรณ์ได้แม่นขึ้น</b> — สร้างแบบจำลองแยกตามส่วนงานแล้วรวมกลับ (sum-of-the-parts) ได้</li>
+<li><b>ประเมินมูลค่าแบบ SOTP</b> — ใช้ตัวคูณที่ต่างกันตามลักษณะธุรกิจ</li>
+<li><b>เข้าใจการจัดสรรทรัพยากร</b> — ดูว่าผู้บริหารเทเงินลงทุนไปที่ส่วนงานไหน</li>
+<li><b>ประเมินคุณภาพกำไร</b> — เห็นว่ากำไรมาจากธุรกิจหลักหรือธุรกิจชั่วคราว</li>
+</ul>
+
+<h4>ข้อจำกัดของข้อมูลจำแนกตามส่วนงาน</h4>
+<ul>
+<li><b>ใช้เกณฑ์ภายในของกิจการ</b> — แต่ละบริษัทนิยามส่วนงานไม่เหมือนกัน <b>เปรียบเทียบข้ามบริษัทได้ยาก</b> และตัวเลขอาจไม่เป็นไปตามมาตรฐานการรายงานทางการเงิน</li>
+<li><b>การปันส่วนต้นทุนร่วมใช้ดุลยพินิจสูง</b> — ค่าใช้จ่ายสำนักงานใหญ่ ดอกเบี้ย ภาษี ปันส่วนอย่างไรก็ได้ → <b>เปิดช่องแต่งตัวเลขระหว่างส่วนงาน</b></li>
+<li><b>ราคาโอนระหว่างส่วนงาน (transfer price)</b> ไม่ใช่ราคาตลาด ทำให้กำไรส่วนงานบิดเบือน</li>
+<li><b>เปลี่ยนโครงสร้างส่วนงานบ่อย</b> ทำให้เปรียบเทียบย้อนหลังไม่ได้ และอาจใช้ซ่อนส่วนงานที่ขาดทุน</li>
+<li><b>รวมส่วนงานเข้าด้วยกัน (aggregation)</b> ทำให้ข้อมูลหยาบเกินกว่าจะวิเคราะห์ได้</li>
+<li><b>ไม่มีงบกระแสเงินสดรายส่วนงาน</b> — วิเคราะห์สภาพคล่องรายธุรกิจไม่ได้</li>
+</ul>
+
+<div class="tutor">
+<div class="bt">🧑‍🏫 ติวเตอร์สรุปให้ — LOS 3.4</div>
+
+<div class="t-sec">
+<span class="t-lab">เล่าแบบบ้านๆ</span>
+<p>TFRS 8 มีปรัชญาเดียวคือ <b>"ผู้บริหารดูงบยังไง ก็ให้นักลงทุนดูแบบนั้น"</b> เรียกว่า <b>management approach</b></p>
+<p>ลองนึกถึงเจ้าของร้านที่ขายทั้งกาแฟและเบเกอรี่ ถ้าทุกเช้าเขาเปิดดูรายงานยอดขาย<b>แยกสองหมวด</b> นั่นแปลว่ากาแฟกับเบเกอรี่คือ "ส่วนงานดำเนินงาน" คนละอัน แต่ถ้าเขาดูแค่ยอดรวมร้าน ก็มีส่วนงานเดียว — <b>ไม่เกี่ยวกับว่าสินค้าต่างกันแค่ไหน แต่เกี่ยวกับว่าเจ้านายตัวจริงดูรายงานชุดไหน</b></p>
+<p>จุดนี้เองที่เป็นทั้งข้อดีและข้อเสีย — <b>ข้อดี</b> คือเราได้เห็นธุรกิจผ่านสายตาผู้บริหารจริงๆ <b>ข้อเสีย</b> คือแต่ละบริษัทแบ่งไม่เหมือนกัน เอามาเทียบกันข้ามบริษัทแทบไม่ได้ และผู้บริหารยัง<b>ปันส่วนต้นทุนร่วมได้ตามใจ</b> อยากให้ส่วนงานไหนดูกำไรดีก็จัดได้</p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">สูตรจำ</span>
+<div class="mnemo">เงื่อนไขส่วนงาน 3 ข้อ =<br><b>"ทำธุรกิจ → เจ้านายดู → แยกตัวเลขได้"</b></div>
+<p><b>ข้อจำกัดจำเป็นคำคู่:</b> <span style="color:var(--tutor)"><b>"เกณฑ์ภายใน (เทียบข้ามบริษัทไม่ได้) + ปันส่วนตามใจ (แต่งได้) + เปลี่ยนโครงสร้างบ่อย (ซ่อนขาดทุนได้)"</b></span></p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">เก็งข้อสอบ &amp; วิธีทำ</span>
+<ul>
+<li><b>แนวข้อสอบยอดฮิต:</b> ถามว่าข้อใด<b>ไม่ใช่</b>ข้อจำกัดของข้อมูลส่วนงาน → ตัวเลือกที่เป็นคำตอบมักเป็นข้อความเชิง<b>ประโยชน์</b>แฝงมา เช่น "ช่วยให้พยากรณ์ได้แม่นยำขึ้น"</li>
+<li><b>คำที่ต้องจับ:</b> <b>CODM</b> — ถ้าโจทย์บอกว่า "ผู้บริหารสูงสุดไม่ได้สอบทานผลการดำเนินงานของหน่วยนี้เป็นประจำ" → <b>ไม่ใช่ส่วนงานดำเนินงาน</b> แม้จะมีตัวเลขแยกครบ</li>
+<li><b>จุดที่คนพลาด:</b> CODM <b>ไม่ใช่ตำแหน่ง</b> จะเป็น CEO คนเดียวหรือคณะกรรมการบริหารทั้งคณะก็ได้ — ตัวเลือกที่บอกว่า "ต้องเป็น CEO เท่านั้น" ผิดเสมอ</li>
+<li><b>เชื่อมกับบทที่ 4:</b> ถ้าข้อสอบถามว่าทำไมนักวิเคราะห์ต้องระวังเมื่อบริษัท<b>เปลี่ยนโครงสร้างส่วนงานหลังซื้อกิจการ</b> → ตอบ <b>อาจกำลังซ่อนผลขาดทุนของธุรกิจที่เพิ่งซื้อมาไว้ในส่วนงานที่กำไรดี</b></li>
+</ul>
+</div>
+</div>
+
+<div class="done-wrap"><button class="done" data-id="los34">✓ อ่านจบ LOS 3.4 แล้ว</button></div>
+</section>
+
+<section id="los35">
+<h3 class="los"><span class="n">LOS 3.5</span>วิเคราะห์และอธิบายข้อกำหนดในการเปิดเผยส่วนงานดำเนินงาน</h3>
+
+<h4>① เกณฑ์เชิงปริมาณ — กฎ 10%</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค) — เข้าข้อใดข้อหนึ่งก็ต้องรายงานแยก</div>
+<p class="quote">กิจการต้องรายงานข้อมูลแยกต่างหากเกี่ยวกับส่วนงานดำเนินงานที่<b>เป็นไปตามเกณฑ์เชิงปริมาณข้อใดข้อหนึ่ง</b>ดังต่อไปนี้<br>
+(1) <b>รายได้ของส่วนงานที่รายงาน ซึ่งรวมถึงยอดขายให้ลูกค้าภายนอกและรายได้ระหว่างส่วนงาน มีจำนวนตั้งแต่ร้อยละ 10 ขึ้นไปของรายได้รวมของทุกส่วนงานดำเนินงาน</b><br>
+(2) <b>ค่าสัมบูรณ์ของผลกำไรหรือขาดทุนที่รายงาน มีจำนวนตั้งแต่ร้อยละ 10 ขึ้นไปของจำนวนที่สูงกว่าระหว่าง (ก) ผลกำไรรวมของทุกส่วนงานดำเนินงานที่ไม่มีผลขาดทุน และ (ข) ค่าสัมบูรณ์ของผลขาดทุนรวมของทุกส่วนงานดำเนินงานที่มีผลขาดทุน</b><br>
+(3) <b>สินทรัพย์ของส่วนงานมีจำนวนตั้งแต่ร้อยละ 10 ขึ้นไปของสินทรัพย์ทั้งสิ้นของทุกส่วนงานดำเนินงานรวมกัน</b></p>
+</div>
+
+<div class="box ex">
+<div class="bt">✅ ตัวอย่าง 3-3 — ทดสอบเกณฑ์กำไรขาดทุน 10%</div>
+<p>บริษัทมี 5 ส่วนงาน กำไร(ขาดทุน)ดังนี้: A +400, B +300, C +100, D −250, E −50 (ล้านบาท)</p>
+<ul>
+<li>ผลรวมส่วนงานที่ <b>มีกำไร</b> = 400 + 300 + 100 = <b>800</b></li>
+<li>ค่าสัมบูรณ์ของผลรวมส่วนงานที่ <b>ขาดทุน</b> = |−250 − 50| = <b>300</b></li>
+<li>เลือกจำนวนที่ <b>สูงกว่า</b> = <b>800</b> → เกณฑ์ 10% = <b>80 ล้านบาท</b></li>
+</ul>
+<p><b>ผลลัพธ์:</b> A (400) ✓ · B (300) ✓ · C (100) ✓ · D (|−250| = 250) ✓ → <b>ต้องรายงานแยก</b><br>
+E (|−50| = 50 &lt; 80) ✗ → <b>ไม่ผ่านเกณฑ์กำไร</b> แต่ยังต้องไปทดสอบเกณฑ์รายได้และสินทรัพย์ต่อ</p>
+<p><b>จุดหลอก 2 ชั้น:</b> ① ใช้ <b>ค่าสัมบูรณ์</b> ของกำไร/ขาดทุนส่วนงาน ไม่ใช่ตัวเลขสุทธิ ② ตัวส่วนเป็น <b>จำนวนที่สูงกว่า</b> ระหว่างกลุ่มกำไรกับกลุ่มขาดทุน ไม่ใช่ผลสุทธิ (800 − 300 = 500) ซึ่งเป็นตัวเลือกหลอกที่พบบ่อย</p>
+</div>
+
+<h4>② เกณฑ์ 75% — ทดสอบความครอบคลุม</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค)</div>
+<p class="quote">หาก<b>รายได้จากลูกค้าภายนอกรวมของส่วนงานที่รายงานมีจำนวนน้อยกว่าร้อยละ 75 ของรายได้ของกิจการ</b> กิจการต้อง<b>ระบุส่วนงานดำเนินงานเพิ่มเติมเป็นส่วนงานที่ต้องรายงาน แม้ว่าส่วนงานนั้นจะไม่เป็นไปตามเกณฑ์เชิงปริมาณ จนกระทั่งรายได้จากลูกค้าภายนอกของส่วนงานที่ต้องรายงานมีจำนวนอย่างน้อยร้อยละ 75 ของรายได้ของกิจการ</b></p>
+</div>
+<div class="box explain">
+<div class="bt">💡 ขยายความ</div>
+<p>เกณฑ์ 10% กรองส่วนงาน "รายตัว" ส่วนเกณฑ์ 75% กรอง "ภาพรวม" ว่าส่วนงานที่รายงานครอบคลุมธุรกิจจริงพอหรือยัง หากไม่ถึง 75% ให้ทยอยดึงส่วนงานที่ใหญ่รองลงมาเข้ามาจนครบ ส่วนที่เหลือรวมแสดงเป็น <b>"ส่วนงานอื่นๆ (all other segments)"</b></p>
+</div>
+
+<h4>③ ข้อมูลที่ต้องเปิดเผยทั่วทั้งกิจการ</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค) — 3 กลุ่ม</div>
+<p class="quote">กิจการต้องเปิดเผยข้อมูลเกี่ยวกับ<br>
+(1) <b>ข้อมูลเกี่ยวกับผลิตภัณฑ์และบริการ</b><br>
+(2) <b>ข้อมูลเกี่ยวกับเขตภูมิศาสตร์</b><br>
+(3) <b>ข้อมูลเกี่ยวกับลูกค้ารายใหญ่</b></p>
+</div>
+<div class="box explain">
+<div class="bt">💡 ขยายความ</div>
+<ul>
+<li><b>ผลิตภัณฑ์และบริการ</b> — รายได้จากลูกค้าภายนอกของแต่ละผลิตภัณฑ์/บริการ</li>
+<li><b>เขตภูมิศาสตร์</b> — แยก "ประเทศที่กิจการมีถิ่นที่อยู่" กับ "ต่างประเทศรวม" ทั้งด้าน <b>รายได้</b> และ <b>สินทรัพย์ไม่หมุนเวียน</b> และหากรายได้หรือสินทรัพย์ของประเทศใดมีสาระสำคัญ ต้องแยกแสดงประเทศนั้น</li>
+<li><b>ลูกค้ารายใหญ่</b> — หากรายได้จากลูกค้ารายเดียวมีจำนวน <b>ตั้งแต่ร้อยละ 10 ขึ้นไปของรายได้ของกิจการ</b> ต้องเปิดเผย <b>ข้อเท็จจริง จำนวนรายได้ และส่วนงานที่รายงานรายได้นั้น</b> แต่ <b>ไม่ต้องเปิดเผยชื่อลูกค้า</b></li>
+</ul>
+</div>
+<div class="box warn">
+<div class="bt">⚠️ ข้อมูล 3 กลุ่มนี้ต้องเปิดเผย "แม้กิจการมีส่วนงานเดียว"</div>
+<p>และให้เปิดเผยตาม <b>เกณฑ์ที่ใช้ในการจัดทำงบการเงิน</b> ไม่ใช่เกณฑ์ที่ผู้บริหารใช้ภายใน — ต่างจากข้อมูลส่วนงานดำเนินงานที่ใช้เกณฑ์ภายใน</p>
+</div>
+
+<div class="tutor">
+<div class="bt">🧑‍🏫 ติวเตอร์สรุปให้ — LOS 3.5</div>
+
+<div class="t-sec">
+<span class="t-lab">เล่าแบบบ้านๆ</span>
+<p>ข้อนี้คือ <b>"ด่านคัดตัวนักกีฬาเข้าทีมชาติ"</b> ครับ</p>
+<ul>
+<li><b>รอบแรก (เกณฑ์ 10%)</b> — คัดรายคน ใครตัวใหญ่พอในด้าน<b>รายได้ หรือ กำไร หรือ สินทรัพย์</b> <b>เข้าเกณฑ์แค่ด้านเดียวก็ติดทีม</b></li>
+<li><b>รอบสอง (เกณฑ์ 75%)</b> — เช็กภาพรวมว่าทีมที่คัดได้ครอบคลุมพลังทั้งหมดพอไหม ถ้ารายได้ของทีมรวมกันยัง<b>ไม่ถึง 75%</b> ของทั้งบริษัท ต้อง<b>ดึงคนตัวรองลงมาเข้าทีมเพิ่ม</b>จนครบ</li>
+</ul>
+<p>ส่วนเกณฑ์กำไร 10% ที่ดูยุ่งยาก จริงๆ แค่ <b>"แยกกองกำไรกับกองขาดทุน แล้วเลือกกองที่ใหญ่กว่ามาเป็นฐาน"</b> เท่านั้นเอง เหตุผลที่ต้องทำแบบนี้ก็เพื่อไม่ให้กำไรกับขาดทุนมาหักล้างกันจนฐานเล็กผิดปกติ</p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">สูTรจำ</span>
+<div class="mnemo">คัดตัว: <b>10% รายตัว (รายได้ / กำไร / สินทรัพย์ — เอาข้อใดข้อหนึ่ง)</b><br>เช็กทีม: <b>75% ภาพรวม</b></div>
+<div class="mnemo">เกณฑ์กำไร 10% =<br><b>|กำไร/ขาดทุนส่วนงาน| ÷ "กองที่ใหญ่กว่า"</b><br>(ห้ามเอากำไรลบขาดทุน)</div>
+<p><b>เปิดเผยทั่วกิจการ 3 กลุ่ม จำว่า</b> <span style="color:var(--tutor)"><b>"ของที่ขาย – ที่ไหน – ขายให้ใครรายใหญ่"</b></span></p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">เก็งข้อสอบ &amp; วิธีทำ</span>
+<ul>
+<li><b>ข้อคำนวณที่ออกบ่อยที่สุดของ LOS นี้:</b> ให้กำไร/ขาดทุนของหลายส่วนงานมาแล้วถามว่าส่วนงานใดต้องรายงานแยก → <b>ขั้นตอนทำ 3 สเต็ป</b> ① รวมกองกำไร ② รวมกองขาดทุนแล้วถอดเครื่องหมายลบ ③ เอากองที่ใหญ่กว่า × 10% = เส้นตัด แล้วเทียบกับ<b>ค่าสัมบูรณ์</b>ของแต่ละส่วนงาน</li>
+<li><b>ตัวเลือกหลอกที่ดักไว้แน่นอน:</b> คำตอบที่คำนวณจาก <b>กำไรสุทธิ (กำไร − ขาดทุน)</b> จะถูกใส่เป็นตัวเลือกเสมอ เช่นในตัวอย่าง 3-3 คือ 500 × 10% = 50 — <b>อย่าหลง</b></li>
+<li><b>ข้อเชิงความรู้:</b> "ต้องเปิดเผยชื่อลูกค้ารายใหญ่หรือไม่" → <b>ไม่ต้อง</b> เปิดเผยแค่ข้อเท็จจริง จำนวนเงิน และส่วนงานที่รายได้นั้นอยู่</li>
+<li><b>ข้อที่หลายคนตอบผิด:</b> บริษัทที่มี<b>ส่วนงานเดียว</b> ยังต้องเปิดเผยข้อมูล 3 กลุ่มทั่วทั้งกิจการอยู่ดี</li>
+<li><b>คำวิเศษ:</b> เกณฑ์ 10% ใช้คำว่า <b>"ข้อใดข้อหนึ่ง"</b> — ถ้าตัวเลือกเขียนว่า "ต้องเข้าเกณฑ์ทั้งสามข้อ" ผิดทันที</li>
+</ul>
+</div>
+</div>
+
+<div class="done-wrap"><button class="done" data-id="los35">✓ อ่านจบ LOS 3.5 แล้ว</button></div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ บทที่ 4 ============ -->
+<h2 class="ch" id="ch4"><small>CHAPTER 4</small>การรวมธุรกิจ</h2>
+
+<section id="los41">
+<h3 class="los"><span class="n">LOS 4.1</span>อธิบายวิธีปฏิบัติทางบัญชีสำหรับการรวมธุรกิจตามวิธีซื้อและตามวิธีรวมส่วนได้เสีย</h3>
+
+<h4>① นิยาม "ธุรกิจ"</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค)</div>
+<p class="quote">ธุรกิจ หมายถึง <b>กลุ่มของกิจกรรมและสินทรัพย์ที่เมื่อรวมกันแล้ว สามารถนำมาจัดการและดำเนินงานเพื่อวัตถุประสงค์ในการจัดหาสินค้าหรือบริการแก่ลูกค้า การก่อให้เกิดผลตอบแทนการลงทุน (ในรูปของเงินปันผล หรือดอกเบี้ย) หรือการก่อให้เกิดผลตอบแทนจากรายได้อื่นตามปกติธุรกิจ</b></p>
+</div>
+<div class="box explain">
+<div class="bt">💡 ขยายความ — ทำไมต้องทดสอบก่อน</div>
+<p>ธุรกิจประกอบด้วย <b>ปัจจัยนำเข้า (input)</b> และ <b>กระบวนการ (process)</b> ที่เมื่อรวมกันแล้วสามารถสร้าง <b>ผลผลิต (output)</b> ได้ ถ้าสิ่งที่ซื้อมา <b>ไม่เข้านิยามธุรกิจ ให้ถือเป็นการซื้อสินทรัพย์ (asset acquisition)</b> ซึ่งผลลัพธ์ต่างกันมาก:</p>
+<div class="tw"><table>
+<tr><th>ประเด็น</th><th>รวมธุรกิจ (TFRS 3)</th><th>ซื้อสินทรัพย์</th></tr>
+<tr><td>ค่าความนิยม</td><td>รับรู้ได้</td><td><b>ไม่รับรู้</b></td></tr>
+<tr><td>ต้นทุนที่เกี่ยวข้องกับการซื้อ</td><td><b>เป็นค่าใช้จ่ายทันที</b></td><td>รวมเป็นต้นทุนสินทรัพย์</td></tr>
+<tr><td>การปันส่วนราคาซื้อ</td><td>มูลค่ายุติธรรมรายรายการ</td><td>ปันส่วนตามสัดส่วนมูลค่ายุติธรรม</td></tr>
+</table></div>
+</div>
+
+<h4>② วิธีซื้อ (Acquisition Method) — 4 ขั้นตอน</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค) — ท่องให้ครบและถูกลำดับ</div>
+<p class="quote">กิจการต้องบันทึกบัญชีสำหรับการรวมธุรกิจทุกรายการโดยถือปฏิบัติตาม<b>วิธีซื้อ</b> ซึ่งประกอบด้วย<br>
+(1) <b>การระบุผู้ซื้อ</b><br>
+(2) <b>การกำหนดวันที่ซื้อ</b><br>
+(3) <b>การรับรู้และการวัดมูลค่าของสินทรัพย์ที่ระบุได้ที่ได้มา หนี้สินที่รับมา และส่วนได้เสียที่ไม่มีอำนาจควบคุมในผู้ถูกซื้อ</b><br>
+(4) <b>การรับรู้และการวัดมูลค่าของค่าความนิยม หรือผลกำไรจากการซื้อในราคาต่ำกว่ามูลค่ายุติธรรม</b></p>
+</div>
+
+<div class="box explain">
+<div class="bt">💡 ขยายความรายขั้นตอน</div>
+<ul>
+<li><b>ขั้นที่ 1 ระบุผู้ซื้อ</b> — <b>ผู้ซื้อคือกิจการที่ได้มาซึ่งอำนาจควบคุมผู้ถูกซื้อ</b> ไม่จำเป็นต้องเป็นฝ่ายที่จ่ายเงินหรือออกหุ้น ระวังกรณี <b>"การซื้อธุรกิจย้อนกลับ (reverse acquisition)"</b> ที่ผู้ออกหุ้นกลับกลายเป็นผู้ถูกซื้อในทางบัญชี</li>
+<li><b>ขั้นที่ 2 วันที่ซื้อ</b> = <b>วันที่ผู้ซื้อได้มาซึ่งอำนาจควบคุมผู้ถูกซื้อ</b> โดยทั่วไปคือวันที่โอนสิ่งตอบแทน (closing date) ไม่ใช่วันลงนามสัญญา</li>
+<li><b>ขั้นที่ 3 วัดด้วยมูลค่ายุติธรรม ณ วันที่ซื้อ</b> — รวมถึงสินทรัพย์ที่ผู้ถูกซื้อไม่เคยบันทึกมาก่อน เช่น <b>แบรนด์ที่สร้างขึ้นเอง ความสัมพันธ์กับลูกค้า สัญญาระยะยาว</b> ขั้นตอนนี้เรียกว่า <b>การปันส่วนราคาซื้อ (Purchase Price Allocation – PPA)</b></li>
+<li><b>ขั้นที่ 4</b> — คำนวณค่าความนิยมเป็นตัวเลขคงเหลือ (residual)</li>
+</ul>
+</div>
+
+<h4>③ ต้นทุนที่เกี่ยวข้องกับการซื้อ</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค)</div>
+<p class="quote"><b>ต้นทุนที่เกี่ยวข้องกับการซื้อธุรกิจ เช่น ค่าธรรมเนียมที่ปรึกษาทางบัญชี ที่ปรึกษากฎหมาย ที่ปรึกษาทางการเงิน และค่าใช้จ่ายในการหาผู้เชี่ยวชาญอื่น ให้ผู้ซื้อบันทึกเป็นค่าใช้จ่ายในงวดที่เกิดรายการ</b></p>
+</div>
+<div class="box warn">
+<div class="bt">⚠️ ข้อยกเว้นที่ออกสอบ</div>
+<p><b>ต้นทุนการออกตราสารหนี้และตราสารทุนเพื่อใช้ซื้อธุรกิจ ไม่ถือเป็นต้นทุนที่เกี่ยวข้องกับการซื้อ</b> แต่ให้รับรู้ตาม TAS 32 และ TFRS 9 คือ <b>นำไปหักจากรายการที่เกี่ยวข้อง</b> (ต้นทุนออกหุ้น → หักจากส่วนเกินมูลค่าหุ้น / ต้นทุนออกหุ้นกู้ → หักจากมูลค่าหนี้สิน)</p>
+</div>
+
+<h4>④ สิ่งตอบแทนที่คาดว่าจะต้องจ่าย และระยะเวลาในการวัดมูลค่า</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค)</div>
+<p class="quote">สิ่งตอบแทนที่ผู้ซื้อโอนให้<b>รวมถึงสินทรัพย์หรือหนี้สินที่ผู้ซื้อคาดว่าจะต้องจ่ายชำระตามข้อตกลง</b> โดยผู้ซื้อต้อง<b>รับรู้มูลค่ายุติธรรม ณ วันที่ซื้อเป็นส่วนหนึ่งของสิ่งตอบแทนที่โอนให้</b></p>
+<p class="quote" style="margin-top:10px">หากการบันทึกบัญชีเมื่อเริ่มแรกสำหรับการรวมธุรกิจ<b>ไม่เสร็จสมบูรณ์ภายในวันสิ้นรอบระยะเวลารายงาน</b>ที่การรวมธุรกิจนั้นเกิดขึ้น ผู้ซื้อต้อง<b>รายงานจำนวนเงินโดยประมาณ</b>สำหรับรายการที่การบันทึกบัญชียังไม่เสร็จสมบูรณ์ และสามารถ<b>ปรับปรุงย้อนหลังได้ภายในระยะเวลาในการวัดมูลค่า ซึ่งต้องไม่เกิน 1 ปีนับจากวันที่ซื้อ</b></p>
+</div>
+<div class="box explain">
+<div class="bt">💡 ขยายความ — Contingent consideration</div>
+<p>เช่น <b>earn-out</b> ที่สัญญาว่า "ถ้าปีหน้ากำไรถึงเป้า จะจ่ายเพิ่มอีก 100 ล้านบาท" ต้องรับรู้ <b>มูลค่ายุติธรรม ณ วันที่ซื้อ</b> เข้าไปในสิ่งตอบแทนทันที การเปลี่ยนแปลงมูลค่าในภายหลัง:</p>
+<ul>
+<li>ถ้าจัดประเภทเป็น <b>หนี้สิน</b> → วัดมูลค่ายุติธรรมใหม่ทุกงวด รับรู้ผลต่างใน <b>กำไรขาดทุน</b></li>
+<li>ถ้าจัดประเภทเป็น <b>ส่วนของเจ้าของ</b> → <b>ไม่ต้องวัดมูลค่าใหม่</b></li>
+<li><b>การเปลี่ยนแปลงหลังพ้นระยะเวลาวัดมูลค่า 1 ปี ห้ามย้อนกลับไปปรับค่าความนิยม</b></li>
+</ul>
+</div>
+
+<h4>⑤ ค่าความนิยมและการซื้อในราคาต่ำกว่ามูลค่ายุติธรรม</h4>
+<div class="f">
+<b>ค่าความนิยม</b> = ( สิ่งตอบแทนที่โอนให้ + ส่วนได้เสียที่ไม่มีอำนาจควบคุม<br>+ มูลค่ายุติธรรมของส่วนได้เสียที่ผู้ซื้อถืออยู่เดิม )<br>− มูลค่ายุติธรรมสุทธิของสินทรัพย์ที่ระบุได้ที่ได้มาและหนี้สินที่รับมา
+</div>
+
+<div class="box principle">
+<div class="bt">📌 หลักการ — กำไรจากการซื้อในราคาต่ำกว่ามูลค่ายุติธรรม (คงประโยค)</div>
+<p class="quote">การซื้อในราคาต่ำกว่ามูลค่ายุติธรรมอาจเกิดขึ้นได้ เช่น <b>กรณีการบังคับขาย</b> ก่อนรับรู้กำไรจากการซื้อในราคาต่ำกว่ามูลค่ายุติธรรม <b>ผู้ซื้อต้องทำการประเมินความถูกต้องของการระบุสินทรัพย์ที่ได้มาและหนี้สินที่รับมาทั้งหมดอีกครั้งหนึ่ง</b> และต้อง<b>รับรู้ผลกำไรดังกล่าวในกำไรหรือขาดทุน ณ วันที่ซื้อ โดยถือเป็นผลกำไรในส่วนของผู้ซื้อ</b></p>
+</div>
+<div class="box warn">
+<div class="bt">⚠️ ลำดับขั้นตอนคือจุดออกสอบ</div>
+<p>ต้อง <b>"ประเมินใหม่ก่อน (reassessment) แล้วจึงรับรู้กำไร"</b> — ห้ามรับรู้กำไรทันที และกำไรนี้เข้า <b>กำไรขาดทุน ไม่ใช่ OCI และไม่ใช่ส่วนเกินทุน</b></p>
+</div>
+
+<h4>⑥ ส่วนได้เสียที่ไม่มีอำนาจควบคุม (NCI)</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค) — เลือกได้ 2 ทาง เป็นรายรายการ</div>
+<p class="quote">ผู้ซื้อต้องวัดมูลค่าของส่วนได้เสียที่ไม่มีอำนาจควบคุมด้วย<br>
+(1) <b>มูลค่ายุติธรรม</b> หรือ<br>
+(2) <b>มูลค่าของสินทรัพย์สุทธิที่ระบุได้ของผู้ถูกซื้อที่ผู้ซื้อรับรู้ตามสัดส่วนความเป็นเจ้าของในปัจจุบัน</b></p>
+</div>
+<div class="box ex">
+<div class="bt">✅ ตัวอย่าง 4-1 — Full Goodwill vs Partial Goodwill</div>
+<p>P ซื้อ 80% ของ S ด้วยเงินสด 800 ล้านบาท มูลค่ายุติธรรมของสินทรัพย์สุทธิที่ระบุได้ของ S = 900 ล้านบาท มูลค่ายุติธรรมของ NCI = 190 ล้านบาท</p>
+<div class="tw"><table>
+<tr><th>รายการ</th><th class="c">ทางเลือก (1)<br>มูลค่ายุติธรรม</th><th class="c">ทางเลือก (2)<br>ตามสัดส่วน</th></tr>
+<tr><td>สิ่งตอบแทนที่โอนให้</td><td class="c">800</td><td class="c">800</td></tr>
+<tr><td>+ NCI</td><td class="c">190</td><td class="c">180 <span style="font-size:8.5px">(20%×900)</span></td></tr>
+<tr><td>รวม</td><td class="c">990</td><td class="c">980</td></tr>
+<tr><td>− สินทรัพย์สุทธิที่ระบุได้</td><td class="c">(900)</td><td class="c">(900)</td></tr>
+<tr><td><b>ค่าความนิยม</b></td><td class="c"><b>90</b></td><td class="c"><b>80</b></td></tr>
+</table></div>
+<p><b>ผลต่าง 10 ล้านบาท = ค่าความนิยมส่วนของ NCI</b> → ทางเลือก (1) ทำให้ทั้ง <b>สินทรัพย์รวมและส่วนของเจ้าของรวมสูงกว่า</b> 10 ล้านบาท จึงทำให้ <b>ROA ต่ำกว่า</b> และ <b>D/E ต่ำกว่า</b> เล็กน้อย</p>
+</div>
+
+<div class="box principle">
+<div class="bt">📌 หลักการ — การเปลี่ยนสัดส่วนที่ไม่สูญเสียการควบคุม (คงประโยค)</div>
+<p class="quote"><b>การเปลี่ยนแปลงในส่วนได้เสียในความเป็นเจ้าของของบริษัทใหญ่ในบริษัทย่อย ซึ่งมิได้ส่งผลให้บริษัทใหญ่สูญเสียการควบคุม ถือเป็นรายการในส่วนของเจ้าของ</b></p>
+</div>
+<div class="box warn">
+<div class="bt">⚠️ ประโยคทอง</div>
+<p>P ถือ 80% แล้วซื้อเพิ่มเป็น 90% หรือขายลงเหลือ 60% (ยังควบคุมอยู่) → <b>ไม่รับรู้กำไร/ขาดทุน และไม่ปรับค่าความนิยม</b> ผลต่างเข้า <b>ส่วนของเจ้าของ</b> โดยตรง<br>
+แต่ถ้าขายจนเหลือ 40% (<b>สูญเสียการควบคุม</b>) → <b>ต้องวัดส่วนที่เหลือใหม่ด้วยมูลค่ายุติธรรม และรับรู้กำไร/ขาดทุนในกำไรขาดทุน</b></p>
+</div>
+
+<div class="tutor">
+<div class="bt">🧑‍🏫 ติวเตอร์สรุปให้ — LOS 4.1</div>
+
+<div class="t-sec">
+<span class="t-lab">เล่าแบบบ้านๆ</span>
+<p>วิธีซื้อก็เหมือน <b>"ซื้อบ้านมือสองแล้วต้องประเมินราคาใหม่ทั้งหลัง"</b> ครับ</p>
+<p>เจ้าของเดิมบันทึกบ้านไว้ในบัญชี 3 ล้าน แต่วันนี้ราคาตลาด 8 ล้าน พอเราซื้อมา <b>เราต้องบันทึกที่ 8 ล้าน ไม่ใช่ 3 ล้าน</b> แถมยังต้องตีราคาของที่เจ้าของเดิมไม่เคยลงบัญชีด้วย เช่น <b>แบรนด์ ฐานลูกค้า สัญญาระยะยาว</b> — ขั้นตอนตีราคาใหม่ทั้งหมดนี้เรียกว่า <b>PPA</b></p>
+<p>แล้วถ้าจ่ายไป 10 ล้าน แต่ตีราคาของที่จับต้องระบุได้ทั้งหมดแล้วได้แค่ 8 ล้าน → <b>ส่วนเกิน 2 ล้านคือค่าความนิยม</b> พูดง่ายๆ คือ "เงินที่จ่ายเกินไปโดยอธิบายไม่ได้ว่าไปซื้ออะไร"</p>
+<p>ส่วน <b>NCI</b> คือ "ส่วนของเค้กที่เราไม่ได้กิน แต่ต้องยกเค้กทั้งก้อนมาวางบนโต๊ะเรา" เพราะเราคุมบริษัทย่อยทั้งบริษัท เลยต้องรวมงบเข้ามา 100% แล้วค่อยกันส่วนของคนอื่นออกมาแสดงเป็น NCI</p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">สูตรจำ</span>
+<div class="mnemo">วิธีซื้อ 4 ขั้น =<br><b>ใคร → เมื่อไร → อะไรเท่าไร → เหลือเท่าไร</b><br>(ผู้ซื้อ · วันที่ซื้อ · วัด FV สินทรัพย์–หนี้สิน–NCI · ค่าความนิยม)</div>
+<div class="mnemo">ค่าความนิยม = <b>(จ่าย + NCI + หุ้นเดิม) − FV สินทรัพย์สุทธิ</b></div>
+<p><b>จำเรื่องต้นทุน:</b> <span style="color:var(--tutor)"><b>"ค่าที่ปรึกษา = ค่าใช้จ่ายทันที · ค่าออกหุ้น/หุ้นกู้ = ไปหักจากหุ้น/หนี้"</b></span></p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">เก็งข้อสอบ &amp; วิธีทำ</span>
+<ul>
+<li><b>ข้อคำนวณหลัก:</b> หาค่าความนิยม → ตั้งสูตรแล้วเติมตัวเลขทีละบรรทัด <b>ระวังตัวเลขหลอกคือ "มูลค่าตามบัญชี" ของสินทรัพย์สุทธิ</b> ต้องใช้ <b>มูลค่ายุติธรรม</b> เสมอ</li>
+<li><b>ข้อ Full vs Partial goodwill:</b> ถ้าโจทย์ให้ <b>FV ของ NCI</b> มา = ให้ใช้ทางเลือก full ถ้าให้แค่ % = ใช้ทางเลือก partial (NCI% × FV สินทรัพย์สุทธิ) ผลต่างของสองวิธีคือ <b>ค่าความนิยมส่วนของ NCI</b> เสมอ</li>
+<li><b>ข้อเชิงหลักการที่ออกซ้ำ:</b> "ค่าธรรมเนียมที่ปรึกษากฎหมายในการซื้อธุรกิจบันทึกอย่างไร" → <b>ค่าใช้จ่ายในงวดที่เกิดรายการ</b> ตัวเลือกหลอกคือ "รวมเป็นต้นทุนการซื้อ" (อันนั้นคือ asset acquisition)</li>
+<li><b>Bargain purchase:</b> จำ<b>ลำดับ</b> — ต้อง <b>ประเมินใหม่ก่อน</b> แล้วจึงรับรู้กำไร และกำไรเข้า <b>P/L</b> ไม่ใช่ OCI</li>
+<li><b>ตัวเลขที่ต้องจำ:</b> <b>ระยะเวลาในการวัดมูลค่า ไม่เกิน 1 ปี</b> นับจากวันที่ซื้อ</li>
+<li><b>ประโยคทองที่ถามตรงๆ:</b> ซื้อหุ้นเพิ่มหรือขายหุ้นออกโดย<b>ยังคุมอยู่</b> → <b>"ถือเป็นรายการในส่วนของเจ้าของ"</b> ไม่มีกำไรขาดทุน ไม่แตะค่าความนิยม</li>
+</ul>
+</div>
+</div>
+
+<div class="done-wrap"><button class="done" data-id="los41">✓ อ่านจบ LOS 4.1 แล้ว</button></div>
+</section>
+
+<section id="los42">
+<h3 class="los"><span class="n">LOS 4.2</span>เปรียบเทียบและจำแนกความแตกต่างระหว่างวิธีรวมส่วนได้เสียและวิธีซื้อ</h3>
+
+<div class="box principle">
+<div class="bt">📌 หลักการ — ลักษณะสำคัญของวิธีรวมส่วนได้เสีย (คงประโยค)</div>
+<p class="quote">
+(1) <b>ไม่มีการทำการปันส่วนราคาซื้อ (Purchase Price Allocation: PPA)</b><br>
+(2) <b>สามารถนำสินทรัพย์และหนี้สินตามมูลค่าบัญชีของกิจการในงบการเงินมารับรู้</b><br>
+(3) <b>ไม่มีการรับรู้ส่วนต่างระหว่างต้นทุนการรวมธุรกิจและมูลค่าตามบัญชีของกิจการเป็นสินทรัพย์ (ค่าความนิยม) หรือรายได้ (กำไรจากการต่อรองราคาซื้อ) แต่ให้รับรู้ส่วนต่างโดยตรงในส่วนของเจ้าของ</b><br>
+(4) <b>ต้องรวมผลการดำเนินงานของแต่ละกิจการหรือธุรกิจที่นำมารวมตั้งแต่วันที่เสนองบการเงินล่าสุด หรือตั้งแต่วันที่รวมอยู่ภายใต้การควบคุมเดียวกัน แล้วแต่ระยะเวลาใดจะสั้นกว่า โดยต้องปรับย้อนหลังงบการเงินเสมือนหนึ่งได้มีการรวมธุรกิจมาแต่ต้น</b>
+</p>
+</div>
+
+<div class="tw"><table>
+<tr><th>ประเด็น</th><th>วิธีซื้อ</th><th>วิธีรวมส่วนได้เสีย</th></tr>
+<tr><td><b>การทำ PPA</b></td><td>ต้องทำ</td><td><b>ไม่ต้องทำ</b></td></tr>
+<tr><td><b>มูลค่าสินทรัพย์/หนี้สิน</b></td><td><b>มูลค่ายุติธรรม</b> ณ วันที่ซื้อ</td><td><b>มูลค่าตามบัญชี</b>เดิม</td></tr>
+<tr><td><b>ค่าความนิยม</b></td><td>รับรู้เป็นสินทรัพย์</td><td><b>ไม่รับรู้</b></td></tr>
+<tr><td><b>กำไรจากการต่อรองราคาซื้อ</b></td><td>รับรู้เป็นรายได้</td><td><b>ไม่รับรู้</b></td></tr>
+<tr><td><b>ส่วนต่างราคาซื้อ</b></td><td>เป็นค่าความนิยม/กำไร</td><td><b>รับรู้ตรงในส่วนของเจ้าของ</b></td></tr>
+<tr><td><b>การรวมผลการดำเนินงาน</b></td><td>ตั้งแต่<b>วันที่ซื้อ</b>เป็นต้นไป</td><td><b>ปรับย้อนหลัง</b>เสมือนรวมมาแต่ต้น</td></tr>
+<tr><td><b>ผลต่อสินทรัพย์รวม</b></td><td>สูงกว่า (FV + goodwill)</td><td>ต่ำกว่า (BV)</td></tr>
+<tr><td><b>ผลต่อกำไรปีถัดไป</b></td><td><b>ต่ำกว่า</b> (ค่าเสื่อม/ตัดจำหน่ายสูงจากฐาน FV)</td><td><b>สูงกว่า</b></td></tr>
+<tr><td><b>ผลต่อ ROE / ROA</b></td><td><b>ต่ำกว่า</b></td><td><b>สูงกว่า</b></td></tr>
+</table></div>
+
+<div class="box explain">
+<div class="bt">💡 แก่นสำคัญ — ทำไมวิธีรวมส่วนได้เสียทำให้งบ "ดูดี"</div>
+<p>เพราะสินทรัพย์บันทึกด้วย <b>มูลค่าตามบัญชีเดิมซึ่งมักต่ำกว่ามูลค่ายุติธรรม</b> ทำให้ <b>ค่าเสื่อมราคาและค่าตัดจำหน่ายในอนาคตต่ำกว่า → กำไรสูงกว่า</b> ขณะเดียวกัน <b>ฐานสินทรัพย์และส่วนของเจ้าของก็ต่ำกว่า → ตัวส่วนเล็กกว่า</b> ผลคือ <b>ROA และ ROE สูงกว่าวิธีซื้ออย่างชัดเจน</b> นี่คือเหตุผลที่มาตรฐานสากลยกเลิกการใช้วิธีนี้กับการรวมธุรกิจทั่วไป และจำกัดให้ใช้เฉพาะกรณีภายใต้การควบคุมเดียวกันเท่านั้น</p>
+</div>
+
+<div class="tutor">
+<div class="bt">🧑‍🏫 ติวเตอร์สรุปให้ — LOS 4.2</div>
+
+<div class="t-sec">
+<span class="t-lab">เล่าแบบบ้านๆ</span>
+<p>ความต่างทั้งหมดของสองวิธีนี้ สรุปได้เป็นประโยคเดียว:</p>
+<p><b>วิธีซื้อ = "ตีราคาใหม่ทั้งหมด" · วิธีรวมส่วนได้เสีย = "ยกบัญชีเดิมมาทั้งดุ้น"</b></p>
+<p>พอเข้าใจประโยคนี้ ผลที่ตามมาจะไหลออกมาเองทุกบรรทัด:</p>
+<ul>
+<li>ยกบัญชีเดิมมา → ไม่ต้องตีราคา → <b>ไม่มี PPA</b></li>
+<li>ไม่มีการตีราคา → ไม่มีส่วนเกิน → <b>ไม่มีค่าความนิยม</b></li>
+<li>แล้วส่วนต่างที่จ่ายไปจริงกับบัญชีเดิมไปไหน → <b>ยัดเข้าส่วนของเจ้าของตรงๆ ไม่ผ่านกำไรขาดทุน</b></li>
+<li>สินทรัพย์ราคาต่ำกว่า → <b>ค่าเสื่อมน้อยกว่า → กำไรสูงกว่า</b> และฐานสินทรัพย์เล็กกว่า → <b>ROA/ROE สูงกว่า</b></li>
+</ul>
+<p>และข้อสุดท้ายที่คนลืมบ่อย — วิธีรวมส่วนได้เสียต้อง <b>ปรับงบย้อนหลังเสมือนรวมกันมาตั้งแต่ต้น</b> ต่างจากวิธีซื้อที่รวมเฉพาะ<b>ตั้งแต่วันที่ซื้อไปข้างหน้า</b></p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">สูตรจำ</span>
+<div class="mnemo"><b>ซื้อ = FV + Goodwill + นับจากวันซื้อ</b><br><b>รวมส่วนได้เสีย = BV + ไม่มี Goodwill + ย้อนหลัง</b></div>
+<div class="mnemo">ท่องผลลัพธ์: <b>"pooling งบสวยกว่าเสมอ"</b><br>(กำไรสูงกว่า · สินทรัพย์ต่ำกว่า · ROA &amp; ROE สูงกว่า)</div>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">เก็งข้อสอบ &amp; วิธีทำ</span>
+<ul>
+<li><b>แนวที่ออกแน่นอน:</b> ถามว่าวิธีใดทำให้ <b>ROE สูงกว่า</b> → ตอบ <b>วิธีรวมส่วนได้เสีย</b> เหตุผลสองชั้น (กำไรสูงกว่า + ส่วนของเจ้าของต่ำกว่า)</li>
+<li><b>ข้อที่ดักคนจำผิว:</b> "ภายใต้วิธีรวมส่วนได้เสีย ส่วนต่างราคาซื้อบันทึกเป็นอะไร" → <b>รับรู้โดยตรงในส่วนของเจ้าของ</b> ตัวเลือกหลอกคือ "ค่าความนิยม" และ "กำไรจากการต่อรองราคาซื้อ" ซึ่งทั้งคู่<b>ไม่รับรู้</b>ในวิธีนี้</li>
+<li><b>ข้อเรื่องช่วงเวลา:</b> "งบปีที่รวมธุรกิจต้องรวมผลการดำเนินงานของอีกฝ่ายตั้งแต่เมื่อไร" → วิธีซื้อ = <b>วันที่ซื้อ</b> / วิธีรวมส่วนได้เสีย = <b>ย้อนหลังทั้งงวด</b></li>
+<li><b>เทคนิคตอบเร็ว:</b> เจอคำถามเปรียบเทียบตัวเลขใดๆ ให้ท่อง <b>"pooling = งบสวย"</b> แล้วเลือกข้อที่สอดคล้อง จะได้คะแนนเกือบทุกครั้ง ยกเว้นคำถามเรื่อง<b>สินทรัพย์รวม</b>และ<b>ค่าเสื่อมราคา</b>ที่ pooling จะ<b>ต่ำกว่า</b></li>
+</ul>
+</div>
+</div>
+
+<div class="done-wrap"><button class="done" data-id="los42">✓ อ่านจบ LOS 4.2 แล้ว</button></div>
+</section>
+
+<section id="los43">
+<h3 class="los"><span class="n">LOS 4.3</span>ระบุสถานการณ์ที่ทำให้กิจการต้องนำวิธีรวมส่วนได้เสียมาใช้เป็นวิธีปฏิบัติทางบัญชีสำหรับการรวมธุรกิจ</h3>
+
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค)</div>
+<p class="quote">วิธีรวมส่วนได้เสียใช้สำหรับ<b>การรวมธุรกิจภายใต้การควบคุมเดียวกัน (Business Combination Under Common Control : BCUCC)</b></p>
+</div>
+
+<div class="box explain">
+<div class="bt">💡 ขยายความ — BCUCC คืออะไร</div>
+<p>คือการรวมธุรกิจที่ <b>กิจการทั้งหมดที่นำมารวมกันถูกควบคุมโดยบุคคลหรือกลุ่มบุคคลเดียวกัน ทั้งก่อนและหลังการรวมธุรกิจ และการควบคุมนั้นไม่ได้เป็นการชั่วคราว</b></p>
+<p><b>เหตุผลเชิงหลักการ:</b> เมื่อทุกฝ่ายอยู่ใต้ร่มเดียวกัน ธุรกรรมนี้ <b>ไม่ใช่การแลกเปลี่ยนกับบุคคลภายนอกอย่างเป็นอิสระ (arm's length)</b> ราคาที่ตกลงกันอาจไม่สะท้อนมูลค่ายุติธรรมจริง จึงไม่เหมาะจะใช้วิธีซื้อที่ต้องตีมูลค่ายุติธรรมใหม่และสร้างค่าความนิยมขึ้นมา</p>
+</div>
+
+<div class="box ex">
+<div class="bt">✅ ตัวอย่าง 4-2 — การปรับโครงสร้างภายในกลุ่ม</div>
+<p>บริษัท Holding ถือหุ้น 100% ทั้งใน A และ B ต่อมา Holding สั่งให้ A ซื้อหุ้นทั้งหมดของ B</p>
+<ul>
+<li><b>ก่อนรายการ:</b> Holding ควบคุมทั้ง A และ B</li>
+<li><b>หลังรายการ:</b> Holding ยังควบคุมทั้ง A และ B (ผ่าน A)</li>
+<li>→ เป็น <b>BCUCC</b> ใช้ <b>วิธีรวมส่วนได้เสีย</b> A บันทึกสินทรัพย์/หนี้สินของ B ด้วย <b>มูลค่าตามบัญชีเดิม</b> ส่วนต่างระหว่างเงินที่จ่ายกับมูลค่าตามบัญชีเข้า <b>ส่วนของเจ้าของโดยตรง</b> และต้อง <b>ปรับย้อนหลังงบเปรียบเทียบ</b></li>
+</ul>
+</div>
+
+<div class="box warn">
+<div class="bt">⚠️ จุดตัดสินที่ออกสอบ</div>
+<p>ถามตัวเองแค่คำถามเดียว: <b>"ผู้ควบคุมสูงสุดเปลี่ยนไปหรือไม่?"</b><br>
+• ไม่เปลี่ยน → <b>BCUCC → วิธีรวมส่วนได้เสีย</b><br>
+• เปลี่ยน (ซื้อจากบุคคลภายนอก) → <b>TFRS 3 → วิธีซื้อ</b></p>
+</div>
+
+<div class="tutor">
+<div class="bt">🧑‍🏫 ติวเตอร์สรุปให้ — LOS 4.3</div>
+
+<div class="t-sec">
+<span class="t-lab">เล่าแบบบ้านๆ</span>
+<p>นึกภาพ <b>"พ่อสั่งให้ลูกคนโตซื้อรถของลูกคนรอง"</b> ครับ</p>
+<p>รถยังอยู่ในบ้านหลังเดิม พ่อยังเป็นเจ้าของตัวจริงเหมือนเดิม <b>ไม่มีอะไรเปลี่ยนในเชิงเศรษฐกิจเลย</b> เปลี่ยนแค่ว่ารถจอดอยู่ในชื่อใคร</p>
+<p>ถ้าเราปล่อยให้ใช้วิธีซื้อ ลูกคนโตก็จะ<b>ตีราคารถใหม่ให้สูงขึ้น แล้วสร้างค่าความนิยมขึ้นมาจากอากาศ</b> ทั้งที่ไม่มีการซื้อขายกับคนนอกจริงๆ — ราคาที่ตกลงกันในบ้านจะตั้งเท่าไรก็ได้ ไม่ใช่ราคาตลาด</p>
+<p>มาตรฐานจึงบอกว่ากรณีนี้ <b>ห้ามตีราคาใหม่ ให้ยกบัญชีเดิมมาเลย</b> ส่วนต่างที่จ่ายกันไปมาในบ้าน ให้ถือเป็นการโยกเงินกันในส่วนของเจ้าของ ไม่ใช่กำไรขาดทุน</p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">สูตรจำ</span>
+<div class="mnemo">ถามคำถามเดียว:<br><b>"เจ้าของตัวจริงเปลี่ยนไหม?"</b><br>ไม่เปลี่ยน → BCUCC → รวมส่วนได้เสีย<br>เปลี่ยน → TFRS 3 → วิธีซื้อ</div>
+<p><b>เงื่อนไข BCUCC จำ 3 คำ:</b> <span style="color:var(--tutor)"><b>"คนเดียวกัน – ทั้งก่อนและหลัง – ไม่ชั่วคราว"</b></span></p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">เก็งข้อสอบ &amp; วิธีทำ</span>
+<ul>
+<li><b>รูปแบบข้อสอบ:</b> ให้ผังโครงสร้างกลุ่มบริษัทมา แล้วถามว่าใช้วิธีใด → <b>วาดผังก่อนและหลังรายการ</b> แล้วดูว่า<b>บริษัทบนสุด</b>ยังเป็นคนเดิมไหม</li>
+<li><b>คีย์เวิร์ดที่เจอแล้วตอบได้เลย:</b> "การปรับโครงสร้างภายในกลุ่ม" · "บริษัทในเครือเดียวกัน" · "ผู้ถือหุ้นใหญ่รายเดียวกันทั้งก่อนและหลัง" → <b>BCUCC ทั้งหมด</b></li>
+<li><b>ตัวหลอกที่ต้องระวัง:</b> คำว่า <b>"ไม่ได้เป็นการชั่วคราว"</b> — ถ้าโจทย์บอกว่าควบคุมร่วมกันเพียงชั่วคราวเพื่อเตรียมขายออก → <b>ไม่ใช่ BCUCC</b></li>
+<li><b>ข้อต่อยอด:</b> ถ้าถามผลกระทบ ให้ตอบชุดเดียวกับ LOS 4.2 ได้เลย — <b>ไม่มีค่าความนิยม ใช้มูลค่าตามบัญชี ส่วนต่างเข้าส่วนของเจ้าของ ปรับย้อนหลัง</b></li>
+</ul>
+</div>
+</div>
+
+<div class="done-wrap"><button class="done" data-id="los43">✓ อ่านจบ LOS 4.3 แล้ว</button></div>
+</section>
+
+<section id="los44">
+<h3 class="los"><span class="n">LOS 4.4</span>อธิบายหลักการจัดทำงบแสดงฐานะการเงินและงบกำไรขาดทุนเบ็ดเสร็จตามข้อกำหนดของมาตรฐานการบัญชีภายใต้วิธีซื้อ</h3>
+
+<div class="box principle">
+<div class="bt">📌 หลักการ — ขั้นตอนการจัดทำงบการเงินรวม (คงประโยค)</div>
+<p class="quote">
+(1) <b>รวมรายการที่เหมือนกันของสินทรัพย์ หนี้สิน ส่วนของเจ้าของ รายได้ ค่าใช้จ่าย และกระแสเงินสดของบริษัทใหญ่กับบริษัทย่อย</b><br>
+(2) <b>หักกลบ (ตัด) มูลค่าตามบัญชีของเงินลงทุนของบริษัทใหญ่ในบริษัทย่อยแต่ละแห่ง กับส่วนของบริษัทใหญ่ในส่วนของเจ้าของของบริษัทย่อยแต่ละแห่ง</b><br>
+(3) <b>ตัดรายการสินทรัพย์ หนี้สิน ส่วนของเจ้าของ รายได้ ค่าใช้จ่าย และกระแสเงินสดที่เกี่ยวข้องกับรายการระหว่างกันภายในกลุ่มกิจการแบบเต็มจำนวน</b>
+</p>
+</div>
+
+<div class="box explain">
+<div class="bt">💡 ขยายความ — จำเป็นภาพ</div>
+<ol>
+<li><b>บวกทุกอย่างเข้าด้วยกันบรรทัดต่อบรรทัด 100%</b> — แม้ถือหุ้นแค่ 80% ก็รวมสินทรัพย์และรายได้ของบริษัทย่อย <b>เต็มจำนวน</b> เพราะบริษัทใหญ่ <b>ควบคุม</b> ทั้งหมด ส่วนที่ไม่ได้เป็นเจ้าของไปแสดงเป็น <b>NCI</b></li>
+<li><b>ตัด "เงินลงทุน" คู่กับ "ทุนของบริษัทย่อย"</b> — ป้องกันการนับซ้ำ ส่วนที่เหลือจากการตัดคือ <b>ค่าความนิยม</b></li>
+<li><b>ตัดรายการระหว่างกันทั้งหมดเต็มจำนวน</b> — ลูกหนี้/เจ้าหนี้ระหว่างกัน · ขาย/ต้นทุนขายระหว่างกัน · เงินปันผลระหว่างกัน · <b>กำไรที่ยังไม่เกิดขึ้นจริงในสินค้าคงเหลือและที่ดิน อาคารและอุปกรณ์</b></li>
+</ol>
+</div>
+
+<div class="box ex">
+<div class="bt">✅ ตัวอย่าง 4-3 — กระดาษทำการอย่างง่าย</div>
+<p>P ซื้อ 100% ของ S ด้วยเงินสด 1,200 ล้านบาท ณ วันซื้อ S มีสินทรัพย์ตามบัญชี 1,500 หนี้สิน 600 ส่วนของเจ้าของ 900 โดยที่ดินมีมูลค่ายุติธรรมสูงกว่าบัญชี 200 ล้านบาท</p>
+<div class="tw"><table>
+<tr><th>ขั้นตอน</th><th class="c">จำนวน (ลบ.)</th></tr>
+<tr><td>สิ่งตอบแทนที่โอนให้</td><td class="c">1,200</td></tr>
+<tr><td>มูลค่ายุติธรรมสินทรัพย์สุทธิที่ระบุได้ (900 + 200)</td><td class="c">(1,100)</td></tr>
+<tr><td><b>ค่าความนิยม</b></td><td class="c"><b>100</b></td></tr>
+</table></div>
+<p><b>รายการปรับปรุงในกระดาษทำการ:</b></p>
+<ul>
+<li>ปรับที่ดินขึ้น <b>+200</b> (step-up เป็นมูลค่ายุติธรรม)</li>
+<li>ตัดเงินลงทุน <b>−1,200</b> คู่กับทุนของ S <b>−900</b> และส่วนปรับมูลค่า <b>−200</b></li>
+<li>บันทึกค่าความนิยม <b>+100</b></li>
+</ul>
+<p><b>ผลต่องวดถัดไป:</b> ถ้าเป็นอาคารแทนที่ดิน ส่วน step-up 200 ต้องคิดค่าเสื่อมราคาเพิ่ม → <b>กำไรในงบรวมต่ำกว่าผลรวมกำไรของ P และ S แยกกัน</b> ซึ่งเป็นจุดที่นักวิเคราะห์ต้องระวังเวลาเทียบตัวเลข</p>
+</div>
+
+<h4>งบกำไรขาดทุนเบ็ดเสร็จรวม</h4>
+<div class="box explain">
+<div class="bt">💡 ประเด็นสำคัญ</div>
+<ul>
+<li><b>รวมรายได้และค่าใช้จ่ายของบริษัทย่อย "ตั้งแต่วันที่ซื้อ" เท่านั้น</b> — ซื้อวันที่ 1 ต.ค. ก็รวมแค่ 3 เดือน ไม่ใช่ทั้งปี <b>(จุดออกสอบบ่อยมาก)</b></li>
+<li>ต้องแสดง <b>การปันส่วนกำไรสุทธิและกำไรขาดทุนเบ็ดเสร็จรวม ระหว่างส่วนที่เป็นของบริษัทใหญ่กับส่วนที่เป็นของ NCI</b></li>
+<li><b>กำไรต่อหุ้นคำนวณจากกำไรส่วนที่เป็นของบริษัทใหญ่เท่านั้น ไม่รวม NCI</b></li>
+<li>ค่าเสื่อมราคาและค่าตัดจำหน่ายต้องคำนวณจาก <b>ฐานมูลค่ายุติธรรมที่ปรับใหม่</b> ไม่ใช่มูลค่าตามบัญชีเดิมของบริษัทย่อย</li>
+</ul>
+</div>
+
+<div class="tutor">
+<div class="bt">🧑‍🏫 ติวเตอร์สรุปให้ — LOS 4.4</div>
+
+<div class="t-sec">
+<span class="t-lab">เล่าแบบบ้านๆ</span>
+<p>การทำงบรวมมีแค่ <b>3 จังหวะ</b> ครับ จำเป็นภาพได้เลย</p>
+<ul>
+<li><b>จังหวะ 1 — บวก</b> เอางบแม่กับงบลูกมาวางคู่กัน แล้ว<b>บวกกันบรรทัดต่อบรรทัดเต็ม 100%</b> (ถึงจะถือแค่ 80% ก็บวกเต็ม เพราะเรา<b>คุม</b>ได้ทั้งบริษัท)</li>
+<li><b>จังหวะ 2 — ตัดเงินลงทุนกับทุน</b> ถ้าไม่ตัด จะกลายเป็นนับซ้ำ (มีทั้ง "เงินลงทุนในบริษัทย่อย" และ "สินทรัพย์ของบริษัทย่อย" พร้อมกัน) <b>เศษที่เหลือจากการตัดคือค่าความนิยม</b></li>
+<li><b>จังหวะ 3 — ตัดรายการในครอบครัว</b> ขายของให้กันเอง กู้เงินกันเอง จ่ายปันผลกันเอง → <b>ตัดทิ้งให้หมดเต็มจำนวน</b> เพราะมองจากคนนอก กลุ่มนี้ยังไม่ได้ขายอะไรให้ใครเลย</li>
+</ul>
+<p>และสองจุดที่ข้อสอบชอบดัก: <b>รวมกำไรบริษัทย่อยเฉพาะนับจากวันซื้อ</b> (ไม่ใช่ทั้งปี) และ <b>EPS ใช้กำไรเฉพาะส่วนของบริษัทใหญ่</b> (ต้องหัก NCI ออกก่อน)</p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">สูตรจำ</span>
+<div class="mnemo">งบรวม 3 จังหวะ =<br><b>บวก → ตัดเงินลงทุน → ตัดระหว่างกัน</b></div>
+<div class="mnemo"><b>"คุมเต็ม รวมเต็ม เป็นเจ้าของบางส่วน โชว์ NCI"</b></div>
+<p><b>จำเรื่อง EPS:</b> <span style="color:var(--tutor)"><b>"EPS ไม่กิน NCI"</b></span> — กำไรส่วนของ NCI ไม่เข้าตัวเศษ</p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">เก็งข้อสอบ &amp; วิธีทำ</span>
+<ul>
+<li><b>ข้อคำนวณที่ออกบ่อย:</b> "ซื้อบริษัทย่อยวันที่ 1 ตุลาคม รายได้รวมในงบรวมเป็นเท่าไร" → <b>รายได้แม่ทั้งปี + รายได้ลูกเฉพาะ 3 เดือน</b> ตัวเลือกหลอกคือรวมลูกทั้ง 12 เดือน</li>
+<li><b>ข้อที่พลาดกันเยอะ:</b> ถือ 80% แล้วถามสินทรัพย์รวมในงบรวม → <b>บวกสินทรัพย์ลูกเต็ม 100%</b> ไม่ใช่ 80% (ตัวเลือก 80% ถูกใส่ไว้ดักแน่นอน)</li>
+<li><b>ข้อเชิงหลักการ:</b> "กำไรที่ยังไม่เกิดขึ้นจริงจากการขายสินค้าระหว่างบริษัทในกลุ่มต้องตัดเท่าไร" → <b>เต็มจำนวน 100%</b> (ต่างจากวิธีส่วนได้เสียที่ตัดตามสัดส่วน)</li>
+<li><b>จุดเชื่อมกับการวิเคราะห์:</b> ถ้าถามว่าทำไมกำไรในงบรวมปีถัดไป<b>ต่ำกว่า</b>ผลรวมกำไรของสองบริษัทแยกกัน → ตอบ <b>ค่าเสื่อมราคาที่เพิ่มขึ้นจากการ step-up สินทรัพย์เป็นมูลค่ายุติธรรม</b></li>
+</ul>
+</div>
+</div>
+
+<div class="done-wrap"><button class="done" data-id="los44">✓ อ่านจบ LOS 4.4 แล้ว</button></div>
+</section>
+
+<section id="los45">
+<h3 class="los"><span class="n">LOS 4.5</span>ระบุผลกระทบของการรวมธุรกิจที่มีต่องบแสดงฐานะการเงิน งบกำไรขาดทุนเบ็ดเสร็จ งบกระแสเงินสด และอัตราส่วนทางการเงิน</h3>
+
+<h4>① งบแสดงฐานะการเงิน</h4>
+<ul>
+<li><b>สินทรัพย์รวมเพิ่มขึ้นมาก</b> — จากการรวมสินทรัพย์บริษัทย่อย <b>ที่ปรับเป็นมูลค่ายุติธรรม</b> บวก <b>ค่าความนิยม</b></li>
+<li><b>สินทรัพย์ไม่มีตัวตนเพิ่มขึ้นอย่างมีนัยสำคัญ</b> — จาก PPA ที่รับรู้แบรนด์ ความสัมพันธ์ลูกค้า สิทธิบัตร ซึ่งผู้ถูกซื้อไม่เคยบันทึกมาก่อน</li>
+<li><b>หนี้สินเพิ่มขึ้น</b> — รวมหนี้สินบริษัทย่อย บวกหนี้ที่ก่อเพื่อซื้อกิจการ บวก <b>หนี้สินภาษีเงินได้รอการตัดบัญชี (DTL)</b> ที่เกิดจากการ step-up สินทรัพย์ (เพราะฐานภาษีไม่เปลี่ยน แต่มูลค่าตามบัญชีเพิ่ม → <code>CA &gt; TB → DTL</code>)</li>
+<li><b>ส่วนของเจ้าของ</b> — เพิ่ม <b>NCI</b> เป็นรายการใหม่ และถ้าจ่ายด้วยหุ้น ทุนเรือนหุ้นและส่วนเกินมูลค่าหุ้นจะเพิ่ม</li>
+</ul>
+
+<h4>② งบกำไรขาดทุนเบ็ดเสร็จ</h4>
+<ul>
+<li><b>รายได้เพิ่มขึ้นทันที</b> แต่เฉพาะนับจากวันที่ซื้อ → ปีแรกมักดูเหมือนโตแรงผิดปกติ ปีที่สองการเติบโตจะดูตกฮวบเมื่อเทียบฐานเต็มปี (<b>ต้องแยก organic growth ออกจาก acquisition growth</b>)</li>
+<li><b>กำไรถูกกดจากค่าเสื่อมราคาและค่าตัดจำหน่ายที่สูงขึ้น</b> เพราะคิดจากฐานมูลค่ายุติธรรม</li>
+<li><b>ค่าใช้จ่ายที่เกี่ยวข้องกับการซื้อธุรกิจกดกำไรในปีที่เกิดรายการ</b> (เป็นค่าใช้จ่ายทันที)</li>
+<li><b>ต้นทุนทางการเงินสูงขึ้น</b> หากซื้อด้วยเงินกู้</li>
+<li><b>อาจมีผลขาดทุนจากการด้อยค่าค่าความนิยม</b> ในปีถัดๆ ไป ซึ่งเป็นรายการที่ <b>ไม่ใช่เงินสด</b></li>
+</ul>
+
+<h4>③ งบกระแสเงินสด</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค)</div>
+<p class="quote"><b>เงินสดจ่ายเพื่อซื้อธุรกิจ สุทธิจากเงินสดและรายการเทียบเท่าเงินสดที่ได้มา จัดประเภทเป็นกระแสเงินสดจากกิจกรรมลงทุน</b></p>
+</div>
+<div class="box explain">
+<div class="bt">💡 ขยายความ</div>
+<ul>
+<li>แสดงเป็น <b>ยอดสุทธิ</b> คือ เงินที่จ่ายไป <b>หักด้วย</b> เงินสดที่อยู่ในบริษัทที่ซื้อมา → ถ้าซื้อบริษัทที่มีเงินสดกองอยู่เยอะ ตัวเลขจ่ายสุทธิอาจน้อยมากหรือเป็น <b>เงินสดรับสุทธิ</b> ก็ได้</li>
+<li><b>ถ้าจ่ายด้วยหุ้นทั้งหมด จะไม่ปรากฏในงบกระแสเงินสดเลย</b> แต่ต้องเปิดเผยเป็น <b>รายการที่ไม่ใช่เงินสด</b> → นักวิเคราะห์ที่ดูแค่งบกระแสเงินสดจะพลาดดีลขนาดใหญ่ไปทั้งดีล</li>
+<li><b>CFO เพิ่มขึ้น</b> จากการรวมกระแสเงินสดดำเนินงานของบริษัทย่อย → ระวังอัตราส่วน CFO/หนี้สินที่ดูดีขึ้นแบบหลอกตา</li>
+<li>การจ่าย <b>contingent consideration</b> ส่วนที่เกินกว่ามูลค่าที่รับรู้ ณ วันที่ซื้อ มักจัดเป็น <b>กิจกรรมดำเนินงาน</b></li>
+</ul>
+</div>
+
+<h4>④ สรุปผลกระทบต่ออัตราส่วนทางการเงิน</h4>
+<div class="tw"><table>
+<tr><th>อัตราส่วน</th><th class="c">ทิศทาง</th><th>เหตุผล</th></tr>
+<tr><td>ROA</td><td class="c"><span class="pill p-r">ลด</span></td><td>สินทรัพย์เพิ่มจาก FV + goodwill เร็วกว่ากำไรที่เพิ่ม</td></tr>
+<tr><td>ROE</td><td class="c"><span class="pill p-r">มักลด</span></td><td>ค่าเสื่อม/ตัดจำหน่ายและดอกเบี้ยสูงขึ้น</td></tr>
+<tr><td>อัตราหมุนเวียนสินทรัพย์</td><td class="c"><span class="pill p-r">ลด</span></td><td>ฐานสินทรัพย์ใหญ่ขึ้นมาก</td></tr>
+<tr><td>D/E · D/A</td><td class="c"><span class="pill p-r">เพิ่ม</span></td><td>รวมหนี้บริษัทย่อย + หนี้ที่ก่อเพื่อซื้อ + DTL</td></tr>
+<tr><td>อัตรากำไรสุทธิ</td><td class="c"><span class="pill p-r">มักลด</span></td><td>ค่าใช้จ่ายซื้อธุรกิจ + ค่าตัดจำหน่ายสินทรัพย์ไม่มีตัวตน</td></tr>
+<tr><td>ความสามารถชำระดอกเบี้ย</td><td class="c"><span class="pill p-r">ลด</span></td><td>ดอกเบี้ยจ่ายสูงขึ้น</td></tr>
+<tr><td>EPS</td><td class="c">ขึ้นกับดีล</td><td>จ่ายด้วยหุ้น → dilute / จ่ายด้วยเงินสด → ไม่ dilute</td></tr>
+<tr><td>CFO</td><td class="c"><span class="pill p-g">เพิ่ม</span></td><td>รวม CFO ของบริษัทย่อย</td></tr>
+</table></div>
+
+<div class="tutor">
+<div class="bt">🧑‍🏫 ติวเตอร์สรุปให้ — LOS 4.5</div>
+
+<div class="t-sec">
+<span class="t-lab">เล่าแบบบ้านๆ</span>
+<p>หลังซื้อกิจการ งบการเงินจะ <b>"พองขึ้นทุกด้าน แต่กำไรถูกกด"</b> ครับ</p>
+<ul>
+<li><b>ฝั่งสินทรัพย์พอง</b> — เพราะเอาของบริษัทย่อยมารวม แถม<b>ตีราคาใหม่ให้สูงขึ้น</b> แล้วยังเพิ่ม<b>ค่าความนิยม</b>เข้าไปอีกก้อน</li>
+<li><b>ฝั่งหนี้ก็พอง</b> — หนี้ของบริษัทย่อย + หนี้ที่กู้มาซื้อ + <b>DTL ที่เกิดจากการตีราคาสินทรัพย์ขึ้น</b> (ข้อนี้คนลืมบ่อยมาก)</li>
+<li><b>กำไรกลับถูกกด</b> — ค่าเสื่อมราคาคิดจากฐานใหม่ที่แพงขึ้น + ค่าที่ปรึกษาดีลที่ลงเป็นค่าใช้จ่ายทันที + ดอกเบี้ยเงินกู้</li>
+</ul>
+<p>พอตัวส่วนโตแต่ตัวเศษถูกกด ผลลัพธ์จึงชัดเจน: <b>ROA ลง ROE ลง Asset turnover ลง D/E ขึ้น</b></p>
+<p>ส่วนงบกระแสเงินสดมี<b>กับดักที่นักวิเคราะห์พลาดบ่อยที่สุด</b> — ถ้าดีลนั้น<b>จ่ายด้วยหุ้นทั้งหมด จะไม่มีตัวเลขโผล่ในงบกระแสเงินสดแม้แต่บาทเดียว</b> ดีลหมื่นล้านก็หายไปเฉยๆ ต้องไปอ่านหมายเหตุเรื่องรายการที่ไม่ใช่เงินสดเท่านั้น</p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">สูตรจำ</span>
+<div class="mnemo"><b>"สินทรัพย์พอง · หนี้พอง · กำไรแฟบ"</b><br>→ ROA ลง · D/E ขึ้น · Turnover ลง</div>
+<div class="mnemo">งบกระแสเงินสด:<br><b>"จ่ายเงินสดสุทธิจากเงินสดที่ได้มา = กิจกรรมลงทุน"</b><br><b>"จ่ายด้วยหุ้น = ไม่โผล่ในงบเลย"</b></div>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">เก็งข้อสอบ &amp; วิธีทำ</span>
+<ul>
+<li><b>ข้อยอดนิยม:</b> ถามทิศทางของอัตราส่วนหลังรวมธุรกิจ → ท่อง <b>"พอง-พอง-แฟบ"</b> แล้วตอบได้ทุกข้อ ยกเว้น <b>CFO ที่เพิ่มขึ้น</b> และ <b>EPS ที่ขึ้นกับว่าจ่ายด้วยอะไร</b></li>
+<li><b>ข้อคำนวณงบกระแสเงินสด:</b> "จ่ายซื้อกิจการ 500 ล้าน บริษัทที่ซื้อมีเงินสด 80 ล้าน แสดงในงบเท่าไร" → <b>420 ล้าน ในกิจกรรมลงทุน</b> (สุทธิ)</li>
+<li><b>ข้อที่แยกคนเก่งออกจากคนท่อง:</b> ถามว่าหนี้สินเพิ่มจากอะไรบ้าง → อย่าลืม <b>DTL จากการ step-up</b> ตัวเลือกที่มีแต่ "หนี้บริษัทย่อย + เงินกู้" จะไม่ครบ</li>
+<li><b>ข้อเชิงวิเคราะห์:</b> "ทำไมการเติบโตของรายได้ปีแรกหลังซื้อกิจการจึงไม่สะท้อนผลงานจริง" → ตอบ <b>ต้องแยก organic growth ออกจาก acquisition growth</b> เพราะปีแรกรวมแค่บางเดือน ปีที่สองจะดูโตตกฮวบทั้งที่ธุรกิจเท่าเดิม</li>
+</ul>
+</div>
+</div>
+
+<div class="done-wrap"><button class="done" data-id="los45">✓ อ่านจบ LOS 4.5 แล้ว</button></div>
+</section>
+
+<section id="los46">
+<h3 class="los"><span class="n">LOS 4.6</span>อธิบายเกี่ยวกับค่าความนิยม และวิธีปฏิบัติเพื่อวัตถุประสงค์ในการวิเคราะห์ทางการเงิน</h3>
+
+<div class="box principle">
+<div class="bt">📌 นิยาม (คงประโยค)</div>
+<p class="quote">ค่าความนิยม หมายถึง <b>สินทรัพย์ที่แสดงถึงผลประโยชน์เชิงเศรษฐกิจในอนาคตที่ได้รับจากสินทรัพย์อื่นที่ได้รับมาจากการรวมธุรกิจ ซึ่งไม่สามารถระบุและรับรู้เป็นรายการแยกออกมาให้ชัดเจนได้</b></p>
+<p class="quote" style="margin-top:10px"><b>ค่าความนิยมไม่ตัดจำหน่าย แต่ต้องวัดการด้อยค่าอย่างสม่ำเสมอ</b></p>
+</div>
+
+<div class="box explain">
+<div class="bt">💡 ขยายความ — ค่าความนิยมคืออะไรกันแน่</div>
+<p>คือ <b>"ส่วนที่เหลือ (residual)"</b> หลังจากปันส่วนราคาซื้อให้สินทรัพย์และหนี้สินที่ระบุได้ครบแล้ว องค์ประกอบที่แท้จริงอาจเป็น:</p>
+<ul>
+<li><b>มูลค่าที่แท้จริง</b> — การผนึกกำลัง (synergy) · ทีมงานที่มีความสามารถ · ชื่อเสียงที่ระบุแยกไม่ได้</li>
+<li><b>มูลค่าลวง</b> — <b>การจ่ายแพงเกินไป (overpayment)</b> · การประเมินมูลค่ายุติธรรมผิดพลาด</li>
+</ul>
+<p>ด้วยเหตุนี้ <b>ค่าความนิยมจึงเป็นสินทรัพย์ที่มีคุณภาพต่ำที่สุดในงบแสดงฐานะการเงิน</b> — แปลงเป็นเงินสดแยกไม่ได้ ขายแยกไม่ได้ และมูลค่าขึ้นกับดุลยพินิจผู้บริหารสูงมาก</p>
+</div>
+
+<h4>การทดสอบการด้อยค่า</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค)</div>
+<p class="quote">ค่าความนิยม<b>ไม่ต้องตัดจำหน่ายอีกต่อไป แต่ต้องมีการทบทวนการด้อยค่าทุกปีอย่างน้อยเพื่อปรับลดมูลค่า หรือเมื่อมีข้อบ่งชี้การด้อยค่า</b></p>
+</div>
+<div class="box explain">
+<div class="bt">💡 กลไกการทดสอบ</div>
+<ol>
+<li><b>ปันส่วนค่าความนิยมเข้าหน่วยสินทรัพย์ที่ก่อให้เกิดเงินสด (CGU)</b> ที่คาดว่าจะได้ประโยชน์จากการผนึกกำลัง</li>
+<li>เปรียบเทียบ <b>มูลค่าที่คาดว่าจะได้รับคืนของ CGU</b> (จำนวนที่สูงกว่าระหว่าง <b>มูลค่าจากการใช้</b> กับ <b>มูลค่ายุติธรรมหักต้นทุนในการขาย</b>) กับ <b>มูลค่าตามบัญชีของ CGU</b></li>
+<li>ถ้ามูลค่าตามบัญชีสูงกว่า → รับรู้ <b>ขาดทุนจากการด้อยค่า</b> โดย <b>ตัดค่าความนิยมก่อนเป็นอันดับแรก</b> แล้วจึงเฉลี่ยลดสินทรัพย์อื่นตามสัดส่วน</li>
+<li><b>ขาดทุนจากการด้อยค่าของค่าความนิยมที่รับรู้แล้ว ห้ามกลับรายการในงวดถัดไป</b> ⚠️ <b>จุดออกสอบ</b></li>
+</ol>
+</div>
+
+<h4>วิธีปฏิบัติเพื่อวัตถุประสงค์ในการวิเคราะห์</h4>
+<ul>
+<li><b>ตัดค่าความนิยมออกจากสินทรัพย์รวมและส่วนของเจ้าของ</b> เพื่อคำนวณ <b>"สินทรัพย์สุทธิที่มีตัวตน (tangible book value)"</b> — ใช้เป็นฐานอนุรักษนิยมในการเทียบกับบริษัทที่โตเองโดยไม่ซื้อกิจการ ซึ่งจะไม่มีค่าความนิยมในงบเลย</li>
+<li><b>ปรับกำไรโดยบวกกลับขาดทุนจากการด้อยค่าค่าความนิยม</b> เมื่อวิเคราะห์แนวโน้มกำไร เพราะเป็นรายการที่ไม่ใช่เงินสดและเกิดครั้งเดียว</li>
+<li><b>ระวังสัญญาณเตือน (red flag)</b> — ค่าความนิยมที่สูงผิดปกติเทียบกับสินทรัพย์รวม · บริษัทที่ไม่เคยด้อยค่าเลยทั้งที่ธุรกิจที่ซื้อมาขาดทุนต่อเนื่อง · การด้อยค่าก้อนใหญ่ครั้งเดียวมักบ่งบอกว่า <b>จ่ายแพงเกินไปตั้งแต่แรก</b></li>
+<li><b>เปรียบเทียบข้ามบริษัทต้องระวัง</b> — บริษัทที่เติบโตด้วยการซื้อกิจการจะมีสินทรัพย์ไม่มีตัวตนสูงและ ROA ต่ำกว่าบริษัทที่เติบโตเอง ทั้งที่ธุรกิจจริงอาจไม่ต่างกัน</li>
+</ul>
+
+<div class="tutor">
+<div class="bt">🧑‍🏫 ติวเตอร์สรุปให้ — LOS 4.6</div>
+
+<div class="t-sec">
+<span class="t-lab">เล่าแบบบ้านๆ</span>
+<p>ค่าความนิยมคือ <b>"ใบเสร็จของส่วนที่จ่ายเกินโดยอธิบายไม่ได้"</b> ครับ</p>
+<p>เวลาซื้อบริษัท เราปันราคาซื้อให้ของที่จับต้องและระบุได้ก่อน — เครื่องจักร ที่ดิน แบรนด์ ฐานลูกค้า — พอปันหมดแล้วยังเหลือเงินอีกก้อน <b>ก้อนที่เหลือนั้นแหละคือค่าความนิยม</b></p>
+<p>คำถามสำคัญคือ ก้อนนั้นคืออะไรกันแน่? มีได้ 2 แบบ</p>
+<ul>
+<li><b>ของจริง</b> — การผนึกกำลัง ทีมงานเก่ง ชื่อเสียงที่แยกตีราคาไม่ได้</li>
+<li><b>ของปลอม</b> — <b>เราจ่ายแพงเกินไป</b> หรือตีมูลค่าผิด</li>
+</ul>
+<p>ปัญหาคือ <b>มองจากงบการเงินแยกไม่ออกว่าเป็นแบบไหน</b> จนกว่าจะถึงวันที่บริษัทรับรู้ <b>ด้อยค่าก้อนใหญ่</b> ซึ่งก็คือวันที่ผู้บริหารยอมรับกลายๆ ว่า "ตอนนั้นเราซื้อแพงไป"</p>
+<p>นักวิเคราะห์จึงมัก<b>ตัดค่าความนิยมออกจากทั้งสินทรัพย์และส่วนของเจ้าของ</b> เพื่อดู "มูลค่าที่จับต้องได้จริง" และเพื่อให้เทียบกับบริษัทที่โตเองได้อย่างยุติธรรม</p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">สูตรจำ</span>
+<div class="mnemo">ค่าความนิยม = <b>"เศษที่เหลือ"</b><br>คุณภาพต่ำสุดในงบ · ขายแยกไม่ได้ · ขึ้นกับดุลยพินิจ</div>
+<div class="mnemo">กฎเหล็ก 3 ข้อ:<br><b>ไม่ตัดจำหน่าย · ทดสอบด้อยค่าอย่างน้อยปีละครั้ง · ด้อยแล้วห้ามกลับรายการ</b></div>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">เก็งข้อสอบ &amp; วิธีทำ</span>
+<ul>
+<li><b>ข้อที่ออกแทบทุกชุด:</b> "ขาดทุนจากการด้อยค่าค่าความนิยมสามารถกลับรายการได้หรือไม่" → <b>ไม่ได้เด็ดขาด</b> (สินทรัพย์อื่นกลับได้ แต่ goodwill ห้าม)</li>
+<li><b>ข้อที่ดักคนจำครึ่งเดียว:</b> "ค่าความนิยมตัดจำหน่ายกี่ปี" → <b>ไม่ตัดจำหน่ายเลย</b> ตัวเลือกหลอกมักเป็น 10 ปี / 20 ปี (เป็นมาตรฐานเก่าที่ยกเลิกแล้ว)</li>
+<li><b>ลำดับการตัดเมื่อด้อยค่า:</b> <b>ตัดค่าความนิยมก่อนเป็นอันดับแรก</b> แล้วจึงเฉลี่ยลดสินทรัพย์อื่นตามสัดส่วน</li>
+<li><b>มูลค่าที่คาดว่าจะได้รับคืน:</b> จำว่า <b>"เลือกตัวที่สูงกว่า"</b> ระหว่างมูลค่าจากการใช้ กับ FV หักต้นทุนขาย (ข้อสอบชอบใส่คำว่า "ต่ำกว่า" มาหลอก)</li>
+<li><b>ข้อเชิงวิเคราะห์:</b> "บริษัท A โตด้วยการซื้อกิจการ บริษัท B โตเอง ทำไม ROA ของ A ต่ำกว่า" → ตอบ <b>A มีค่าความนิยมและสินทรัพย์ไม่มีตัวตนจาก PPA อยู่ในฐานสินทรัพย์ ส่วน B ไม่มี</b> แก้โดยเทียบบน tangible book value</li>
+</ul>
+</div>
+</div>
+
+<div class="done-wrap"><button class="done" data-id="los46">✓ อ่านจบ LOS 4.6 แล้ว</button></div>
+</section>
+
+<section id="los47">
+<h3 class="los"><span class="n">LOS 4.7</span>อธิบายประเด็นเกี่ยวกับวิธีการแต่งกำไรและการตรวจสอบการปรับแต่งกำไรเมื่อมีการรวมธุรกิจ</h3>
+
+<div class="box explain">
+<div class="bt">💡 โครงสร้างการวิเคราะห์ — แบ่งเป็น 2 ช่วงเวลา</div>
+<p>ตำราแบ่งประเด็นตรวจสอบออกเป็น <b>"ณ วันซื้อธุรกิจ"</b> (4 ประเด็น) และ <b>"ภายหลังซื้อธุรกิจ"</b> (4 ประเด็น) แต่ละประเด็นมี <b>ข้อควรคำนึง</b> และ <b>วิธีการตรวจสอบ</b> กำกับ</p>
+</div>
+
+<h4>ช่วงที่ 1 : ณ วันซื้อธุรกิจ</h4>
+<div class="tw"><table>
+<tr><th>ประเด็น</th><th>ข้อควรคำนึง</th><th>วิธีการตรวจสอบ</th></tr>
+<tr><td><b>① เหตุผลและความจำเป็นของการซื้อธุรกิจ</b></td><td>การซื้อธุรกิจนั้นมีความสมเหตุสมผลหรือไม่เมื่อพิจารณาจากกลยุทธ์และเป้าหมายทางธุรกิจของผู้ซื้อ</td><td>ประเมินเป้าหมายของการซื้อธุรกิจ และทบทวน MD&amp;A และแหล่งข้อมูลอื่นๆ เกี่ยวกับกลยุทธ์ทางธุรกิจ</td></tr>
+<tr><td><b>② ราคาที่จ่ายซื้อ</b></td><td>บ่อยครั้งการซื้อธุรกิจมักทำด้วยราคาจ่ายซื้อที่สูงเกินไป ซึ่งเป็นสัญญาณแรกของความล้มเหลวในอนาคต</td><td>ประเมินการตอบสนองของราคาหุ้นที่มีต่อข่าวสารเกี่ยวกับการตัดสินใจซื้อธุรกิจ รวมถึงพิจารณารายงานความเห็นของที่ปรึกษาอิสระที่เปิดเผยต่อสาธารณะ</td></tr>
+<tr><td><b>③ พิจารณากลยุทธ์ซื้อธุรกิจในระยะยาว</b></td><td>การซื้อธุรกิจหรือการขายกิจการบางส่วนหรือทั้งหมดที่เกิดขึ้นล่าสุดมีแนวโน้มเป็นอย่างไร</td><td>ทบทวนการซื้อธุรกิจทั้งหมดที่เกิดขึ้นในช่วง 5 ปีที่ผ่านมาหรือนานกว่านั้น และพิจารณาสิ่งบ่งชี้ในแง่กลยุทธ์ทางธุรกิจและความสำเร็จที่ตามมา</td></tr>
+<tr><td><b>④ ขนาดและโครงสร้างของการซื้อธุรกิจ</b></td><td>หากขนาดและโครงสร้างของการซื้อธุรกิจมีขนาดใหญ่และมีความยุ่งยากซับซ้อน จะเป็นสิ่งบ่งชี้แนวโน้มที่จะมีการปรับแต่งกำไรที่เพิ่มขึ้น</td><td>ทบทวนการซื้อธุรกิจต่างๆ และคำนวณขนาดและจำนวนเงินที่เกี่ยวข้อง การตอบสนองของผู้ลงทุน และหลักฐานเกี่ยวกับปัญหาต่างๆ ในเวลาต่อมา</td></tr>
+</table></div>
+
+<h4>ช่วงที่ 2 : ภายหลังซื้อธุรกิจ</h4>
+<div class="tw"><table>
+<tr><th>ประเด็น</th><th>ข้อควรคำนึง</th><th>วิธีการตรวจสอบ</th></tr>
+<tr><td><b>⑤ มูลค่าของสินทรัพย์มีการปันส่วนอย่างไร</b></td><td>การตัดสินใจเกี่ยวกับการปันส่วนมูลค่าของสินทรัพย์เป็นปัจจัยหนึ่งที่ส่งสัญญาณการปรับแต่งกำไร</td><td>กำหนดอัตราร้อยละของการปันส่วนไปสู่แต่ละรายการ</td></tr>
+<tr><td><b>⑥ สินทรัพย์ที่เสื่อมค่าได้หรือที่ตัดจำหน่ายได้</b></td><td>รายการเหล่านี้จะทำให้ค่าใช้จ่ายในการดำเนินงานในงวดอนาคตสูงขึ้น รายการเหล่านี้ดูเหมือนว่าจะสูงเกินไปหรือต่ำเกินไปหรือไม่</td><td>คำนวณอัตราร้อยละเมื่อเทียบกับราคาซื้อธุรกิจ และเปรียบเทียบอัตราร้อยละนี้ทั้งในแง่ของกิจการเองและในแง่ของอุตสาหกรรม</td></tr>
+<tr><td><b>⑦ การวิจัยและพัฒนาที่อยู่ระหว่างดำเนินการ</b></td><td>จะต้องมีการตัดจำหน่ายออก จำนวนที่ตัดจำหน่ายออกมีความสมเหตุสมผลหรือไม่</td><td>พิจารณา ประเมินและติดตามความเป็นไปได้ในการใช้ประโยชน์เชิงพาณิชย์ของโครงการวิจัยและพัฒนาที่อยู่ระหว่างดำเนินงาน</td></tr>
+<tr><td><b>⑧ ค่าความนิยม</b></td><td>ไม่ต้องตัดจำหน่ายอีกต่อไป แต่ต้องมีการทบทวนการด้อยค่าทุกปีอย่างน้อย หรือเมื่อมีข้อบ่งชี้การด้อยค่า ค่าความนิยมมีจำนวนสูงเกินไปเพื่อนำไปสู่การลดค่าใช้จ่ายต่างๆ ในอนาคตหรือไม่</td><td>พิจารณาและประเมินการด้อยค่าของค่าความนิยม รวมถึงการปฏิบัติตามมาตรฐานการรายงานทางการเงินที่เกี่ยวข้อง</td></tr>
+</table></div>
+
+<div class="box warn">
+<div class="bt">⚠️ กลไกการแต่งกำไรที่ต้องเข้าใจ — "เกมการปันส่วน"</div>
+<p>ผู้บริหารมีแรงจูงใจจะ <b>ปันส่วนราคาซื้อไปที่ค่าความนิยมให้มากที่สุด</b> และปันไปที่สินทรัพย์ที่ต้องตัดจำหน่ายให้น้อยที่สุด เพราะ:</p>
+<ul>
+<li><b>ค่าความนิยมไม่ตัดจำหน่าย</b> → ไม่กดกำไรในอนาคตเลย</li>
+<li><b>สินทรัพย์ไม่มีตัวตนที่มีอายุจำกัดต้องตัดจำหน่าย</b> → กดกำไรทุกปี</li>
+</ul>
+<p>ผลคือ <b>กำไรในปีถัดๆ ไปดูสูงเกินจริง</b> จนกว่าจะถึงวันที่ต้องรับรู้การด้อยค่าก้อนใหญ่ครั้งเดียว</p>
+<p style="margin-top:8px"><b>อีกกลไกหนึ่ง — "Big Bath":</b> ตั้งประมาณการหนี้สินจากการปรับโครงสร้างไว้สูงเกินจริง ณ วันซื้อ (กลบไปในค่าความนิยม ไม่กระทบกำไร) แล้วค่อยๆ <b>กลับรายการเข้ามาเป็นกำไร</b> ในปีถัดๆ ไป</p>
+</div>
+
+<div class="box explain">
+<div class="bt">💡 หมายเหตุเรื่องภาษี</div>
+<p>ตำราระบุว่าสินทรัพย์ที่เสื่อมค่าหรือตัดจำหน่ายได้ <b>"นำมาหักเป็นรายจ่ายทางภาษี (ในประเทศไทยไม่สามารถหักได้)"</b> — เป็นข้อแตกต่างระหว่างบริบทต่างประเทศกับไทยที่ควรจำไว้</p>
+</div>
+
+<div class="tutor">
+<div class="bt">🧑‍🏫 ติวเตอร์สรุปให้ — LOS 4.7</div>
+
+<div class="t-sec">
+<span class="t-lab">เล่าแบบบ้านๆ</span>
+<p>หัวใจของ LOS นี้คือ <b>"เกมการปันส่วน"</b> ครับ เข้าใจเกมนี้เกมเดียว ตอบได้ทั้งหัวข้อ</p>
+<p>สมมติเราจ่ายซื้อบริษัทไป 1,000 ล้าน ตอนนี้เราต้องเลือกว่าจะปันเงินก้อนนี้ไปไว้ที่ไหน</p>
+<ul>
+<li><b>ปันไปที่เครื่องจักร/สินทรัพย์ไม่มีตัวตนที่มีอายุจำกัด</b> → ต้องตัดค่าเสื่อม/ค่าตัดจำหน่าย <b>กดกำไรทุกปี</b> ไปอีก 10 ปี</li>
+<li><b>ปันไปที่ค่าความนิยม</b> → <b>ไม่ต้องตัดจำหน่ายเลย กำไรไม่ถูกกดสักบาท</b></li>
+</ul>
+<p>ถ้าคุณเป็น CEO ที่โบนัสผูกกับกำไร คุณจะเลือกอะไร? — ใช่ครับ <b>ยัดเข้าค่าความนิยมให้มากที่สุด</b> นี่คือแรงจูงใจแต่งกำไรที่ซ่อนอยู่ในทุกดีล</p>
+<p>อีกท่าหนึ่งคือ <b>Big Bath</b> — ตั้งสำรองค่าปรับโครงสร้างไว้เยอะๆ ตอนซื้อ (เพราะมันไปกลบในค่าความนิยม ไม่กระทบกำไรปีนั้น) แล้วปีถัดๆ ไปค่อยๆ <b>กลับรายการออกมาเป็นกำไร</b> ทำให้ดูเหมือนบริหารเก่ง</p>
+<p>ส่วนตาราง 8 ประเด็นในตำรา ให้จำว่าแบ่ง<b>ก่อน-หลัง</b>อย่างละ 4 ข้อ แต่ละข้อมีคู่ <b>"ข้อควรคำนึง + วิธีตรวจสอบ"</b> เสมอ</p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">สูตรจำ</span>
+<div class="mnemo"><b>ณ วันซื้อ (4 ข้อ):</b><br>ทำไมซื้อ → แพงไปไหม → ที่ผ่านมาทำมากี่ดีล → ดีลนี้ใหญ่/ซับซ้อนแค่ไหน</div>
+<div class="mnemo"><b>หลังซื้อ (4 ข้อ):</b><br>ปันส่วนยังไง → ของที่ต้องตัดจำหน่าย → R&amp;D ระหว่างทำ → ค่าความนิยม</div>
+<p><b>แรงจูงใจแต่งกำไร:</b> <span style="color:var(--tutor)"><b>"ยัดเข้า Goodwill ให้มาก ยัดเข้าของที่ต้องตัดจำหน่ายให้น้อย"</b></span></p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">เก็งข้อสอบ &amp; วิธีทำ</span>
+<ul>
+<li><b>แนวข้อสอบหลัก:</b> ให้สถานการณ์มาแล้วถามว่าเป็นสัญญาณการแต่งกำไรหรือไม่ → <b>ดูว่าการตัดสินใจนั้นทำให้ค่าใช้จ่ายในอนาคตลดลงหรือไม่</b> ถ้าใช่ = สัญญาณเตือน</li>
+<li><b>ข้อที่ออกบ่อย:</b> "ราคาที่จ่ายซื้อสูงเกินไป เป็นสัญญาณอะไร" → ตำราใช้คำว่า <b>"สัญญาณแรกของความล้มเหลวในอนาคต"</b> จำประโยคนี้ไว้</li>
+<li><b>วิธีตรวจสอบที่ถามตรงๆ:</b> เรื่องราคาจ่ายซื้อ → <b>ดูการตอบสนองของราคาหุ้นต่อข่าวดีล + รายงานที่ปรึกษาอิสระ</b> / เรื่องกลยุทธ์ระยะยาว → <b>ทบทวนดีลย้อนหลัง 5 ปี</b> (ตัวเลข 5 ปีนี้ออกสอบได้)</li>
+<li><b>ข้อเชื่อมกับ LOS 4.6:</b> ถ้าถามว่าทำไมค่าความนิยมสูงผิดปกติจึงเป็น red flag → ตอบ <b>อาจเกิดจากการปันส่วนเพื่อเลี่ยงค่าตัดจำหน่ายในอนาคต และมักจบด้วยการด้อยค่าก้อนใหญ่</b></li>
+<li><b>เกร็ดบริบทไทย:</b> ตำราวงเล็บไว้ว่า <b>"ในประเทศไทยไม่สามารถหักเป็นรายจ่ายทางภาษีได้"</b> — เป็นจุดที่อาจถูกหยิบมาถามความเข้าใจเรื่องความแตกต่างของบริบท</li>
+</ul>
+</div>
+</div>
+
+<div class="done-wrap"><button class="done" data-id="los47">✓ อ่านจบ LOS 4.7 แล้ว</button></div>
+</section>
+
+<section id="los48">
+<h3 class="los"><span class="n">LOS 4.8</span>อธิบายหลักเกณฑ์และประโยชน์ของการรายงานข้อมูลทางการเงินจำแนกตามส่วนงาน</h3>
+
+<div class="box explain">
+<div class="bt">💡 หัวข้อนี้ต่อเนื่องจาก LOS 3.4 และ 3.5</div>
+<p>หลักเกณฑ์ทั้งหมด (นิยาม 3 ข้อ · เกณฑ์ 10% · เกณฑ์ 75% · การเปิดเผย 3 กลุ่ม) ได้อธิบายไว้แล้วใน <a href="#los34" style="color:var(--brand);font-weight:700">LOS 3.4</a> และ <a href="#los35" style="color:var(--brand);font-weight:700">LOS 3.5</a> ในบทที่ 4 จะเน้นการเชื่อมโยงเข้ากับ <b>บริบทของการรวมธุรกิจ</b></p>
+</div>
+
+<div class="box principle">
+<div class="bt">📌 หลักการ — วัตถุประสงค์ของ TFRS 8 (คงประโยค)</div>
+<p class="quote">กิจการต้อง<b>เปิดเผยข้อมูลเพื่อให้ผู้ใช้งบการเงินสามารถประเมินลักษณะและผลกระทบทางการเงินของกิจกรรมทางธุรกิจที่กิจการดำเนินอยู่ และสภาพแวดล้อมทางเศรษฐกิจที่กิจการดำเนินงานอยู่</b></p>
+</div>
+
+<h4>ความสำคัญพิเศษในบริบทการรวมธุรกิจ</h4>
+<ul>
+<li><b>ตรวจสอบว่าการซื้อกิจการคุ้มค่าจริงหรือไม่</b> — เมื่อบริษัทซื้อธุรกิจใหม่มาแล้วตั้งเป็นส่วนงานใหม่ เราจะเห็นรายได้และกำไรของธุรกิจนั้นแยกออกมา ทำให้ติดตาม <b>ผลตอบแทนจากเงินที่จ่ายซื้อ</b> ได้</li>
+<li><b>เป็นสัญญาณเตือนเมื่อโครงสร้างส่วนงานเปลี่ยน</b> — ถ้าบริษัทเอาธุรกิจที่เพิ่งซื้อมา <b>ยุบรวมเข้ากับส่วนงานเดิมที่ทำกำไรดี</b> ให้สงสัยว่าอาจกำลังซ่อนผลขาดทุน</li>
+<li><b>เชื่อมโยงกับการทดสอบด้อยค่าค่าความนิยม</b> — CGU ที่ปันส่วนค่าความนิยมเข้าไป <b>ต้องไม่ใหญ่กว่าส่วนงานดำเนินงาน</b> ดังนั้นข้อมูลส่วนงานช่วยให้ประเมินได้ว่าค่าความนิยมควรด้อยค่าหรือยัง</li>
+<li><b>แยกการเติบโตจากการซื้อกิจการออกจากการเติบโตจากธุรกิจเดิม</b> — เป็นหัวใจของการประเมินคุณภาพการเติบโต</li>
+</ul>
+
+<div class="tutor">
+<div class="bt">🧑‍🏫 ติวเตอร์สรุปให้ — LOS 4.8</div>
+
+<div class="t-sec">
+<span class="t-lab">เล่าแบบบ้านๆ</span>
+<p>LOS นี้คือ <b>"LOS 3.4 + 3.5 สวมหมวกการรวมธุรกิจ"</b> ครับ หลักเกณฑ์ไม่มีอะไรใหม่เลย แต่<b>มุมที่ถามเปลี่ยนไป</b></p>
+<p>ลองคิดแบบนี้ — บริษัทซื้อกิจการมาด้วยเงิน 5,000 ล้าน แล้วบอกว่า "ดีลนี้คุ้มมาก" เราจะเช็กยังไง?</p>
+<p>คำตอบคือ <b>ดูรายงานส่วนงาน</b> ถ้าธุรกิจที่ซื้อมาตั้งเป็นส่วนงานใหม่ เราจะเห็นรายได้ กำไร และสินทรัพย์ของมันแยกออกมา แล้วคำนวณได้เลยว่า<b>ผลตอบแทนจากเงิน 5,000 ล้านที่จ่ายไป เป็นเท่าไร</b></p>
+<p>และนี่คือ<b>สัญญาณเตือนที่สำคัญมาก</b> — ถ้าปีถัดมาบริษัทจู่ๆ <b>ยุบส่วนงานนั้นไปรวมกับส่วนงานเดิมที่กำไรดี</b> ให้ตั้งข้อสงสัยทันทีว่ากำลังซ่อนผลขาดทุนของดีลที่ล้มเหลวอยู่หรือเปล่า</p>
+<p>อีกจุดที่ลึกขึ้นมาหน่อย: <b>CGU ที่ใช้ทดสอบด้อยค่าค่าความนิยม ต้องไม่ใหญ่กว่าส่วนงานดำเนินงาน</b> — ข้อมูลส่วนงานจึงเป็นเครื่องมือตรวจสอบว่าค่าความนิยมควรถูกด้อยค่าแล้วหรือยัง</p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">สูตรจำ</span>
+<div class="mnemo">ส่วนงาน + M&amp;A =<br><b>"ดีลคุ้มไหม · ซ่อนขาดทุนหรือเปล่า · goodwill ควรด้อยยัง"</b></div>
+<p><b>กฎที่ต้องจำ:</b> <span style="color:var(--tutor)"><b>"CGU ต้องไม่ใหญ่กว่าส่วนงานดำเนินงาน"</b></span></p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">เก็งข้อสอบ &amp; วิธีทำ</span>
+<ul>
+<li><b>ข้อที่ออกได้ทันที:</b> ใช้หลักเกณฑ์เดียวกับ LOS 3.5 ทั้งหมด — <b>เกณฑ์ 10% (ข้อใดข้อหนึ่ง) · เกณฑ์ 75% · เปิดเผย 3 กลุ่ม</b> ถ้าท่อง 3.5 ได้ ข้อนี้ได้ฟรี</li>
+<li><b>มุมใหม่ที่ต้องเตรียม:</b> ถามเชิงวิเคราะห์ว่า "ข้อมูลส่วนงานช่วยประเมินการซื้อกิจการอย่างไร" → ตอบ <b>ติดตามผลตอบแทนจากเงินที่จ่ายซื้อได้ และเห็นว่าดีลนั้นสร้างกำไรจริงหรือไม่</b></li>
+<li><b>คำถามดัก red flag:</b> "บริษัทเปลี่ยนโครงสร้างการรายงานส่วนงานหลังซื้อกิจการ 1 ปี สื่อถึงอะไร" → <b>อาจกำลังกลบผลขาดทุนของกิจการที่ซื้อมา และทำให้เปรียบเทียบย้อนหลังไม่ได้</b></li>
+<li><b>วัตถุประสงค์ TFRS 8 ที่อาจถามตรงตัว:</b> ท่องประโยค <b>"ประเมินลักษณะและผลกระทบทางการเงินของกิจกรรมทางธุรกิจ และสภาพแวดล้อมทางเศรษฐกิจที่กิจการดำเนินงานอยู่"</b></li>
+</ul>
+</div>
+</div>
+
+<div class="done-wrap"><button class="done" data-id="los48">✓ อ่านจบ LOS 4.8 แล้ว</button></div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ บทที่ 5 ============ -->
+<h2 class="ch" id="ch5"><small>CHAPTER 5</small>การวิเคราะห์การดำเนินธุรกิจข้ามชาติ</h2>
+
+<section id="los51">
+<h3 class="los"><span class="n">LOS 5.1</span>อธิบายผลกระทบของอัตราแลกเปลี่ยนที่มีต่องบการเงินของบริษัทที่มีการดำเนินธุรกิจข้ามชาติ</h3>
+
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค) — ประเด็นหลัก 2 ข้อ</div>
+<p class="quote">ประเด็นหลักในการบัญชีสำหรับรายการที่เป็นเงินตราต่างประเทศและหน่วยงานต่างประเทศ คือ<br>
+(1) <b>การพิจารณาว่าจะใช้อัตราแลกเปลี่ยนใด</b> และ<br>
+(2) <b>การรายงานผลกระทบจากการเปลี่ยนแปลงของอัตราแลกเปลี่ยนในงบการเงินอย่างไร</b></p>
+</div>
+
+<div class="box explain">
+<div class="bt">💡 ขยายความ — 2 เรื่องที่ต้องแยกให้ออก</div>
+<div class="tw"><table>
+<tr><th>ประเด็น</th><th>รายการที่เป็นเงินตราต่างประเทศ</th><th>การแปลงค่างบการเงินของหน่วยงานต่างประเทศ</th></tr>
+<tr><td>เกิดขึ้นเมื่อ</td><td>กิจการทำรายการค้าเป็นสกุลเงินอื่น เช่น ส่งออก นำเข้า กู้เงินต่างประเทศ</td><td>กิจการมีบริษัทย่อย/สาขาในต่างประเทศ ที่ใช้สกุลเงินอื่น</td></tr>
+<tr><td>ผลต่างรับรู้ที่ไหน</td><td><b>กำไรหรือขาดทุน (P/L)</b></td><td><b>กำไรขาดทุนเบ็ดเสร็จอื่น (OCI)</b></td></tr>
+<tr><td>กระทบกำไรสุทธิ</td><td><b>กระทบ</b></td><td><b>ไม่กระทบ</b></td></tr>
+</table></div>
+<p style="margin-top:10px"><b>นี่คือเส้นแบ่งที่ออกสอบซ้ำที่สุดในบทนี้</b> — "ขายของไปต่างประเทศแล้วค่าเงินเปลี่ยน" เข้า P/L ส่วน "แปลงงบบริษัทย่อยต่างประเทศ" เข้า OCI</p>
+</div>
+
+<h4>ผลกระทบเชิงธุรกิจของอัตราแลกเปลี่ยน</h4>
+<ul>
+<li><b>ผู้ส่งออก</b> — เงินบาทอ่อนค่า → รายได้เมื่อแปลงเป็นบาทสูงขึ้น → <b>กำไรดีขึ้น</b></li>
+<li><b>ผู้นำเข้า / ผู้ที่มีหนี้สกุลต่างประเทศ</b> — เงินบาทอ่อนค่า → ต้นทุนและภาระหนี้เป็นบาทสูงขึ้น → <b>ขาดทุนจากอัตราแลกเปลี่ยน</b></li>
+<li><b>บริษัทที่มีบริษัทย่อยในต่างประเทศ</b> — เงินสกุลท้องถิ่นแข็งค่าเทียบกับบาท → เมื่อแปลงงบกลับมา <b>สินทรัพย์ รายได้ และกำไรในงบรวมเพิ่มขึ้น</b> ทั้งที่ธุรกิจจริงอาจไม่ได้โตเลย</li>
+</ul>
+
+<div class="tutor">
+<div class="bt">🧑‍🏫 ติวเตอร์สรุปให้ — LOS 5.1</div>
+
+<div class="t-sec">
+<span class="t-lab">เล่าแบบบ้านๆ</span>
+<p>ทั้งบทที่ 5 ยืนอยู่บน <b>เส้นแบ่งเส้นเดียว</b> ครับ ถ้าจำเส้นนี้ได้ จะตอบได้ครึ่งบท</p>
+<div class="mnemo" style="margin-top:8px">
+<b>ทำการค้าเป็นเงินต่างประเทศ → กำไรขาดทุน (P/L)</b><br>
+<b>แปลงงบบริษัทย่อยต่างประเทศ → OCI</b>
+</div>
+<p style="margin-top:10px">ทำไมถึงต่างกัน? เหตุผลง่ายมาก</p>
+<ul>
+<li><b>รายการค้า</b> เช่น เรามีลูกหนี้ 1 ล้านดอลลาร์ — <b>เดี๋ยวเงินก้อนนี้จะเข้ากระเป๋าเราจริงๆ</b> ค่าเงินขยับ = เราได้/เสียเงินจริง จึงต้องเข้ากำไรขาดทุน</li>
+<li><b>แปลงงบบริษัทย่อย</b> — บริษัทลูกที่อเมริกายังทำธุรกิจของมันอยู่ดี <b>เราไม่ได้จะขายมันวันนี้ ไม่มีเงินสดเข้าออกจริง</b> เป็นแค่การ "แปลงหน่วยวัด" เพื่อเอามารวมงบ จึงพักไว้ใน OCI ก่อน</li>
+</ul>
+<p>และตอนขายบริษัทย่อยทิ้งเมื่อไร ยอดสะสมใน OCI (CTA) <b>ถึงจะไหลเข้ากำไรขาดทุน</b> เพราะตอนนั้นกำไร/ขาดทุนเกิดขึ้นจริงแล้ว</p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">สูตรจำ</span>
+<div class="mnemo"><b>"ค้าขาย เข้ากำไร · แปลงงบ เข้า OCI"</b></div>
+<p><b>ทิศทางธุรกิจ:</b> <span style="color:var(--tutor)"><b>"บาทอ่อน ส่งออกยิ้ม นำเข้าร้องไห้"</b></span></p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">เก็งข้อสอบ &amp; วิธีทำ</span>
+<ul>
+<li><b>รูปแบบที่ออกบ่อยที่สุด:</b> ให้สถานการณ์มาแล้วถามว่า<b>ผลต่างอัตราแลกเปลี่ยนรับรู้ที่ไหน</b> → อ่านหาคำว่า "ลูกหนี้/เจ้าหนี้/เงินกู้" (= P/L) หรือ "บริษัทย่อยในต่างประเทศ/แปลงค่างบการเงิน" (= OCI)</li>
+<li><b>ข้อที่พลาดกันเยอะ:</b> กำไรจากอัตราแลกเปลี่ยนของ<b>รายการค้า</b>กระทบ<b>กำไรสุทธิและ EPS</b> ส่วน<b>การแปลงงบ ไม่กระทบกำไรสุทธิและ EPS เลย</b></li>
+<li><b>ประเด็นหลัก 2 ข้อที่อาจถามตรงตัว:</b> ท่องว่า <b>"(1) ใช้อัตราแลกเปลี่ยนใด (2) รายงานผลกระทบอย่างไร"</b></li>
+<li><b>ข้อเชิงธุรกิจ:</b> ถามว่าบริษัทส่งออกได้ประโยชน์เมื่อค่าเงินเป็นอย่างไร → <b>เงินบาทอ่อนค่า</b> (ได้บาทมากขึ้นต่อ 1 ดอลลาร์)</li>
+</ul>
+</div>
+</div>
+
+<div class="done-wrap"><button class="done" data-id="los51">✓ อ่านจบ LOS 5.1 แล้ว</button></div>
+</section>
+
+<section id="los52">
+<h3 class="los"><span class="n">LOS 5.2</span>อธิบายหลักการบัญชีและหลักการเปิดเผยข้อมูลเกี่ยวกับผลต่างของอัตราแลกเปลี่ยน</h3>
+
+<h4>① สกุลเงินที่ใช้ในการดำเนินงาน (Functional Currency)</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค)</div>
+<p class="quote">สกุลเงินที่ใช้ในการดำเนินงาน หมายถึง <b>สกุลเงินที่ใช้ในสภาพแวดล้อมทางเศรษฐกิจหลักที่กิจการดำเนินงานอยู่</b></p>
+</div>
+
+<div class="box principle">
+<div class="bt">📌 ปัจจัยหลักในการพิจารณา (คงประโยค)</div>
+<p class="quote">
+(ก) <b>สกุลเงินที่มีอิทธิพลอย่างมากต่อราคาขายของสินค้าและบริการ</b> (มักเป็นสกุลเงินที่ใช้ในการกำหนดราคาขายและใช้ชำระราคา) และ<b>สกุลเงินของประเทศที่แรงผลักดันของการแข่งขันและกฎข้อบังคับต่างๆ เป็นตัวกำหนดราคาขายของสินค้าและบริการของกิจการเป็นส่วนใหญ่</b><br>
+(ข) <b>สกุลเงินที่มีอิทธิพลอย่างมากต่อต้นทุนค่าแรงงาน ค่าวัตถุดิบ และต้นทุนอื่นๆ ในการจัดหาสินค้าหรือบริการ</b>
+</p>
+<p class="quote" style="margin-top:10px"><b>ปัจจัยประกอบอื่น</b> ได้แก่ <b>สกุลเงินที่ได้มาจากกิจกรรมจัดหาเงิน</b> และ<b>สกุลเงินของเงินที่ได้รับจากกิจกรรมดำเนินงานที่มักจะดำรงไว้</b></p>
+</div>
+
+<div class="box warn">
+<div class="bt">⚠️ ต้องแยก 3 คำนี้ให้ขาด</div>
+<div class="tw"><table>
+<tr><th>คำศัพท์</th><th>ความหมาย</th></tr>
+<tr><td><b>สกุลเงินต่างประเทศ</b><br>(foreign currency)</td><td>สกุลเงินอื่นนอกเหนือจากสกุลเงินที่ใช้ในการดำเนินงานของกิจการ</td></tr>
+<tr><td><b>สกุลเงินที่ใช้ในการดำเนินงาน</b><br>(functional currency)</td><td>สกุลเงินในสภาพแวดล้อมทางเศรษฐกิจหลักที่กิจการดำเนินงานอยู่ — <b>กิจการเลือกไม่ได้ ต้องพิจารณาจากข้อเท็จจริง</b></td></tr>
+<tr><td><b>สกุลเงินที่ใช้นำเสนองบการเงิน</b><br>(presentation currency)</td><td>สกุลเงินที่ใช้ในการนำเสนองบการเงิน — <b>กิจการเลือกได้อย่างอิสระ</b></td></tr>
+</table></div>
+</div>
+
+<h4>② รายการที่เป็นตัวเงิน vs ไม่เป็นตัวเงิน</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค)</div>
+<p class="quote"><b>รายการที่เป็นตัวเงิน</b> หมายถึง <b>สิทธิที่จะได้รับหรือภาระผูกพันที่จะต้องจ่ายเป็นจำนวนเงินที่กำหนดไว้หรือสามารถกำหนดจำนวนได้</b></p>
+</div>
+<div class="tw"><table>
+<tr><th class="c">รายการที่เป็นตัวเงิน (Monetary)</th><th class="c">รายการที่ไม่เป็นตัวเงิน (Non-monetary)</th></tr>
+<tr><td>เงินสดและรายการเทียบเท่าเงินสด<br>ลูกหนี้การค้า · เงินให้กู้ยืม<br>เจ้าหนี้การค้า · เงินกู้ยืม · หุ้นกู้<br>ประมาณการหนี้สินที่จ่ายเป็นเงินสด<br>เงินปันผลค้างจ่าย</td><td>สินค้าคงเหลือ<br>ที่ดิน อาคาร และอุปกรณ์<br>สินทรัพย์ไม่มีตัวตน · ค่าความนิยม<br>เงินจ่ายล่วงหน้าค่าสินค้า<br>รายได้รับล่วงหน้า<br>ทุนเรือนหุ้น</td></tr>
+</table></div>
+<div class="box explain">
+<div class="bt">💡 เทคนิคแยก</div>
+<p>ถามว่า <b>"รายการนี้จะกลายเป็นเงินสดจำนวนที่แน่นอนหรือไม่?"</b> — ลูกหนี้ 100 ดอลลาร์ จะได้ 100 ดอลลาร์แน่นอน → <b>เป็นตัวเงิน</b> ส่วนสินค้าคงเหลือที่ซื้อมา 100 ดอลลาร์ จะขายได้เท่าไรไม่รู้ → <b>ไม่เป็นตัวเงิน</b></p>
+<p><b>จุดหลอก:</b> "เงินจ่ายล่วงหน้าค่าสินค้า" และ "รายได้รับล่วงหน้า" <b>ไม่เป็นตัวเงิน</b> เพราะจะได้รับ/ส่งมอบเป็น <b>สินค้า</b> ไม่ใช่เงินสด</p>
+</div>
+
+<h4>③ หลักการแปลงค่ารายการที่เป็นเงินตราต่างประเทศ</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค)</div>
+<p class="quote">
+<b>ณ วันที่เกิดรายการ</b> — แปลงค่าด้วย<b>อัตราแลกเปลี่ยนทันที ณ วันที่เกิดรายการ</b><br>
+<b>ณ วันสิ้นรอบระยะเวลารายงาน</b> —<br>
+(ก) <b>รายการที่เป็นตัวเงิน ให้แปลงค่าด้วยอัตราปิด</b><br>
+(ข) <b>รายการที่ไม่เป็นตัวเงินซึ่งวัดมูลค่าด้วยราคาทุนเดิม ให้แปลงค่าด้วยอัตราแลกเปลี่ยน ณ วันที่เกิดรายการ</b><br>
+(ค) <b>รายการที่ไม่เป็นตัวเงินซึ่งวัดมูลค่าด้วยมูลค่ายุติธรรม ให้แปลงค่าด้วยอัตราแลกเปลี่ยน ณ วันที่มีการวัดมูลค่ายุติธรรมนั้น</b>
+</p>
+</div>
+
+<div class="box principle">
+<div class="bt">📌 นิยาม "อัตราปิด" (คงประโยค)</div>
+<p class="quote">อัตราปิด คือ <b>อัตราแลกเปลี่ยนทันที ณ วันที่ในงบแสดงฐานะการเงิน</b> โดย<b>สินทรัพย์ให้ใช้อัตราแลกเปลี่ยนที่ธนาคารพาณิชย์รับซื้อ (อัตราซื้อ)</b> ส่วน<b>หนี้สินให้ใช้อัตราแลกเปลี่ยนที่ธนาคารพาณิชย์เสนอขาย (อัตราขาย) ณ วันที่ในงบแสดงฐานะการเงิน</b></p>
+</div>
+<div class="box warn">
+<div class="bt">⚠️ ออกสอบบ่อยมาก — อัตราซื้อ / อัตราขาย</div>
+<p>มองจาก <b>มุมของธนาคาร</b> เสมอ:</p>
+<ul>
+<li><b>กิจการมีสินทรัพย์เป็นเงินตราต่างประเทศ</b> (เช่น เงินฝาก USD, ลูกหนี้ USD) → จะเอาไป <b>ขายให้ธนาคาร</b> → ธนาคารเป็นฝ่ายซื้อ → ใช้ <b>อัตราซื้อ (bid)</b></li>
+<li><b>กิจการมีหนี้สินเป็นเงินตราต่างประเทศ</b> (เช่น เจ้าหนี้ USD) → ต้องไป <b>ซื้อเงินจากธนาคาร</b> → ธนาคารเป็นฝ่ายขาย → ใช้ <b>อัตราขาย (ask)</b></li>
+</ul>
+<p><b>สรุปสั้น: สินทรัพย์ใช้อัตราซื้อ · หนี้สินใช้อัตราขาย</b></p>
+</div>
+
+<div class="box ex">
+<div class="bt">✅ ตัวอย่าง 5-1 — ผลต่างอัตราแลกเปลี่ยนจากรายการค้า</div>
+<p>1 พ.ย. บริษัทไทยขายสินค้าให้ลูกค้าต่างประเทศ 100,000 USD (อัตรา 34.00) · 31 ธ.ค. ยังไม่ได้รับชำระ อัตราซื้อ = 35.50</p>
+<ul>
+<li>บันทึกขาย 1 พ.ย. = 100,000 × 34.00 = <b>3,400,000 บาท</b></li>
+<li>ลูกหนี้ ณ 31 ธ.ค. (รายการที่เป็นตัวเงิน ใช้อัตราปิด–อัตราซื้อ) = 100,000 × 35.50 = <b>3,550,000 บาท</b></li>
+<li><b>กำไรจากอัตราแลกเปลี่ยน = 150,000 บาท → รับรู้ในกำไรหรือขาดทุน</b></li>
+</ul>
+<p><b>สังเกต:</b> <b>รายได้จากการขายยังคงเป็น 3,400,000 บาทเท่าเดิม ไม่ปรับ</b> — กำไร 150,000 บาทแสดงแยกเป็น "กำไรจากอัตราแลกเปลี่ยน" เพราะรายได้เป็นรายการที่เกิดขึ้น ณ วันนั้นแล้ว</p>
+</div>
+
+<h4>④ การแปลงค่างบการเงินเป็นสกุลเงินที่ใช้นำเสนอ</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ — ตารางที่ 5-4 (คงประโยค)</div>
+<p class="quote">
+<b>สินทรัพย์และหนี้สิน</b> (ทั้งงวดปัจจุบันและงวดเปรียบเทียบ) — <b>แปลงค่าด้วยอัตราปิด ณ วันที่ในงบแสดงฐานะทางการเงิน</b><br>
+<b>รายได้ ค่าใช้จ่าย และรายการกำไรขาดทุนเบ็ดเสร็จ</b> — <b>แปลงค่าด้วยอัตราแลกเปลี่ยน ณ วันที่เกิดรายการ หรืออัตราถัวเฉลี่ยที่เหมาะสมสำหรับรอบบัญชีนั้นๆ</b><br>
+<b>ผลต่างของอัตราแลกเปลี่ยนทั้งหมดที่เกิดขึ้นให้รับรู้ในกำไรขาดทุนเบ็ดเสร็จอื่น</b>
+</p>
+</div>
+<div class="box explain">
+<div class="bt">💡 หมายเหตุเรื่องส่วนของเจ้าของ</div>
+<p>ตารางในตำราระบุว่าส่วนของผู้ถือหุ้น <b>"ไม่ระบุ"</b> เพราะ TAS 21 ไม่ได้กำหนดอัตราไว้ชัดเจน — <b>ในทางปฏิบัตินิยมใช้อัตราตามประวัติ (historical rate)</b> คือ อัตรา ณ วันที่เกิดรายการทุน และกำไรสะสมเป็นยอดยกมาบวกกำไรที่แปลงค่าแล้ว ลบเงินปันผลที่แปลงด้วยอัตรา ณ วันประกาศจ่าย</p>
+</div>
+
+<h4>⑤ การรับรู้ผลต่างจากการแปลงค่า</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค)</div>
+<p class="quote"><b>ผลสะสมของผลต่างของอัตราแลกเปลี่ยนจะถูกแสดงแยกต่างหากในองค์ประกอบของส่วนของเจ้าของ จนกว่าจะมีการจำหน่ายหน่วยงานต่างประเทศนั้น</b></p>
+<p class="quote" style="margin-top:10px"><b>ผลต่างจากการแปลงค่าที่เป็นส่วนได้เสียที่ไม่มีอำนาจควบคุม จะถูกจัดสรรและรายงานเป็นส่วนหนึ่งของส่วนได้เสียที่ไม่มีอำนาจควบคุมในงบแสดงฐานะการเงินรวม</b></p>
+</div>
+<div class="box explain">
+<div class="bt">💡 ขยายความ — CTA</div>
+<p>ยอดสะสมนี้มักเรียกว่า <b>"ผลต่างจากการแปลงค่างบการเงิน (Cumulative Translation Adjustment: CTA)"</b> แสดงเป็นบรรทัดหนึ่งในส่วนของเจ้าของ</p>
+<ul>
+<li><b>สะสมไปเรื่อยๆ ไม่กระทบกำไรสุทธิเลย</b> ตลอดเวลาที่ยังถือหน่วยงานต่างประเทศอยู่</li>
+<li><b>เมื่อจำหน่ายหน่วยงานต่างประเทศ ให้จัดประเภทยอดสะสมใน CTA ใหม่เข้ากำไรหรือขาดทุน (recycling)</b> เป็นส่วนหนึ่งของกำไร/ขาดทุนจากการจำหน่าย</li>
+<li><b>จุดหลอก:</b> ถ้าถือหุ้น 80% ผลต่างต้อง <b>ปันส่วนให้ NCI 20% ด้วย</b> ไม่ใช่ทั้งหมดเป็นของบริษัทใหญ่</li>
+</ul>
+</div>
+
+<h4>⑥ การป้องกันความเสี่ยง (Hedges)</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค)</div>
+<p class="quote"><b>การป้องกันความเสี่ยงในมูลค่ายุติธรรม (Fair Value Hedge)</b> คือการป้องกันความเสี่ยงจาก<b>การเปลี่ยนแปลงในมูลค่ายุติธรรม</b>ของสินทรัพย์หรือหนี้สินที่รับรู้ในงบการเงิน หรือสัญญาผูกมัดที่ยังไม่รับรู้</p>
+<p class="quote" style="margin-top:8px"><b>การป้องกันความเสี่ยงในกระแสเงินสด (Cash Flow Hedge)</b> คือการป้องกันความเสี่ยงจาก<b>ความผันผวนของกระแสเงินสด</b>ที่คาดว่าจะเกิดขึ้นในอนาคต</p>
+<p class="quote" style="margin-top:8px"><b>เป้าหมายคือการหักกลบกำไรหรือขาดทุนจากเครื่องมือที่ใช้ป้องกันความเสี่ยง (เช่น สัญญาฟอร์เวิร์ด) กับรายการที่มีการป้องกันความเสี่ยง เพื่อลดความไม่แน่นอนของกำไรขาดทุนในงบการเงิน</b></p>
+</div>
+<div class="box explain">
+<div class="bt">💡 ขยายความ</div>
+<ul>
+<li><b>Fair Value Hedge</b> — กำไร/ขาดทุนของ <b>ทั้งเครื่องมือและรายการที่ป้องกัน</b> รับรู้ใน <b>กำไรขาดทุน</b> ในงวดเดียวกัน จึงหักกลบกันทันที</li>
+<li><b>Cash Flow Hedge</b> — ส่วนที่มีประสิทธิผลรับรู้ใน <b>OCI</b> ก่อน แล้วจึงโอนเข้ากำไรขาดทุน <b>เมื่อรายการที่ป้องกันความเสี่ยงส่งผลกระทบต่อกำไรขาดทุน</b> ส่วนที่ไม่มีประสิทธิผลรับรู้ใน <b>กำไรขาดทุน</b> ทันที</li>
+<li><b>Hedge of a net investment in a foreign operation</b> — ป้องกันความเสี่ยงของเงินลงทุนสุทธิในหน่วยงานต่างประเทศ ปฏิบัติคล้าย cash flow hedge คือเข้า <b>OCI</b> และ recycle เมื่อจำหน่ายหน่วยงานนั้น</li>
+</ul>
+</div>
+
+<div class="tutor">
+<div class="bt">🧑‍🏫 ติวเตอร์สรุปให้ — LOS 5.2</div>
+
+<div class="t-sec">
+<span class="t-lab">เล่าแบบบ้านๆ</span>
+<p>LOS นี้ยาว แต่แยกเป็น <b>4 ก้อนเล็กๆ</b> ได้ครับ</p>
+<p><b>ก้อนที่ 1 — สกุลเงิน 3 ตัว</b> ความต่างอยู่ที่ "เลือกได้หรือไม่"</p>
+<ul>
+<li><b>Functional currency = เลือกไม่ได้</b> ดูจากข้อเท็จจริงว่าเงินสกุลไหนมีอิทธิพลต่อ<b>ราคาขาย</b>และ<b>ต้นทุน</b>ของเราจริงๆ</li>
+<li><b>Presentation currency = เลือกได้ตามใจ</b> อยากนำเสนอเป็นบาท ดอลลาร์ หรือยูโรก็ได้</li>
+</ul>
+<p><b>ก้อนที่ 2 — Monetary vs Non-monetary</b> ถามคำถามเดียว: <b>"ของชิ้นนี้จะกลายเป็นเงินสดจำนวนที่แน่นอนไหม"</b> ลูกหนี้ 100 ดอลลาร์ ได้ 100 ดอลลาร์แน่ๆ = monetary ส่วนสินค้าในสต็อกที่ซื้อมา 100 ดอลลาร์ จะขายได้เท่าไรไม่มีใครรู้ = non-monetary</p>
+<p><b>ก้อนที่ 3 — อัตราซื้อ/อัตราขาย</b> จำแค่ว่า <b>มองจากมุมธนาคารเสมอ</b> เรามีดอลลาร์ (สินทรัพย์) ก็ต้องเอาไปขายให้แบงก์ → แบงก์เป็นคนซื้อ → ใช้<b>อัตราซื้อ</b> ส่วนเรามีหนี้ดอลลาร์ ต้องไปซื้อดอลลาร์จากแบงก์ → แบงก์เป็นคนขาย → ใช้<b>อัตราขาย</b></p>
+<p><b>ก้อนที่ 4 — Hedge</b> จำง่ายๆ ว่า <b>FV hedge เข้า P/L ทั้งคู่ (หักกลบกันทันที)</b> ส่วน <b>CF hedge พักไว้ใน OCI ก่อน</b> แล้วค่อยปล่อยออกมาตอนรายการจริงกระทบกำไร</p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">สูตรจำ</span>
+<div class="mnemo"><b>Functional = เลือกไม่ได้ · Presentation = เลือกได้</b></div>
+<div class="mnemo"><b>"สินทรัพย์ใช้อัตราซื้อ · หนี้สินใช้อัตราขาย"</b><br>(ธนาคารได้เปรียบเราเสมอ)</div>
+<div class="mnemo">แปลงค่าสิ้นงวด:<br><b>ตัวเงิน → อัตราปิด</b><br><b>ไม่เป็นตัวเงิน (ราคาทุน) → อัตราวันเกิดรายการ</b><br><b>ไม่เป็นตัวเงิน (FV) → อัตราวันวัด FV</b></div>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">เก็งข้อสอบ &amp; วิธีทำ</span>
+<ul>
+<li><b>ข้อคำนวณคลาสสิก:</b> ขายของเป็น USD แล้วค่าเงินเปลี่ยนตอนสิ้นปี ถามกำไร/ขาดทุนจากอัตราแลกเปลี่ยน → <b>(อัตราปิด − อัตราวันเกิดรายการ) × จำนวนเงินตราต่างประเทศ</b> และจำว่า <b>ยอดขายไม่ปรับ</b> คงเดิมตลอด</li>
+<li><b>ข้อดักที่เจอบ่อย:</b> ถามว่ารายการใด<b>ไม่ใช่</b>รายการที่เป็นตัวเงิน → คำตอบมักเป็น <b>"เงินจ่ายล่วงหน้าค่าสินค้า"</b> หรือ <b>"รายได้รับล่วงหน้า"</b> เพราะชำระกันด้วย<b>ของ</b> ไม่ใช่เงิน</li>
+<li><b>ข้ออัตราซื้อ/ขาย:</b> "กิจการมีเงินฝากสกุลต่างประเทศ ใช้อัตราใด" → <b>อัตราซื้อ</b> (เพราะเป็นสินทรัพย์)</li>
+<li><b>ข้อ Hedge:</b> ถามว่า cash flow hedge รับรู้ส่วนที่มีประสิทธิผลที่ไหน → <b>OCI</b> ส่วนที่<b>ไม่มีประสิทธิผล</b>เข้า <b>P/L ทันที</b> (ตัวเลือกหลอกคือเข้า OCI ทั้งหมด)</li>
+<li><b>ประโยคทองเรื่อง CTA:</b> <b>"แสดงแยกต่างหากในส่วนของเจ้าของ จนกว่าจะมีการจำหน่ายหน่วยงานต่างประเทศนั้น"</b> และอย่าลืมว่า<b>ต้องปันส่วนให้ NCI ตามสัดส่วนด้วย</b></li>
+</ul>
+</div>
+</div>
+
+<div class="done-wrap"><button class="done" data-id="los52">✓ อ่านจบ LOS 5.2 แล้ว</button></div>
+</section>
+
+<section id="los53">
+<h3 class="los"><span class="n">LOS 5.3</span>วิเคราะห์ผลกระทบของการเปลี่ยนแปลงยอดขายที่เป็นสกุลเงินท้องถิ่นและการเปลี่ยนแปลงอัตราแลกเปลี่ยน ที่มีต่อยอดขายของบริษัทย่อยและบริษัทใหญ่ที่ได้มีการแปลงค่า</h3>
+
+<div class="box explain">
+<div class="bt">💡 แนวคิดหลัก — แยกการเติบโต 2 ชั้น</div>
+<p>ยอดขายที่รายงานในงบรวมเปลี่ยนแปลงจาก <b>2 แรงพร้อมกัน</b> คือ <b>การเติบโตของยอดขายจริงในสกุลเงินท้องถิ่น</b> และ <b>การเปลี่ยนแปลงของอัตราแลกเปลี่ยน</b> นักวิเคราะห์ต้องแยกให้ออกว่า <b>โตจากธุรกิจจริง</b> หรือ <b>โตเพราะค่าเงินช่วย</b></p>
+</div>
+
+<div class="f">
+(1 + อัตราเติบโตที่รายงาน) = (1 + <b>อัตราเติบโตสกุลท้องถิ่น</b>) × (1 + <b>%เปลี่ยนแปลงอัตราแลกเปลี่ยน</b>)
+</div>
+
+<div class="box ex">
+<div class="bt">✅ ตัวอย่าง 5-2 — แยกองค์ประกอบการเติบโต</div>
+<p>บริษัทย่อยในสหรัฐฯ ของบริษัทไทยแห่งหนึ่ง</p>
+<div class="tw"><table>
+<tr><th>รายการ</th><th class="c">ปี 25X1</th><th class="c">ปี 25X2</th><th class="c">%เปลี่ยน</th></tr>
+<tr><td>ยอดขาย (ล้าน USD)</td><td class="c">100</td><td class="c">110</td><td class="c"><b>+10.0%</b></td></tr>
+<tr><td>อัตราแลกเปลี่ยนถัวเฉลี่ย (บาท/USD)</td><td class="c">33.00</td><td class="c">35.64</td><td class="c"><b>+8.0%</b></td></tr>
+<tr><td><b>ยอดขายแปลงค่า (ล้านบาท)</b></td><td class="c"><b>3,300</b></td><td class="c"><b>3,920.4</b></td><td class="c"><b>+18.8%</b></td></tr>
+</table></div>
+<p><b>พิสูจน์:</b> (1 + 0.10) × (1 + 0.08) − 1 = 1.10 × 1.08 − 1 = <b>0.188 = 18.8%</b> ✓</p>
+<p><b>แยกองค์ประกอบ:</b></p>
+<ul>
+<li>เติบโตจากธุรกิจจริง = <b>+10.0%</b></li>
+<li>ผลจากอัตราแลกเปลี่ยน = <b>+8.0%</b></li>
+<li>ผลร่วม (interaction) = 0.10 × 0.08 = <b>+0.8%</b></li>
+</ul>
+<p><b>บทสรุปเชิงวิเคราะห์:</b> ยอดขายที่รายงานโต 18.8% ดูน่าประทับใจ แต่ <b>เกือบครึ่งหนึ่งมาจากเงินบาทอ่อนค่า ไม่ใช่ความสามารถในการขาย</b> และผลนี้ <b>ไม่ยั่งยืน</b> หากปีหน้าค่าเงินกลับทิศ การเติบโตจะพลิกเป็นติดลบได้ทันที</p>
+</div>
+
+<div class="box warn">
+<div class="bt">⚠️ ทิศทางที่ต้องจำให้แม่น</div>
+<ul>
+<li><b>สกุลเงินท้องถิ่นของบริษัทย่อยแข็งค่า</b> เทียบกับสกุลเงินที่ใช้นำเสนอ → เมื่อแปลงค่ากลับมา <b>ยอดขาย สินทรัพย์ และกำไรในงบรวมสูงขึ้น</b></li>
+<li><b>สกุลเงินท้องถิ่นอ่อนค่า</b> → <b>ตัวเลขในงบรวมลดลง</b> แม้ธุรกิจจริงจะเติบโตดี</li>
+<li>ดังนั้นบริษัทข้ามชาติมักรายงานเพิ่มว่า <b>"constant currency growth"</b> คือการเติบโตหากอัตราแลกเปลี่ยนคงที่ — <b>นี่คือตัวเลขที่สะท้อนผลงานที่แท้จริง</b></li>
+</ul>
+</div>
+
+<div class="tutor">
+<div class="bt">🧑‍🏫 ติวเตอร์สรุปให้ — LOS 5.3</div>
+
+<div class="t-sec">
+<span class="t-lab">เล่าแบบบ้านๆ</span>
+<p>LOS นี้ตอบคำถามเดียวคือ <b>"ยอดขายที่โตขึ้น มาจากฝีมือ หรือมาจากค่าเงิน?"</b></p>
+<p>ลองนึกภาพบริษัทลูกที่อเมริกา ปีนี้ขายได้ 110 ล้านดอลลาร์ จาก 100 ล้านดอลลาร์ — <b>ฝีมือขายโตจริง 10%</b> แต่พอแปลงกลับเป็นบาท บังเอิญปีนี้บาทอ่อนลง 8% ยอดขายในงบรวมเลยกระโดดเป็น <b>+18.8%</b></p>
+<p>ถ้าผู้บริหารขึ้นเวทีแล้วบอกว่า "ปีนี้เราโต 18.8%" — <b>มันจริงแค่ครึ่งเดียว</b> เพราะอีกครึ่งเป็นของขวัญจากค่าเงินที่อาจหายไปปีหน้า</p>
+<p>บริษัทข้ามชาติดีๆ จึงมักรายงานเพิ่มว่า <b>"constant currency growth"</b> หรือการเติบโตแบบตรึงค่าเงิน ซึ่งคือตัวเลขที่สะท้อนผลงานจริง — เวลาอ่านงบบริษัทข้ามชาติ ให้มองหาตัวเลขนี้เสมอ</p>
+<p>จุดที่ต้องระวังในการคำนวณคือ <b>มันคูณกัน ไม่ใช่บวกกัน</b> 10% + 8% = 18% ซึ่ง<b>ไม่เท่ากับ</b> 18.8% ส่วนที่หายไป 0.8% คือ <b>ผลร่วม (10% × 8%)</b></p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">สูตรจำ</span>
+<div class="mnemo"><b>(1 + g รายงาน) = (1 + g ท้องถิ่น) × (1 + %FX)</b><br>คูณกัน ไม่ใช่บวกกัน</div>
+<div class="mnemo"><b>"ค่าเงินท้องถิ่นแข็ง → งบรวมพอง"</b><br><b>"ค่าเงินท้องถิ่นอ่อน → งบรวมแฟบ"</b></div>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">เก็งข้อสอบ &amp; วิธีทำ</span>
+<ul>
+<li><b>ข้อคำนวณมาตรฐาน:</b> ให้ยอดขายสกุลท้องถิ่น 2 ปี + อัตราแลกเปลี่ยนถัวเฉลี่ย 2 ปี แล้วถาม<b>อัตราเติบโตที่รายงาน</b> → คูณหาเลขบาททั้งสองปีแล้วหาร หรือใช้สูตร (1+g)(1+fx) − 1 ได้ผลเท่ากัน</li>
+<li><b>ตัวเลือกหลอกที่ต้องเลี่ยง:</b> <b>18%</b> (จากการบวก 10+8) จะถูกใส่ไว้เสมอ — จำว่าต้อง<b>คูณ</b></li>
+<li><b>ข้อเชิงวิเคราะห์:</b> ถามว่าการเติบโตแบบใดยั่งยืนกว่า → <b>การเติบโตในสกุลเงินท้องถิ่น (constant currency)</b> เพราะผลจากค่าเงินกลับทิศได้ทุกปี</li>
+<li><b>ข้อทิศทาง:</b> "เงินสกุลท้องถิ่นของบริษัทย่อยอ่อนค่า ส่งผลอย่างไรต่อยอดขายในงบรวม" → <b>ลดลง</b> แม้ยอดขายจริงจะโต</li>
+<li><b>เทคนิคในห้องสอบ:</b> ถ้าโจทย์ให้ตัวเลขเยอะจนงง ให้<b>แปลงเป็นเงินสกุลนำเสนอทั้งสองปีก่อน แล้วค่อยหา %</b> จะเร็วและพลาดน้อยกว่าใช้สูตร</li>
+</ul>
+</div>
+</div>
+
+<div class="done-wrap"><button class="done" data-id="los53">✓ อ่านจบ LOS 5.3 แล้ว</button></div>
+</section>
+
+<section id="los54">
+<h3 class="los"><span class="n">LOS 5.4</span>อธิบายผลกระทบของการแปลงค่าอัตราแลกเปลี่ยนเงินตราต่างประเทศ ที่มีต่องบกำไรขาดทุนเบ็ดเสร็จและงบแสดงฐานะทางการเงินของบริษัทใหญ่</h3>
+
+<h4>① ผลต่องบแสดงฐานะการเงิน</h4>
+<ul>
+<li><b>สินทรัพย์และหนี้สินทุกรายการแปลงด้วยอัตราปิด</b> → เมื่อค่าเงินเปลี่ยน <b>ทุกรายการขยับพร้อมกันทั้งงบ</b> แม้ตัวเลขในสกุลท้องถิ่นไม่เปลี่ยนเลย</li>
+<li>ทำให้ <b>สินทรัพย์รวมและหนี้สินรวมผันผวนตามค่าเงิน</b> แต่ <b>อัตราส่วนภายในงบแสดงฐานะการเงินของบริษัทย่อยไม่เปลี่ยน</b> (เช่น D/A ของบริษัทย่อยเท่าเดิม เพราะทั้งเศษและส่วนคูณอัตราเดียวกัน)</li>
+<li><b>เกิดบรรทัด CTA ในส่วนของเจ้าของ</b> ซึ่งอาจเป็นบวกหรือลบ และ <b>ผันผวนทุกปี</b></li>
+</ul>
+
+<h4>② ผลต่องบกำไรขาดทุนเบ็ดเสร็จ</h4>
+<ul>
+<li><b>รายได้และค่าใช้จ่ายแปลงด้วยอัตราถัวเฉลี่ย</b> → กำไรสุทธิในงบรวมเปลี่ยนตามค่าเงินถัวเฉลี่ยของปี</li>
+<li><b>ผลต่างจากการแปลงค่าไม่เข้ากำไรสุทธิ แต่เข้า OCI</b> → <b>กำไรสุทธิไม่ถูกรบกวน แต่กำไรขาดทุนเบ็ดเสร็จรวมผันผวน</b></li>
+<li>ทำให้เกิดช่องว่างระหว่าง <b>"กำไรสุทธิ"</b> กับ <b>"กำไรขาดทุนเบ็ดเสร็จรวม"</b> ที่บางปีห่างกันมาก — <b>นักวิเคราะห์ควรดูทั้งสองตัว</b></li>
+</ul>
+
+<div class="box warn">
+<div class="bt">⚠️ ความไม่สอดคล้องที่เป็นจุดออกสอบ</div>
+<p><b>งบแสดงฐานะการเงินใช้อัตราปิด แต่งบกำไรขาดทุนใช้อัตราถัวเฉลี่ย</b> — สองอัตรานี้ไม่เท่ากัน จึงทำให้งบไม่ดุล และ <b>ส่วนที่ไม่ดุลนี่เองคือ CTA</b> ที่ต้องไปพักไว้ใน OCI</p>
+<p style="margin-top:8px">ผลข้างเคียงที่สำคัญ: <b>อัตราส่วนที่ผสมตัวเลขจากงบสองฉบับจะถูกบิดเบือน</b> เช่น ROA (กำไรจากอัตราถัวเฉลี่ย ÷ สินทรัพย์จากอัตราปิด) และ อัตราหมุนเวียนสินทรัพย์ — <b>ตัวเลขเหล่านี้ในงบรวมจะไม่เท่ากับที่คำนวณจากงบของบริษัทย่อยในสกุลท้องถิ่น</b></p>
+</div>
+
+<div class="tutor">
+<div class="bt">🧑‍🏫 ติวเตอร์สรุปให้ — LOS 5.4</div>
+
+<div class="t-sec">
+<span class="t-lab">เล่าแบบบ้านๆ</span>
+<p>ต้นตอของทุกเรื่องใน LOS นี้คือ <b>"งบสองฉบับใช้ไม้บรรทัดคนละอัน"</b> ครับ</p>
+<ul>
+<li><b>งบแสดงฐานะการเงิน</b> ถ่ายรูป ณ วันสิ้นปี → ใช้ <b>อัตราปิด</b></li>
+<li><b>งบกำไรขาดทุน</b> เป็นเรื่องที่เกิดตลอดทั้งปี → ใช้ <b>อัตราถัวเฉลี่ย</b></li>
+</ul>
+<p>พอใช้คนละอัตรา งบก็<b>ไม่ดุล</b> สินทรัพย์ลบหนี้สินไม่เท่ากับส่วนของเจ้าของที่คำนวณได้ — <b>ส่วนที่ขาดหายไปนี่แหละคือ CTA</b> ที่เราเอาไปพักไว้ใน OCI</p>
+<p>พูดอีกแบบ: <b>CTA ไม่ใช่กำไรหรือขาดทุนที่เกิดจากอะไรเป็นพิเศษ มันคือ "ตัวเลขที่ทำให้งบดุล"</b> นั่นเอง</p>
+<p>ผลข้างเคียงที่นักวิเคราะห์ต้องรู้: <b>อัตราส่วนที่ดึงตัวเลขมาจากงบสองฉบับจะเพี้ยน</b> เช่น ROA ที่เอากำไร (อัตราเฉลี่ย) หารสินทรัพย์ (อัตราปิด) — ตัวเลขที่ได้ในงบรวม<b>จะไม่ตรงกับ</b>ที่คำนวณจากงบบริษัทย่อยในสกุลท้องถิ่น ทั้งที่เป็นบริษัทเดียวกัน</p>
+<p>อีกจุด: <b>กำไรสุทธิไม่เคยถูกรบกวนจาก CTA เลย</b> แต่ <b>กำไรขาดทุนเบ็ดเสร็จรวม</b> เหวี่ยงแรงมาก — บางปีสองตัวนี้ห่างกันมหาศาล ดังนั้นอย่าดูแค่บรรทัดกำไรสุทธิ</p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">สูตรจำ</span>
+<div class="mnemo"><b>งบฐานะ = อัตราปิด · งบกำไรขาดทุน = อัตราเฉลี่ย</b><br>→ ไม่ดุล → <b>ส่วนต่างคือ CTA</b> → พักใน OCI</div>
+<div class="mnemo"><b>"CTA = ตัวเลขที่ทำให้งบดุล"</b><br>ไม่แตะกำไรสุทธิ แต่แตะกำไรเบ็ดเสร็จรวม</div>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">เก็งข้อสอบ &amp; วิธีทำ</span>
+<ul>
+<li><b>ข้อเชิงแนวคิดที่ออกบ่อย:</b> "ทำไมจึงเกิดผลต่างจากการแปลงค่า" → ตอบ <b>เพราะสินทรัพย์/หนี้สินใช้อัตราปิด แต่รายได้/ค่าใช้จ่ายใช้อัตราถัวเฉลี่ย</b></li>
+<li><b>ข้อที่ดักคนจำผิว:</b> "การแปลงค่างบกระทบกำไรสุทธิหรือไม่" → <b>ไม่กระทบ</b> (กระทบแค่กำไรขาดทุนเบ็ดเสร็จรวม)</li>
+<li><b>ข้ออัตราส่วน:</b> ถามว่าอัตราส่วนใดถูกบิดเบือนจากการแปลงค่า → <b>ตัวที่ผสมสองงบ</b> เช่น ROA, ROE, asset turnover ส่วนตัวที่อยู่ในงบเดียวกัน เช่น gross margin, D/E <b>ไม่เพี้ยน</b></li>
+<li><b>คำอธิบายที่ควรเขียนได้:</b> D/A ของบริษัทย่อยไม่เปลี่ยนเมื่อแปลงค่า เพราะ<b>ทั้งเศษและส่วนคูณด้วยอัตราปิดเดียวกัน หักล้างกันพอดี</b></li>
+</ul>
+</div>
+</div>
+
+<div class="done-wrap"><button class="done" data-id="los54">✓ อ่านจบ LOS 5.4 แล้ว</button></div>
+</section>
+
+<section id="los55">
+<h3 class="los"><span class="n">LOS 5.5</span>คำนวณผลกระทบของการแปลงค่า และประเมินการแปลงค่างบกำไรขาดทุนเบ็ดเสร็จและงบแสดงฐานะทางการเงินของบริษัทย่อยไปเป็นสกุลเงินของบริษัทใหญ่</h3>
+
+<h4>สรุปอัตราที่ใช้</h4>
+<div class="tw"><table>
+<tr><th>รายการ</th><th class="c">อัตราที่ใช้</th><th>เหตุผล</th></tr>
+<tr><td>สินทรัพย์ทุกรายการ</td><td class="c"><b>อัตราปิด</b></td><td>สะท้อนมูลค่า ณ วันสิ้นงวด</td></tr>
+<tr><td>หนี้สินทุกรายการ</td><td class="c"><b>อัตราปิด</b></td><td>สะท้อนภาระ ณ วันสิ้นงวด</td></tr>
+<tr><td>ทุนเรือนหุ้น · ส่วนเกินมูลค่าหุ้น</td><td class="c">อัตราตามประวัติ</td><td>ทางปฏิบัติ (มาตรฐานไม่ระบุ)</td></tr>
+<tr><td>กำไรสะสม</td><td class="c">ยอดยกมา + กำไรแปลงค่า − ปันผล</td><td>สะสมต่อเนื่อง</td></tr>
+<tr><td>รายได้ · ค่าใช้จ่าย</td><td class="c"><b>อัตรา ณ วันที่เกิดรายการ<br>หรืออัตราถัวเฉลี่ย</b></td><td>เกิดขึ้นกระจายตลอดปี</td></tr>
+<tr><td>เงินปันผลจ่าย</td><td class="c">อัตรา ณ วันประกาศจ่าย</td><td>เกิด ณ วันนั้น</td></tr>
+<tr><td><b>ผลต่างจากการแปลงค่า</b></td><td class="c"><b>ยอดที่ทำให้งบดุล</b></td><td>รับรู้ใน <b>OCI</b> (บรรทัด CTA)</td></tr>
+</table></div>
+
+<div class="box ex">
+<div class="bt">✅ ตัวอย่าง 5-3 — แปลงค่างบครบวงจร</div>
+<p><b>สมมติฐาน:</b> บริษัทไทย ถือหุ้น 100% ในบริษัทย่อยที่สหรัฐฯ (functional currency = USD) ตั้งขึ้นต้นปีด้วยทุน 1,000,000 USD</p>
+<p><b>อัตราแลกเปลี่ยน:</b> ต้นปี (วันลงทุน) 33.00 · ถัวเฉลี่ยทั้งปี 34.00 · ปลายปี (อัตราปิด) 36.00</p>
+
+<p style="margin-top:12px"><b>ขั้นที่ 1 — แปลงงบกำไรขาดทุน (ใช้อัตราถัวเฉลี่ย)</b></p>
+<div class="tw"><table>
+<tr><th>รายการ</th><th class="c">USD</th><th class="c">อัตรา</th><th class="c">บาท</th></tr>
+<tr><td>รายได้</td><td class="c">800,000</td><td class="c">34.00</td><td class="c">27,200,000</td></tr>
+<tr><td>ค่าใช้จ่าย</td><td class="c">(600,000)</td><td class="c">34.00</td><td class="c">(20,400,000)</td></tr>
+<tr><td><b>กำไรสุทธิ</b></td><td class="c"><b>200,000</b></td><td class="c">34.00</td><td class="c"><b>6,800,000</b></td></tr>
+</table></div>
+
+<p style="margin-top:12px"><b>ขั้นที่ 2 — แปลงงบแสดงฐานะการเงิน (สินทรัพย์/หนี้สินใช้อัตราปิด)</b></p>
+<div class="tw"><table>
+<tr><th>รายการ</th><th class="c">USD</th><th class="c">อัตรา</th><th class="c">บาท</th></tr>
+<tr><td>สินทรัพย์รวม</td><td class="c">1,500,000</td><td class="c">36.00</td><td class="c">54,000,000</td></tr>
+<tr><td>หนี้สินรวม</td><td class="c">(300,000)</td><td class="c">36.00</td><td class="c">(10,800,000)</td></tr>
+<tr><td><b>สินทรัพย์สุทธิ</b></td><td class="c"><b>1,200,000</b></td><td class="c"></td><td class="c"><b>43,200,000</b></td></tr>
+<tr><td colspan="4" style="background:var(--brand-soft)"><b>ส่วนของเจ้าของ</b></td></tr>
+<tr><td>ทุนเรือนหุ้น</td><td class="c">1,000,000</td><td class="c">33.00</td><td class="c">33,000,000</td></tr>
+<tr><td>กำไรสะสม</td><td class="c">200,000</td><td class="c">34.00</td><td class="c">6,800,000</td></tr>
+<tr><td>รวมก่อน CTA</td><td class="c">1,200,000</td><td class="c"></td><td class="c">39,800,000</td></tr>
+<tr><td><b>ผลต่างจากการแปลงค่า (CTA)</b></td><td class="c">—</td><td class="c">ยอดดุล</td><td class="c"><b>3,400,000</b></td></tr>
+<tr><td><b>รวมส่วนของเจ้าของ</b></td><td class="c"><b>1,200,000</b></td><td class="c"></td><td class="c"><b>43,200,000</b></td></tr>
+</table></div>
+
+<p style="margin-top:12px"><b>ขั้นที่ 3 — พิสูจน์ CTA โดยตรง</b></p>
+<div class="tw"><table>
+<tr><th>องค์ประกอบ</th><th class="c">คำนวณ</th><th class="c">บาท</th></tr>
+<tr><td>ผลจากทุนเรือนหุ้น</td><td class="c">1,000,000 × (36.00 − 33.00)</td><td class="c">3,000,000</td></tr>
+<tr><td>ผลจากกำไรของปี</td><td class="c">200,000 × (36.00 − 34.00)</td><td class="c">400,000</td></tr>
+<tr><td><b>รวม CTA</b></td><td class="c"></td><td class="c"><b>3,400,000</b></td></tr>
+</table></div>
+<p><b>ตรงกันพอดี ✓</b></p>
+
+<div style="margin-top:12px;padding:11px;background:var(--card);border-radius:10px;border:1px solid var(--line)">
+<b>บทสรุปเชิงวิเคราะห์:</b>
+<ul style="margin-bottom:0">
+<li>บริษัทย่อยมี <b>ฐานะเปิดเป็นสินทรัพย์สุทธิ (net asset exposure)</b> 1,200,000 USD</li>
+<li><b>USD แข็งค่า</b> (33 → 36) → เกิด <b>CTA เป็นบวก 3,400,000 บาท</b> เพิ่มส่วนของเจ้าของ</li>
+<li><b>กำไรสุทธิไม่ถูกกระทบเลย</b> — ยังคงเป็น 6,800,000 บาท</li>
+<li>แต่ <b>กำไรขาดทุนเบ็ดเสร็จรวม = 6,800,000 + 3,400,000 = 10,200,000 บาท</b></li>
+</ul>
+</div>
+</div>
+
+<div class="tutor">
+<div class="bt">🧑‍🏫 ติวเตอร์สรุปให้ — LOS 5.5</div>
+
+<div class="t-sec">
+<span class="t-lab">เล่าแบบบ้านๆ</span>
+<p>ข้อนี้คือ <b>ข้อคำนวณหลักของบทที่ 5</b> ทำตาม 3 สเต็ปนี้ได้ รับประกันไม่พลาด</p>
+<ul>
+<li><b>สเต็ป 1</b> — แปลงงบกำไรขาดทุนก่อน ใช้ <b>อัตราถัวเฉลี่ย</b> ทุกบรรทัด ได้กำไรสุทธิเป็นเงินสกุลนำเสนอ</li>
+<li><b>สเต็ป 2</b> — แปลงงบฐานะการเงิน <b>สินทรัพย์และหนี้สินใช้อัตราปิดทั้งหมด</b> ส่วน<b>ทุนเรือนหุ้นใช้อัตราตอนลงทุน (historical)</b> และกำไรสะสมใช้ตัวเลขจากสเต็ป 1</li>
+<li><b>สเต็ป 3</b> — <b>CTA คือตัวเลขที่เติมเข้าไปให้งบดุล</b> คำนวณจาก "สินทรัพย์สุทธิ − ส่วนของเจ้าของที่แปลงมาได้"</li>
+</ul>
+<p>และมี<b>ทางลัดตรวจคำตอบ</b>ที่สวยมาก — คำนวณ CTA ตรงๆ ได้เลยจาก</p>
+<div class="mnemo" style="margin-top:8px">
+CTA = ทุน × (อัตราปิด − อัตราตอนลงทุน)<br>+ กำไรปีนี้ × (อัตราปิด − อัตราเฉลี่ย)
+</div>
+<p style="margin-top:10px">ในตัวอย่าง: 1,000,000 × (36−33) = 3,000,000 บวก 200,000 × (36−34) = 400,000 <b>รวม 3,400,000 ตรงกับยอดดุลพอดี</b> — ถ้าสองวิธีได้ไม่ตรงกัน แปลว่าคำนวณผิดที่ไหนสักแห่ง</p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">สูตรจำ</span>
+<div class="mnemo"><b>สินทรัพย์+หนี้สิน = ปิด</b><br><b>รายได้+ค่าใช้จ่าย = เฉลี่ย</b><br><b>ทุน = ประวัติ</b><br><b>CTA = ยอดที่ทำให้ดุล</b></div>
+<div class="mnemo">ตรวจคำตอบ:<br><b>CTA = ทุน×(ปิด−ประวัติ) + กำไร×(ปิด−เฉลี่ย)</b></div>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">เก็งข้อสอบ &amp; วิธีทำ</span>
+<ul>
+<li><b>รูปแบบข้อสอบ:</b> ให้งบบริษัทย่อยเป็นสกุลต่างประเทศ + อัตรา 3 ตัว (ประวัติ/เฉลี่ย/ปิด) แล้วถาม <b>CTA</b> หรือ <b>สินทรัพย์รวมในงบรวม</b> หรือ <b>กำไรสุทธิในงบรวม</b></li>
+<li><b>ใช้ทางลัดเสมอ</b> ถ้าโจทย์ถามเฉพาะ CTA → ใช้สูตรตรวจคำตอบข้างบน <b>เร็วกว่าแปลงงบทั้งฉบับมาก</b></li>
+<li><b>จุดที่พลาดบ่อยที่สุด:</b> เผลอใช้<b>อัตราปิด</b>กับทุนเรือนหุ้น → ถ้าทำแบบนั้น CTA จะกลายเป็นศูนย์ ซึ่งเป็นตัวเลือกหลอกที่ถูกใส่ไว้แน่นอน</li>
+<li><b>ตรวจทิศทางด้วยสามัญสำนึก:</b> บริษัทย่อยมี<b>สินทรัพย์สุทธิเป็นบวก</b> และสกุลท้องถิ่น<b>แข็งค่า</b> → <b>CTA ต้องเป็นบวก</b> ถ้าคำนวณได้ติดลบ แปลว่าสลับอัตราแล้ว</li>
+<li><b>ข้อต่อยอด:</b> ถามกำไรขาดทุนเบ็ดเสร็จรวม → <b>กำไรสุทธิ + CTA</b> (ในตัวอย่างคือ 6,800,000 + 3,400,000)</li>
+</ul>
+</div>
+</div>
+
+<div class="done-wrap"><button class="done" data-id="los55">✓ อ่านจบ LOS 5.5 แล้ว</button></div>
+</section>
+
+<section id="los56">
+<h3 class="los"><span class="n">LOS 5.6</span>ระบุผลกระทบของการแปลงค่างบการเงินที่มีต่อกำไรต่อหุ้น กระแสเงินสด และอัตราส่วนทางการเงิน</h3>
+
+<h4>① ผลต่อกำไรต่อหุ้น (EPS)</h4>
+<ul>
+<li><b>ตัวเศษ (กำไรส่วนของบริษัทใหญ่) ผันผวนตามอัตราถัวเฉลี่ย</b> ขณะที่ <b>ตัวส่วน (จำนวนหุ้น) ไม่ได้รับผลกระทบจากอัตราแลกเปลี่ยนเลย</b> → EPS จึงผันผวนตามค่าเงินโดยตรง</li>
+<li><b>CTA ไม่กระทบ EPS</b> เพราะอยู่ใน OCI ไม่ใช่กำไรสุทธิ</li>
+<li>การเติบโตของ EPS อาจ <b>ดูดีหรือแย่เกินจริง</b> ให้ดู <b>EPS แบบ constant currency</b> ประกอบเสมอ</li>
+</ul>
+
+<h4>② ผลต่อกระแสเงินสด</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ (คงประโยค)</div>
+<p class="quote"><b>กระแสเงินสดที่เกิดจากรายการที่เป็นเงินตราต่างประเทศ ต้องบันทึกในสกุลเงินที่ใช้นำเสนอรายงานโดยแปลงค่าด้วยอัตราแลกเปลี่ยน ณ วันที่เกิดกระแสเงินสดนั้น</b></p>
+<p class="quote" style="margin-top:8px"><b>ผลกระทบจากการเปลี่ยนแปลงอัตราแลกเปลี่ยนที่มีต่อเงินสดและรายการเทียบเท่าเงินสดที่ถือไว้เป็นเงินตราต่างประเทศ ต้องแสดงแยกต่างหากจากกระแสเงินสดจากกิจกรรมดำเนินงาน ลงทุน และจัดหาเงิน</b></p>
+</div>
+<div class="box explain">
+<div class="bt">💡 ขยายความ</div>
+<p>ในงบกระแสเงินสดรวมจะมีบรรทัดพิเศษชื่อ <b>"ผลกระทบจากการเปลี่ยนแปลงของอัตราแลกเปลี่ยนที่มีต่อเงินสดและรายการเทียบเท่าเงินสด"</b> อยู่ใกล้ท้ายงบ เพื่อกระทบยอดเงินสดต้นงวดกับปลายงวดให้ตรงกัน <b>บรรทัดนี้ไม่ใช่กระแสเงินสดจริง ไม่ควรนำไปรวมในการประเมิน FCF</b></p>
+</div>
+
+<h4>③ ผลต่ออัตราส่วนทางการเงิน</h4>
+<div class="tw"><table>
+<tr><th>ประเภทอัตราส่วน</th><th>ผลกระทบ</th><th>เหตุผล</th></tr>
+<tr><td><b>ใช้ตัวเลขจากงบเดียวกัน</b><br>(อัตรากำไรขั้นต้น · อัตรากำไรสุทธิ · D/E · Current ratio)</td><td class="c"><span class="pill p-g">ไม่บิดเบือน</span></td><td>ทั้งเศษและส่วนแปลงด้วยอัตราเดียวกัน → หักล้างกันพอดี</td></tr>
+<tr><td><b>ผสมตัวเลข 2 งบ</b><br>(ROA · ROE · อัตราหมุนเวียนสินทรัพย์ · อัตราหมุนเวียนลูกหนี้ · อัตราหมุนเวียนสินค้าคงเหลือ)</td><td class="c"><span class="pill p-r">ถูกบิดเบือน</span></td><td>เศษใช้อัตราถัวเฉลี่ย ส่วนใช้อัตราปิด → ไม่หักล้างกัน</td></tr>
+<tr><td><b>อัตราการเติบโต</b></td><td class="c"><span class="pill p-r">ถูกบิดเบือน</span></td><td>รวมผลจากค่าเงินเข้าไปด้วย</td></tr>
+</table></div>
+
+<div class="box ex">
+<div class="bt">✅ ตัวอย่าง 5-4 — ทำไม D/E ไม่บิดเบือน แต่อัตราหมุนเวียนสินทรัพย์บิดเบือน</div>
+<p>จากตัวอย่าง 5-3 (ปิด 36.00 / ถัวเฉลี่ย 34.00):</p>
+<ul>
+<li><b>D/A ในสกุล USD</b> = 300,000 ÷ 1,500,000 = <b>20.0%</b></li>
+<li><b>D/A ในสกุลบาท</b> = 10,800,000 ÷ 54,000,000 = <b>20.0%</b> → <b>เท่ากันเป๊ะ ✓</b> เพราะทั้งคู่ใช้อัตราปิด 36.00</li>
+</ul>
+<ul style="margin-top:10px">
+<li><b>อัตราหมุนเวียนสินทรัพย์ในสกุล USD</b> = 800,000 ÷ 1,500,000 = <b>0.533 เท่า</b></li>
+<li><b>อัตราหมุนเวียนสินทรัพย์ในสกุลบาท</b> = 27,200,000 ÷ 54,000,000 = <b>0.504 เท่า</b> → <b>ต่ำกว่าความเป็นจริง ✗</b></li>
+</ul>
+<p><b>สาเหตุ:</b> รายได้ใช้อัตรา 34 แต่สินทรัพย์ใช้อัตรา 36 → เมื่อสกุลท้องถิ่นแข็งค่าระหว่างปี ตัวส่วนโตเร็วกว่าตัวเศษ ทำให้ <b>อัตราหมุนเวียนดูแย่ลงทั้งที่ประสิทธิภาพจริงไม่เปลี่ยน</b></p>
+</div>
+
+<div class="tutor">
+<div class="bt">🧑‍🏫 ติวเตอร์สรุปให้ — LOS 5.6</div>
+
+<div class="t-sec">
+<span class="t-lab">เล่าแบบบ้านๆ</span>
+<p>LOS นี้มี<b>กฎทองข้อเดียว</b>ที่ตอบได้ทุกคำถามเรื่องอัตราส่วน:</p>
+<div class="mnemo" style="margin-top:8px"><b>"อยู่งบเดียวกัน = ไม่เพี้ยน<br>ข้ามงบ = เพี้ยน"</b></div>
+<p style="margin-top:10px">เหตุผลง่ายมาก — ถ้าทั้งเศษและส่วนมาจากงบฐานะการเงินเหมือนกัน ทั้งคู่ก็คูณด้วยอัตราปิดเท่ากัน <b>คูณแล้วหารกันก็หักล้างหายไป</b> เช่น D/A ของบริษัทย่อยจะเท่ากันเป๊ะไม่ว่าดูเป็นดอลลาร์หรือเป็นบาท</p>
+<p>แต่ถ้าเศษมาจากงบกำไรขาดทุน (อัตราเฉลี่ย) ส่วนตัวหารมาจากงบฐานะ (อัตราปิด) <b>สองอัตราไม่เท่ากัน หักล้างไม่ลง ตัวเลขจึงเพี้ยน</b> — ROA, asset turnover, inventory turnover โดนทั้งหมด</p>
+<p>ส่วนเรื่อง <b>EPS</b> จำว่า <b>ตัวเศษเหวี่ยงตามค่าเงิน แต่ตัวส่วน (จำนวนหุ้น) ไม่เกี่ยวกับค่าเงินเลย</b> ดังนั้น EPS จึงผันผวนตามค่าเงินเต็มๆ แต่ <b>CTA ไม่แตะ EPS</b> เพราะอยู่ใน OCI</p>
+<p>และเกร็ดสุดท้ายที่มักถูกถาม — ในงบกระแสเงินสดจะมีบรรทัดชื่อยาวๆ ว่า "ผลกระทบจากการเปลี่ยนแปลงของอัตราแลกเปลี่ยนที่มีต่อเงินสดฯ" <b>บรรทัดนี้ไม่ใช่เงินสดจริง</b> เป็นแค่ตัวปรับให้ยอดต้นงวดกับปลายงวดกระทบกันได้ <b>ห้ามเอาไปรวมคำนวณ FCF</b></p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">สูตรจำ</span>
+<div class="mnemo"><b>งบเดียวกัน → ไม่เพี้ยน</b> (GPM, NPM, D/E, Current)<br><b>ข้ามงบ → เพี้ยน</b> (ROA, ROE, Turnover ทุกตัว)</div>
+<div class="mnemo">งบกระแสเงินสด:<br><b>บรรทัด FX effect = แยกต่างหาก ไม่ใช่ CFO/CFI/CFF</b></div>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">เก็งข้อสอบ &amp; วิธีทำ</span>
+<ul>
+<li><b>ข้อที่ออกแน่:</b> ถามว่าอัตราส่วนใด<b>ไม่</b>ได้รับผลกระทบจากการแปลงค่า → มองหาตัวที่<b>ทั้งเศษและส่วนอยู่ในงบเดียวกัน</b> เช่น <b>อัตรากำไรขั้นต้น</b> หรือ <b>D/E</b></li>
+<li><b>ข้อคำนวณเปรียบเทียบ:</b> ให้คำนวณ asset turnover ทั้งสองสกุลแล้วเทียบ → ถ้าสกุลท้องถิ่น<b>แข็งค่า</b>ระหว่างปี ตัวส่วนจะโตกว่าตัวเศษ → <b>turnover ในงบรวมจะต่ำกว่าความจริง</b></li>
+<li><b>ข้อ EPS:</b> "CTA กระทบ EPS หรือไม่" → <b>ไม่กระทบ</b> เพราะไม่ได้อยู่ในกำไรสุทธิ</li>
+<li><b>ข้องบกระแสเงินสด:</b> "ผลกระทบของอัตราแลกเปลี่ยนต่อเงินสดจัดอยู่ในกิจกรรมใด" → <b>ไม่อยู่ในกิจกรรมใดเลย ต้องแสดงแยกต่างหาก</b> (ตัวเลือกหลอกคือ "กิจกรรมดำเนินงาน")</li>
+</ul>
+</div>
+</div>
+
+<div class="done-wrap"><button class="done" data-id="los56">✓ อ่านจบ LOS 5.6 แล้ว</button></div>
+</section>
+
+<section id="los57">
+<h3 class="los"><span class="n">LOS 5.7</span>อธิบายวิธีปฏิบัติทางบัญชีที่เป็นทางเลือกสำหรับบริษัทย่อยที่ดำเนินธุรกิจในเศรษฐกิจที่ประสบเงินเฟ้อรุนแรงมาก</h3>
+
+<div class="box principle">
+<div class="bt">📌 หลักการ — ตารางที่ 5-4 กรณีเงินเฟ้อรุนแรง (คงประโยค)</div>
+<p class="quote">กรณี<b>สกุลเงินที่ใช้ในการดำเนินงานเป็นสกุลเงินของเศรษฐกิจที่มีภาวะเงินเฟ้อรุนแรง</b><br>
+<b>สินทรัพย์และหนี้สิน</b> — <b>อัตราปิด ณ วันที่ในงบแสดงฐานะทางการเงิน</b><br>
+<b>รายได้ ค่าใช้จ่าย และรายการกำไรขาดทุนเบ็ดเสร็จ</b> — <b>อัตรา ณ วันที่เกิดรายการ หรืออัตราถัวเฉลี่ยที่เหมาะสมสำหรับรอบบัญชีนั้นๆ</b></p>
+</div>
+
+<div class="box warn">
+<div class="bt">⚠️ ขั้นตอนสำคัญที่ต้องทำ "ก่อน" การแปลงค่า</div>
+<p>สิ่งที่ทำให้กรณีเงินเฟ้อรุนแรงแตกต่างจากกรณีปกติ คือ <b>ต้องปรับปรุงงบการเงินใหม่ด้วยหน่วยวัดปัจจุบันตาม TAS 29 "การรายงานทางการเงินในสภาพเศรษฐกิจที่มีภาวะเงินเฟ้อรุนแรง" เสียก่อน แล้วจึงนำงบที่ปรับปรุงแล้วไปแปลงค่า</b></p>
+<p style="margin-top:8px"><b>เหตุผล:</b> ในภาวะเงินเฟ้อรุนแรง ตัวเลขราคาทุนเดิมไร้ความหมายโดยสิ้นเชิง — ที่ดินที่ซื้อมา 5 ปีก่อนอาจมีมูลค่าจริงเป็นพันเท่าของตัวเลขในบัญชี หากแปลงค่าตรงๆ ด้วยอัตราปิด สินทรัพย์จะถูกแสดงต่ำกว่าความจริงอย่างรุนแรง</p>
+</div>
+
+<h4>สาระสำคัญของ TAS 29</h4>
+<div class="box explain">
+<div class="bt">💡 หลักการปรับปรุงด้วยหน่วยวัดปัจจุบัน (restatement)</div>
+<ul>
+<li><b>รายการที่ไม่เป็นตัวเงิน</b> (สินค้าคงเหลือ · ที่ดิน อาคารและอุปกรณ์ · ทุนเรือนหุ้น) → <b>ปรับปรุงใหม่ด้วยดัชนีราคาทั่วไป</b> จากวันที่ได้มาจนถึงวันสิ้นงวด</li>
+<li><b>รายการที่เป็นตัวเงิน</b> (เงินสด · ลูกหนี้ · เจ้าหนี้) → <b>ไม่ต้องปรับปรุง</b> เพราะแสดงด้วยหน่วยวัดปัจจุบันอยู่แล้ว</li>
+<li><b>รายการในงบกำไรขาดทุน</b> → ปรับปรุงจากวันที่เกิดรายการมาเป็นหน่วยวัด ณ วันสิ้นงวด</li>
+<li><b>ผลกำไรหรือขาดทุนจากฐานะการเงินสุทธิที่เป็นตัวเงิน (net monetary position) ให้รับรู้ในกำไรหรือขาดทุน</b></li>
+</ul>
+</div>
+
+<div class="box ex">
+<div class="bt">✅ ตัวอย่าง 5-5 — สัญชาตญาณเรื่องกำไร/ขาดทุนจากฐานะที่เป็นตัวเงิน</div>
+<p>ในเศรษฐกิจเงินเฟ้อรุนแรง:</p>
+<ul>
+<li><b>ถือเงินสดและลูกหนี้ไว้มาก (net monetary asset)</b> → อำนาจซื้อหายไปเรื่อยๆ → <b>ขาดทุนจากฐานะที่เป็นตัวเงิน</b></li>
+<li><b>มีหนี้สินมาก (net monetary liability)</b> → หนี้ที่ต้องจ่ายมีอำนาจซื้อลดลง → <b>กำไรจากฐานะที่เป็นตัวเงิน</b></li>
+</ul>
+<p>เปรียบเทียบง่ายๆ: ถ้าเงินเฟ้อ 1,000% ต่อปี การเป็น <b>ลูกหนี้ธนาคาร</b> คือได้กำไร ส่วนการ <b>กองเงินสดไว้เฉยๆ</b> คือขาดทุนมหาศาล</p>
+</div>
+
+<div class="box explain">
+<div class="bt">💡 ข้อสังเกตเพิ่มเติม — "งวดเปรียบเทียบ"</div>
+<p>เมื่อสกุลเงินที่ใช้นำเสนองบการเงิน <b>ไม่ใช่</b> สกุลเงินของเศรษฐกิจที่มีภาวะเงินเฟ้อรุนแรง <b>จำนวนเงินงวดเปรียบเทียบไม่ต้องปรับปรุงใหม่</b> ให้คงตัวเลขที่เคยนำเสนอไว้ในงบการเงินของงวดก่อน</p>
+</div>
+
+<div class="box warn">
+<div class="bt">⚠️ ตัวบ่งชี้ภาวะเงินเฟ้อรุนแรง (TAS 29)</div>
+<ul>
+<li>ประชาชนนิยมเก็บความมั่งคั่งไว้ใน <b>สินทรัพย์ที่ไม่เป็นตัวเงินหรือสกุลเงินต่างประเทศที่ค่อนข้างมีเสถียรภาพ</b></li>
+<li>ประชาชนพิจารณาจำนวนเงินโดยใช้ <b>สกุลเงินต่างประเทศที่ค่อนข้างมีเสถียรภาพ</b> แทนสกุลเงินในประเทศ</li>
+<li>การขายและซื้อเชื่อกำหนดราคาที่ <b>ชดเชยการสูญเสียอำนาจซื้อที่คาดว่าจะเกิดขึ้น</b> แม้ระยะเวลาให้สินเชื่อจะสั้น</li>
+<li>อัตราดอกเบี้ย ค่าจ้าง และราคา <b>เชื่อมโยงกับดัชนีราคา</b></li>
+<li><b>อัตราเงินเฟ้อสะสมในช่วง 3 ปี เข้าใกล้หรือเกินกว่าร้อยละ 100</b> ⚠️ <b>ตัวเลขนี้ออกสอบบ่อย</b></li>
+</ul>
+</div>
+
+<div class="tutor">
+<div class="bt">🧑‍🏫 ติวเตอร์สรุปให้ — LOS 5.7</div>
+
+<div class="t-sec">
+<span class="t-lab">เล่าแบบบ้านๆ</span>
+<p>ลองนึกถึงประเทศที่เงินเฟ้อ 1,000% ต่อปี — ก๋วยเตี๋ยวชามละ 50 บาทวันนี้ ปีหน้าชามละ 550 บาท</p>
+<p>ในสภาพแบบนี้ <b>ตัวเลขราคาทุนเดิมในบัญชีไม่มีความหมายเลย</b> ที่ดินที่ซื้อมา 5 ปีก่อนด้วยเงิน 1 ล้าน วันนี้อาจมีค่าเท่ากับ 1,000 ล้าน แต่ในบัญชียังโชว์ 1 ล้านอยู่</p>
+<p>ถ้าเราเอางบที่ "ตายแล้ว" แบบนี้มาแปลงค่าด้วยอัตราปิดตรงๆ <b>สินทรัพย์จะหดจนแทบเป็นศูนย์</b> ไม่สะท้อนความจริงเลย</p>
+<p>มาตรฐานจึงบอกว่า <b>ต้อง "ชุบชีวิตงบ" ก่อน</b> — เอาดัชนีราคามาปรับตัวเลขเก่าให้เป็นหน่วยวัดวันนี้ตาม <b>TAS 29</b> แล้ว<b>ค่อย</b>แปลงค่าเป็นสกุลนำเสนอ</p>
+<p>จุดที่น่าสนใจอีกอย่างคือ <b>กำไร/ขาดทุนจากฐานะที่เป็นตัวเงิน</b> — ในสภาพเงินเฟ้อโหด <b>การเป็นลูกหนี้คือได้กำไร</b> (หนี้ที่ต้องจ่ายมีค่าน้อยลงเรื่อยๆ) ส่วน<b>การกองเงินสดไว้คือขาดทุนมหาศาล</b> (อำนาจซื้อละลายทุกวัน) ซึ่งตรงข้ามกับสัญชาตญาณปกติของเรา</p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">สูตรจำ</span>
+<div class="mnemo">ลำดับที่ห้ามสลับ:<br><b>① Restate ด้วยดัชนีราคา (TAS 29)<br>② แล้วค่อยแปลงค่าด้วยอัตราปิด</b></div>
+<div class="mnemo">ในภาวะเงินเฟ้อโหด:<br><b>"เป็นหนี้ = กำไร · ถือเงินสด = ขาดทุน"</b></div>
+<p><b>ตัวเลขที่ต้องจำ:</b> <span style="color:var(--tutor)"><b>เงินเฟ้อสะสม 3 ปี ≥ 100%</b></span></p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">เก็งข้อสอบ &amp; วิธีทำ</span>
+<ul>
+<li><b>ข้อที่ออกบ่อยที่สุด:</b> ถามตัวบ่งชี้ภาวะเงินเฟ้อรุนแรง → <b>อัตราเงินเฟ้อสะสม 3 ปี เข้าใกล้หรือเกิน 100%</b> ตัวเลือกหลอกมักเป็น "1 ปี เกิน 100%" หรือ "3 ปี เกิน 50%"</li>
+<li><b>ข้อลำดับขั้นตอน:</b> "ต้องทำอะไรก่อนแปลงค่างบของบริษัทย่อยในประเทศเงินเฟ้อรุนแรง" → <b>ปรับปรุงงบด้วยหน่วยวัดปัจจุบันตาม TAS 29 ก่อน</b></li>
+<li><b>ข้อที่ต้องคิดกลับหัว:</b> "กิจการที่มีหนี้สินสุทธิที่เป็นตัวเงินมาก จะเกิดผลอย่างไร" → <b>กำไรจากฐานะที่เป็นตัวเงิน</b> และรับรู้ใน <b>กำไรหรือขาดทุน</b> (ไม่ใช่ OCI)</li>
+<li><b>ข้อแยกประเภท:</b> รายการใดต้อง restate → <b>เฉพาะรายการที่ไม่เป็นตัวเงิน</b> (สินค้าคงเหลือ PP&amp;E ทุนเรือนหุ้น) ส่วน<b>รายการที่เป็นตัวเงินไม่ต้อง</b> เพราะเป็นหน่วยวัดปัจจุบันอยู่แล้ว</li>
+<li><b>เกร็ดที่อาจถาม:</b> ถ้าสกุลที่ใช้นำเสนอ<b>ไม่ใช่</b>สกุลเงินเฟ้อรุนแรง → <b>งวดเปรียบเทียบไม่ต้องปรับปรุงใหม่</b></li>
+</ul>
+</div>
+</div>
+
+<div class="done-wrap"><button class="done" data-id="los57">✓ อ่านจบ LOS 5.7 แล้ว</button></div>
+</section>
+
+<section id="los58">
+<h3 class="los"><span class="n">LOS 5.8</span>จำแนกประเภทของฐานะเปิดต่อความเสี่ยงจากเงินตราต่างประเทศ และอธิบายผลกระทบที่มีต่องบการเงิน</h3>
+
+<h4>① ฐานะเปิดจากการแปลงค่างบการเงิน</h4>
+<div class="box principle">
+<div class="bt">📌 หลักการ</div>
+<p class="quote">ภายใต้การแปลงค่าด้วย<b>อัตราปิด</b> ฐานะเปิดสุทธิคือ <b>สินทรัพย์สุทธิ (สินทรัพย์รวม − หนี้สินรวม)</b> ของหน่วยงานต่างประเทศ เนื่องจาก<b>สินทรัพย์และหนี้สินทุกรายการแปลงค่าด้วยอัตราเดียวกัน</b></p>
+</div>
+<div class="tw"><table>
+<tr><th>ฐานะเปิด</th><th class="c">สกุลท้องถิ่นแข็งค่า</th><th class="c">สกุลท้องถิ่นอ่อนค่า</th></tr>
+<tr><td><b>สินทรัพย์สุทธิ</b><br>(สินทรัพย์ &gt; หนี้สิน)</td><td class="c"><span class="pill p-g">CTA บวก</span><br>ส่วนของเจ้าของเพิ่ม</td><td class="c"><span class="pill p-r">CTA ลบ</span><br>ส่วนของเจ้าของลด</td></tr>
+<tr><td><b>หนี้สินสุทธิ</b><br>(หนี้สิน &gt; สินทรัพย์)</td><td class="c"><span class="pill p-r">CTA ลบ</span></td><td class="c"><span class="pill p-g">CTA บวก</span></td></tr>
+</table></div>
+<div class="box explain">
+<div class="bt">💡 ท่องง่ายๆ</div>
+<p><b>"สินทรัพย์สุทธิ + ค่าเงินแข็ง = กำไร"</b> และ <b>"หนี้สินสุทธิ + ค่าเงินอ่อน = กำไร"</b> — ส่วนใหญ่บริษัทย่อยมี <b>สินทรัพย์สุทธิ</b> จึงจำหลักง่ายๆ ว่า <b>ค่าเงินท้องถิ่นแข็ง → งบรวมดูดีขึ้น</b></p>
+</div>
+
+<h4>② ฐานะเปิดจากรายการค้า</h4>
+<div class="box explain">
+<div class="bt">💡 เกิดจากรายการที่เป็นตัวเงินสกุลต่างประเทศ</div>
+<ul>
+<li><b>ฐานะเปิดเป็นสินทรัพย์</b> (มีลูกหนี้ USD, เงินฝาก USD) → <b>USD แข็ง = กำไร</b> · <b>USD อ่อน = ขาดทุน</b></li>
+<li><b>ฐานะเปิดเป็นหนี้สิน</b> (มีเจ้าหนี้ USD, เงินกู้ USD) → <b>USD แข็ง = ขาดทุน</b> · <b>USD อ่อน = กำไร</b></li>
+<li><b>รับรู้ใน "กำไรหรือขาดทุน" ทันที</b> ⚠️ ต่างจากการแปลงค่างบการเงินที่เข้า OCI</li>
+</ul>
+</div>
+
+<h4>③ ตารางสรุปเปรียบเทียบ 3 ประเภทความเสี่ยง</h4>
+<div class="tw"><table>
+<tr><th>ประเภท</th><th>เกิดจาก</th><th>รับรู้ที่</th><th>ตัวอย่าง</th></tr>
+<tr><td><b>ความเสี่ยงจากรายการค้า</b><br>(Transaction exposure)</td><td>รายการที่เป็นตัวเงินสกุลต่างประเทศที่ยังไม่ชำระ</td><td><b>กำไรขาดทุน (P/L)</b></td><td>ลูกหนี้/เจ้าหนี้ต่างประเทศ · เงินกู้สกุล USD</td></tr>
+<tr><td><b>ความเสี่ยงจากการแปลงค่า</b><br>(Translation exposure)</td><td>การแปลงค่างบการเงินของหน่วยงานต่างประเทศ</td><td><b>OCI (บรรทัด CTA)</b></td><td>สินทรัพย์สุทธิของบริษัทย่อยในต่างประเทศ</td></tr>
+<tr><td><b>ความเสี่ยงเชิงเศรษฐกิจ</b><br>(Economic exposure)</td><td>ผลต่อความสามารถในการแข่งขันและกระแสเงินสดในอนาคต</td><td><b>ไม่ปรากฏในงบ</b><br>แต่กระทบมูลค่ากิจการ</td><td>คู่แข่งต่างชาติได้เปรียบเมื่อค่าเงินเปลี่ยน · ต้นทุนวัตถุดิบนำเข้าสูงขึ้น</td></tr>
+</table></div>
+<div class="box warn">
+<div class="bt">⚠️ ข้อสังเกตเพื่อความโปร่งใส</div>
+<p>คำว่า <b>transaction / translation / economic exposure</b> เป็นกรอบมาตรฐานทางการเงินระหว่างประเทศ ซึ่ง <b>ตำราบทที่ 5 ไม่ได้ระบุเป็นตารางนิยาม 3 ข้อนี้โดยตรง</b> — ผมสรุปให้เพื่อช่วยจัดระบบความคิด <b>เนื้อหาที่ต้องตอบตามตำราคือ "ผลต่างจากรายการค้าเข้า P/L และผลต่างจากการแปลงค่างบเข้า OCI"</b> ซึ่งถูกต้องตรงกันทั้งสองกรอบ</p>
+</div>
+
+<h4>④ ผลกระทบต่อการวิเคราะห์</h4>
+<ul>
+<li><b>กำไรสุทธิที่ผันผวนจากอัตราแลกเปลี่ยนมักเป็นรายการที่ไม่ยั่งยืน</b> — ควรแยกออกเมื่อประเมินความสามารถในการทำกำไรหลัก</li>
+<li><b>CTA ที่ติดลบสะสมมากๆ เป็นสัญญาณว่าเงินลงทุนในต่างประเทศเสียมูลค่าไปแล้ว</b> และจะถูกรับรู้เข้ากำไรขาดทุนเมื่อขายกิจการนั้นออกไป — <b>เป็นขาดทุนที่ "รออยู่" ในงบ</b></li>
+<li><b>ดูว่ากิจการมีการป้องกันความเสี่ยงหรือไม่</b> — กิจการที่ทำ natural hedge (กู้เงินสกุลเดียวกับที่มีรายได้) จะมีฐานะเปิดสุทธิต่ำ</li>
+<li><b>อ่านหมายเหตุประกอบงบการเงินเรื่องการวิเคราะห์ความอ่อนไหว (sensitivity analysis)</b> ที่กิจการต้องเปิดเผยตาม TFRS 7</li>
+</ul>
+
+<div class="tutor">
+<div class="bt">🧑‍🏫 ติวเตอร์สรุปให้ — LOS 5.8</div>
+
+<div class="t-sec">
+<span class="t-lab">เล่าแบบบ้านๆ</span>
+<p>"ฐานะเปิด" ฟังดูยาก แต่แปลง่ายๆ ว่า <b>"เราเปิดหน้าอกรับหมัดจากค่าเงินไว้เท่าไร"</b></p>
+<p>มีหลักคิดเดียวที่ใช้ได้ทุกกรณี:</p>
+<div class="mnemo" style="margin-top:8px"><b>"ถืออะไรไว้ แล้วของนั้นแพงขึ้น = กำไร"</b></div>
+<ul style="margin-top:10px">
+<li>มี<b>ลูกหนี้ดอลลาร์</b> (ถือดอลลาร์ไว้) → ดอลลาร์แข็ง = <b>กำไร</b></li>
+<li>มี<b>หนี้ดอลลาร์</b> (ติดหนี้ดอลลาร์) → ดอลลาร์แข็ง = <b>ขาดทุน</b> (ต้องจ่ายแพงขึ้น)</li>
+<li>มี<b>บริษัทลูกที่อเมริกาที่มีสินทรัพย์สุทธิ</b> → ดอลลาร์แข็ง = <b>CTA บวก</b></li>
+</ul>
+<p>ความต่างสำคัญอยู่ที่ <b>"ลงที่ไหน"</b> — รายการค้าลง <b>P/L กระทบกำไรสุทธิและ EPS ทันที</b> ส่วนการแปลงงบลง <b>OCI ไม่แตะกำไรสุทธิ</b></p>
+<p>มุมวิเคราะห์ที่ลึกและมักถูกถาม: <b>CTA ที่ติดลบสะสมเยอะๆ คือ "ขาดทุนที่รออยู่"</b> — ตราบใดที่ยังไม่ขายบริษัทย่อยนั้น มันก็นอนนิ่งอยู่ในส่วนของเจ้าของ แต่<b>วันที่ขายเมื่อไร มันจะไหลเข้ากำไรขาดทุนทันที</b></p>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">สูตรจำ</span>
+<div class="mnemo"><b>"สินทรัพย์สุทธิ + ค่าเงินแข็ง = กำไร"</b><br><b>"หนี้สินสุทธิ + ค่าเงินอ่อน = กำไร"</b></div>
+<div class="mnemo">3 ความเสี่ยง:<br><b>รายการค้า → P/L</b><br><b>แปลงค่างบ → OCI</b><br><b>เชิงเศรษฐกิจ → ไม่อยู่ในงบ</b></div>
+</div>
+
+<div class="t-sec">
+<span class="t-lab">เก็งข้อสอบ &amp; วิธีทำ</span>
+<ul>
+<li><b>ข้อทิศทางที่ออกซ้ำ:</b> "บริษัทย่อยมีสินทรัพย์สุทธิ และสกุลท้องถิ่นอ่อนค่า เกิดอะไรขึ้น" → <b>CTA ติดลบ ส่วนของเจ้าของลดลง แต่กำไรสุทธิไม่เปลี่ยน</b></li>
+<li><b>ข้อแยกประเภท:</b> ให้สถานการณ์แล้วถามว่ารับรู้ที่ไหน → <b>มีคำว่า "ลูกหนี้/เจ้าหนี้/เงินกู้" = P/L · มีคำว่า "บริษัทย่อยต่างประเทศ/แปลงค่า" = OCI</b></li>
+<li><b>ข้อ natural hedge:</b> "บริษัทลดฐานะเปิดได้อย่างไร" → <b>กู้เงินในสกุลเดียวกับที่มีรายได้/สินทรัพย์</b> เพื่อให้สินทรัพย์กับหนี้สินหักล้างกัน</li>
+<li><b>ข้อเชิงวิเคราะห์ระดับสูง:</b> "CTA ติดลบสะสม 500 ล้านบาท มีนัยอย่างไร" → <b>เป็นขาดทุนที่ยังไม่รับรู้ และจะถูก recycle เข้ากำไรขาดทุนเมื่อจำหน่ายหน่วยงานต่างประเทศนั้น</b></li>
+<li><b>ข้อควรระวัง:</b> กรอบ transaction/translation/economic เป็นกรอบสากล ถ้าข้อสอบ CISA ถามตามตำราไทย ให้ยึด<b>คำตอบหลักคือ "รายการค้าเข้า P/L · แปลงงบเข้า OCI"</b> ซึ่งตรงกันทั้งสองกรอบอยู่แล้ว</li>
+</ul>
+</div>
+</div>
+
+<div class="done-wrap"><button class="done" data-id="los58">✓ อ่านจบ LOS 5.8 แล้ว</button></div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ ภาคผนวก ============ -->
+<h2 class="ch" id="drill"><small>APPENDIX</small>จุดออกสอบจากแบบฝึกหัด</h2>
+
+<div class="box exam">
+<div class="bt">🎯 ประเด็นที่เชื่อมกับบทที่ 3–5 โดยตรง</div>
+<ul>
+<li><b>วิธีส่วนได้เสีย:</b> <code>เงินลงทุนปลายงวด = ราคาทุน + (%หุ้น × กำไรบริษัทร่วม) − เงินปันผลรับ</code> — เงินปันผลหักออกจากเงินลงทุน <b>ไม่ใช่รายได้</b></li>
+<li><b>การรวมธุรกิจ:</b> ใช้แนวคิด <b>"อำนาจควบคุม (control)"</b> ไม่ใช่ <b>"อิทธิพล (influence)"</b> — ข้อสอบชอบสลับคำสองคำนี้</li>
+<li><b>ค่าความนิยม:</b> เกิดจาก <b>สิ่งตอบแทนที่โอนให้ สูงกว่า มูลค่ายุติธรรมของสินทรัพย์สุทธิที่ระบุได้</b></li>
+<li><b>อัตราแลกเปลี่ยน:</b> เมื่อกิจการนำเงินตราต่างประเทศไปขายให้ธนาคาร <b>ใช้ "อัตราซื้อ"</b></li>
+<li><b>การแปลงค่ารายการที่เป็นตัวเงิน</b>เมื่ออัตราแลกเปลี่ยนเปลี่ยนไป <b>ก่อให้เกิดกำไรหรือขาดทุนจากอัตราแลกเปลี่ยน</b></li>
+</ul>
+</div>
+
+<div class="box exam">
+<div class="bt">🎯 ประเด็นเสริมจากบทอื่นที่มักออกร่วมกัน</div>
+<ul>
+<li><b>ภาษีเงินได้รอการตัดบัญชี:</b> เปรียบเทียบมูลค่าตามบัญชี (CA) กับฐานภาษี (TB) — <b>สินทรัพย์: CA &gt; TB → DTL</b><br>
+<code>ค่าใช้จ่ายภาษีรวม = ภาษีงวดปัจจุบัน + DTL ที่เพิ่ม − DTA ที่เพิ่ม</code><br>
+ผลแตกต่างชั่วคราวต้องคูณอัตราภาษี (เช่น 20%) เพื่อหาตัวเลข DTA/DTL<br>
+<span style="color:var(--purple)"><b>เชื่อมกับบทที่ 4:</b> การ step-up สินทรัพย์ในการรวมธุรกิจทำให้ CA &gt; TB จึงเกิด <b>DTL</b> ซึ่งต้องนำไปบวกก่อนคำนวณค่าความนิยม</span></li>
+<li><b>ผลประโยชน์พนักงาน:</b> <b>P/L</b> = ต้นทุนบริการปัจจุบัน + ต้นทุนบริการในอดีต + ดอกเบี้ยสุทธิ · <b>OCI</b> = ผลกำไร/ขาดทุนจากการวัดมูลค่าใหม่ (actuarial gain/loss)<br>
+<code>ดอกเบี้ยสุทธิ = อัตราคิดลด × (ภาระผูกพันต้นงวด − สินทรัพย์โครงการต้นงวด)</code><br>
+⚠️ <b>เงินสมทบโครงการไม่ใช่ค่าใช้จ่ายใน P/L</b> — เป็นตัวเลขหลอก</li>
+<li><b>กำไรต่อหุ้น:</b> การออกหุ้นใหม่หรือซื้อคืน → <b>ถ่วงน้ำหนักตามเวลา</b> · การแตกหุ้นหรือปันผลเป็นหุ้น → <b>ปรับย้อนหลังทั้งงวด</b> · <b>EPS ต้องแสดงเป็นบรรทัดสุดท้ายในงบกำไรขาดทุนเบ็ดเสร็จ</b></li>
+<li><b>ธนาคาร:</b> สินเชื่อเป็นสินทรัพย์หลัก · เงินฝากเป็นหนี้สินหลัก · NPLs คือปัจจัยเสี่ยงสำคัญ · <b>ไม่มีสินค้าคงเหลือ</b></li>
+<li><b>อสังหาริมทรัพย์:</b> มีอสังหาริมทรัพย์เพื่อการลงทุนและหนี้สินตามสัญญาเช่า แต่ <b>ปกติไม่มีอสังหาริมทรัพย์เพื่อการขาย</b></li>
+<li><b>ต้นทุนคงที่:</b> ในธุรกิจผลิตชิ้นส่วนรถยนต์ ต้นทุนขายและรายได้ <b>ไม่ลดลงในสัดส่วนเดียวกันเสมอไป</b> เพราะมีต้นทุนคงที่</li>
+</ul>
+</div>
+
+<div class="box warn">
+<div class="bt">⚠️ กลยุทธ์ทำข้อสอบ</div>
+<ul>
+<li><b>คำถามประเภท "ไม่ถูกต้อง" หรือ "ยกเว้น"</b> มีจำนวนมาก — <b>วงกลมคำนี้ไว้ทุกครั้งก่อนอ่านตัวเลือก</b></li>
+<li><b>ตัวเลขหลอก:</b> ข้อสอบคำนวณมักใส่ข้อมูลที่ไม่เกี่ยวข้องมาด้วย เช่น เงินสมทบโครงการผลประโยชน์ หรือเงินปันผลที่ได้รับ (ในบริบทวิธีส่วนได้เสีย) — <b>คัดเฉพาะตัวเลขที่กระทบกำไรขาดทุนจริงๆ</b></li>
+<li><b>ตัวเลือก "ถูกทุกข้อ"</b> พบได้บ่อยในชุดแบบฝึกหัดนี้ — หากตรวจแล้วทุกตัวเลือกดูถูกต้อง ให้พิจารณาตอบข้อนี้</li>
+<li><b>ระวังคำว่า "และ" กับ "หรือ"</b> — เกณฑ์ 10% ใช้ <b>"ข้อใดข้อหนึ่ง"</b> แต่ข้อยกเว้นวิธีส่วนได้เสียใช้ <b>"ครบทุกข้อ"</b></li>
+</ul>
+</div>
+
+<div class="box exam" id="note">
+<div class="bt">✅ หมายเหตุการตรวจทานความถูกต้อง</div>
+<p><b>เนื้อหาที่อ้างอิงตรงจากไฟล์ PDF และ LOS:</b> ตารางที่ 3-1 · นิยามการควบคุมและอิทธิพลอย่างมีนัยสำคัญ · หลักฐาน 5 ข้อ (ก–จ) · ข้อยกเว้นวิธีส่วนได้เสีย 4 ข้อ · นิยามและเกณฑ์ 10% ของส่วนงานดำเนินงาน · นิยามธุรกิจ · วิธีซื้อ 4 ขั้นตอน · ลักษณะวิธีรวมส่วนได้เสีย 4 ข้อ · นิยามค่าความนิยม · NCI 2 ทางเลือก · ตารางการแต่งกำไร 8 ประเด็น · ปัจจัย functional currency · นิยามรายการที่เป็นตัวเงิน · นิยามอัตราปิด (อัตราซื้อ/อัตราขาย) · ตารางที่ 5-4 · การรับรู้ผลต่างใน OCI · Fair value hedge และ cash flow hedge</p>
+<p style="margin-top:9px"><b>ส่วนที่เป็นคำอธิบายขยายความและตัวอย่างที่ผมสร้างเสริม</b> (อ้างอิงหลักการ TFRS/TAS ที่เกี่ยวข้อง) ได้แก่ ตัวอย่างคำนวณทุกตัวอย่าง · ตารางผลกระทบต่ออัตราส่วนทางการเงิน · เกณฑ์ 75% และลูกค้ารายใหญ่ 10% ตาม TFRS 8 · รายละเอียด TAS 29 และตัวบ่งชี้เงินเฟ้อรุนแรง · ตาราง 3 ประเภทความเสี่ยง · กล่องติวเตอร์ทุกกล่อง (สูตรจำและแนวเก็งข้อสอบเป็นเทคนิคช่วยจำ ไม่ใช่ถ้อยคำตามตำรา)</p>
+<p style="margin-top:9px"><b>จุดที่ควรเปิดหนังสือยืนยันซ้ำ:</b> ตารางที่ 5-4 หน้า 277 ในส่วนคอลัมน์ "กรณีเงินเฟ้อรุนแรง" และช่อง "ส่วนของผู้ถือหุ้น" ที่ตำราระบุว่า <b>"ไม่ระบุ"</b> — แนะนำเปิดดูหน้าจริงประกอบ เพราะเป็นตารางที่จัดรูปแบบซับซ้อน</p>
+</div>
+
+</div><!-- /wrap -->
+
+<div id="bar"></div>
+<div id="fab">
+  <button onclick="window.scrollTo({top:0,behavior:'smooth'})" title="กลับขึ้นบน">↑</button>
+  <button onclick="save(1)" title="บันทึกตำแหน่ง">🔖</button>
+</div>
+<div id="toast"></div>
+
+<footer>
+  CISA 2.2 · การวิเคราะห์งบการเงินขั้นสูง บทที่ 3–5<br>
+  เอกสารสรุปเพื่อการทบทวน · โปรดตรวจสอบกับตำราและมาตรฐานการรายงานทางการเงินฉบับปัจจุบัน
+</footer>
+
+<script>
+(function(){
+  var KEY='cisa_fsa345_v1', TKEY='cisa_fsa345_theme', FKEY='cisa_fsa345_fs', RKEY='cisa_fsa345_read';
+  var TOTAL=21;
+
+  /* ---- theme & font ---- */
+  var th=localStorage.getItem(TKEY); if(th) document.documentElement.setAttribute('data-theme',th);
+  var fs=parseFloat(localStorage.getItem(FKEY)||'16.5');
+  document.documentElement.style.setProperty('--fs',fs+'px');
+
+  window.tg=function(){
+    var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',n);
+    localStorage.setItem(TKEY,n); toast(n==='dark'?'โหมดกลางคืน':'โหมดกลางวัน');
+  };
+  window.fz=function(d){
+    fs=Math.min(22,Math.max(13,fs+d*1.2));
+    document.documentElement.style.setProperty('--fs',fs+'px');
+    localStorage.setItem(FKEY,fs); toast('ขนาดตัวอักษร '+fs.toFixed(1)+'px');
+  };
+
+  /* ---- toast ---- */
+  var tEl=document.getElementById('toast'),tTo;
+  function toast(m){tEl.textContent=m;tEl.classList.add('on');clearTimeout(tTo);tTo=setTimeout(function(){tEl.classList.remove('on')},1700)}
+
+  /* ================= READ STATE ================= */
+  var readSet={};
+  try{
+    var raw=JSON.parse(localStorage.getItem(RKEY)||'[]');
+    for(var i=0;i<raw.length;i++) readSet[raw[i]]=1;
+  }catch(e){readSet={}}
+
+  function saveRead(){
+    var arr=[]; for(var k in readSet) if(readSet[k]) arr.push(k);
+    try{localStorage.setItem(RKEY,JSON.stringify(arr))}catch(e){}
+  }
+
+  function countRead(){var n=0;for(var k in readSet) if(readSet[k]) n++;return n}
+
+  function updateMeter(){
+    var n=countRead();
+    document.getElementById('rbN').textContent=n;
+    document.getElementById('rbFill').style.width=(n/TOTAL*100)+'%';
+  }
+
+  function paint(id){
+    var sec=document.getElementById(id); if(!sec) return;
+    var btn=sec.querySelector('.done');
+    var link=document.querySelector('nav.toc a[href="#'+id+'"]');
+    var label=btn?btn.getAttribute('data-label'):'';
+    if(readSet[id]){
+      sec.classList.add('read');
+      if(btn) btn.textContent='✔ อ่านแล้ว — แตะเพื่อกลับมาอ่านใหม่';
+      if(link) link.classList.add('done-link');
+    }else{
+      sec.classList.remove('read');
+      if(btn) btn.textContent=label;
+      if(link) link.classList.remove('done-link');
+    }
+  }
+
+  var btns=document.querySelectorAll('.done');
+  for(var b=0;b<btns.length;b++){
+    (function(btn){
+      btn.setAttribute('data-label',btn.textContent);
+      var id=btn.getAttribute('data-id');
+      btn.addEventListener('click',function(){
+        if(readSet[id]){
+          delete readSet[id];
+          paint(id); saveRead(); updateMeter();
+          toast('ยกเลิกสถานะอ่านแล้ว');
+        }else{
+          readSet[id]=1;
+          paint(id); saveRead(); updateMeter();
+          var n=countRead();
+          toast(n>=TOTAL?'🎉 อ่านครบทั้ง 21 LOS แล้ว!':('✔ บันทึกแล้ว · อ่านไป '+n+'/'+TOTAL+' LOS'));
+          var sec=document.getElementById(id);
+          var next=sec?sec.nextElementSibling:null;
+          while(next && next.tagName!=='SECTION' && next.tagName!=='H2'){next=next.nextElementSibling}
+          if(next){
+            setTimeout(function(){
+              var y=next.getBoundingClientRect().top+window.scrollY-12;
+              window.scrollTo({top:y,behavior:'smooth'});
+            },260);
+          }
+        }
+      });
+      paint(id);
+    })(btns[b]);
+  }
+  updateMeter();
+
+  window.clrRead=function(){
+    readSet={}; saveRead(); updateMeter();
+    var ids=document.querySelectorAll('.done');
+    for(var i=0;i<ids.length;i++) paint(ids[i].getAttribute('data-id'));
+    toast('ล้างสถานะอ่านแล้วทั้งหมด');
+  };
+
+  /* ================= RESUME POSITION ================= */
+  function curHead(){
+    var hs=document.querySelectorAll('h2.ch,h3.los'),best='',y=window.scrollY+120;
+    for(var i=0;i<hs.length;i++){
+      if(hs[i].getBoundingClientRect().top+window.scrollY<=y){
+        best=hs[i].textContent.replace(/\s+/g,' ').trim();
+      }
+    }
+    return best||'ต้นเอกสาร';
+  }
+
+  function save(manual){
+    var d={y:window.scrollY,h:document.documentElement.scrollHeight,t:Date.now(),head:curHead()};
+    try{localStorage.setItem(KEY,JSON.stringify(d))}catch(e){}
+    if(manual) toast('🔖 บันทึกตำแหน่งแล้ว');
+  }
+  window.save=save;
+
+  window.clr=function(){
+    localStorage.removeItem(KEY);
+    document.getElementById('resume').style.display='none';
+    toast('ล้างตำแหน่งการอ่านแล้ว');
+  };
+
+  var bar=document.getElementById('bar'),sTo,rAF=false;
+  function onScroll(){
+    if(rAF) return; rAF=true;
+    requestAnimationFrame(function(){
+      var h=document.documentElement.scrollHeight-window.innerHeight;
+      bar.style.width=(h>0?Math.min(100,window.scrollY/h*100):0)+'%';
+      rAF=false;
+    });
+    clearTimeout(sTo); sTo=setTimeout(save,500);
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  window.addEventListener('beforeunload',function(){save()});
+  document.addEventListener('visibilitychange',function(){if(document.hidden) save()});
+
+  var rawPos=null; try{rawPos=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+  if(rawPos && rawPos.y>350){
+    var box=document.getElementById('resume');
+    var pct=rawPos.h?Math.round(rawPos.y/(rawPos.h-window.innerHeight)*100):0;
+    pct=Math.max(1,Math.min(99,pct));
+    var mins=Math.round((Date.now()-rawPos.t)/60000), when;
+    if(mins<1) when='เมื่อสักครู่';
+    else if(mins<60) when=mins+' นาทีที่แล้ว';
+    else if(mins<1440) when=Math.round(mins/60)+' ชั่วโมงที่แล้ว';
+    else when=Math.round(mins/1440)+' วันที่แล้ว';
+    document.getElementById('rInfo').innerHTML=
+      '<b>'+(rawPos.head||'')+'</b><br>อ่านไปแล้วประมาณ '+pct+'% · '+when;
+    box.style.display='block';
+    document.getElementById('rGo').onclick=function(){
+      box.style.display='none';
+      window.scrollTo({top:rawPos.y,behavior:'smooth'});
+    };
+    document.getElementById('rNo').onclick=function(){
+      box.style.display='none';
+      localStorage.removeItem(KEY);
+      window.scrollTo({top:0,behavior:'smooth'});
+    };
+  }
+
+  document.querySelectorAll('nav.toc a').forEach(function(a){
+    a.addEventListener('click',function(){
+      document.getElementById('toc').classList.remove('open');
+      setTimeout(save,700);
+    });
+  });
+
+  onScroll();
+})();
+</script>
+</body>
+</html>
