@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<title>สรุป CISA II — การวิเคราะห์งบการเงินขั้นสูง บทที่ 6–7 (แมปตาม LOS + แบบฝึกหัดจริง)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f7fb; --card:#ffffff; --ink:#1b2333; --ink-soft:#4a5568;
+  --muted:#6b7280; --line:#e4e8f0; --brand:#1d4ed8; --brand-soft:#e8efff;
+  --accent:#0d9488; --accent-soft:#d9f5f1; --warn:#b45309; --warn-soft:#fff3d9;
+  --danger:#b91c1c; --danger-soft:#fdeaea; --code:#f1f3f8;
+  --tutor:#7c3aed; --tutor-soft:#f3ecff; --tutor-line:#ddd0ff;
+  --radius:12px; --fs:14px;
+}
+html[data-theme="dark"]{
+  --bg:#0f141c; --card:#161d28; --ink:#e7ecf4; --ink-soft:#c2cad8;
+  --muted:#93a0b4; --line:#26303e; --brand:#7aa2ff; --brand-soft:#1b2740;
+  --accent:#4fd6c4; --accent-soft:#12302e; --warn:#f0b357; --warn-soft:#332714;
+  --danger:#ff8b8b; --danger-soft:#33191a; --code:#1b2432;
+  --tutor:#c4b5fd; --tutor-soft:#241c3d; --tutor-line:#3b2f63;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth;font-size:var(--fs);overflow-x:hidden}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"IBM Plex Sans Thai","Sarabun","Noto Sans Thai",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  line-height:1.72; font-size:1rem; letter-spacing:.1px;
+  padding:0 0 80px; overflow-x:hidden; max-width:100vw;
+}
+.wrap{max-width:100%;margin:0 auto;padding:0 6px}
+.hero{
+  background:linear-gradient(160deg,#1d4ed8 0%,#0b2a6b 60%,#071a42 100%);
+  color:#fff;padding:20px 10px 18px;border-radius:0 0 16px 16px;
+}
+html[data-theme="dark"] .hero{background:linear-gradient(160deg,#182a52 0%,#101a30 60%,#0b111c 100%)}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);
+  padding:3px 9px;border-radius:999px;font-size:.65rem;font-weight:600;margin-bottom:8px}
+.hero h1{margin:0 0 5px;font-size:1.2rem;line-height:1.4;font-weight:700}
+.hero p{margin:0;font-size:.76rem;opacity:.9}
+.tools{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.tbtn{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.26);color:#fff;
+  border-radius:8px;padding:6px 10px;font-size:.7rem;font-weight:600;cursor:pointer;
+  font-family:inherit;display:inline-flex;align-items:center;gap:4px}
+.tbtn:active{transform:scale(.96)}
+#losStat{background:rgba(255,255,255,.22);cursor:default}
+section{margin-top:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:12px 9px;margin-top:10px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+h2{font-size:.98rem;margin:18px 0 4px;line-height:1.45;font-weight:700;
+  padding-left:9px;border-left:4px solid var(--brand);border-radius:2px}
+h3{font-size:.9rem;margin:0 0 7px;font-weight:700;color:var(--brand)}
+h4{font-size:.82rem;margin:12px 0 5px;font-weight:700}
+p{margin:0 0 9px}
+ul,ol{margin:0 0 9px;padding-left:18px}
+li{margin:3px 0}
+b,strong{font-weight:700}
+.small{font-size:.72rem;color:var(--muted)}
+.chapter-head{background:var(--brand-soft);border:1px solid var(--line);border-radius:var(--radius);
+  padding:12px 10px;margin-top:22px}
+.chapter-head .no{font-size:.68rem;font-weight:700;color:var(--brand);letter-spacing:.6px}
+.chapter-head h2{border:0;padding:0;margin:4px 0 7px;font-size:1.12rem}
+.los{background:var(--card);border-radius:9px;padding:9px 10px;border:1px dashed var(--line)}
+.los b{font-size:.75rem;color:var(--brand)}
+.los ol{margin:5px 0 0;padding-left:17px;font-size:.78rem}
+.losblk{margin-top:16px}
+.losblk > *{transition:opacity .4s ease, filter .4s ease}
+.losblk.done > *:not(.doneWrap){opacity:.26;filter:grayscale(.6)}
+.losTag{display:flex;align-items:flex-start;gap:7px;background:var(--brand);color:#fff;
+  border-radius:9px;padding:7px 10px;font-size:.74rem;font-weight:700;margin-bottom:2px;line-height:1.5}
+.losTag .mark{background:rgba(255,255,255,.26);border-radius:5px;padding:1px 6px;
+  font-size:.64rem;white-space:nowrap;flex-shrink:0}
+.losblk.base .losTag{background:var(--muted)}
+.doneWrap{display:flex;justify-content:center;margin:14px 0 22px}
+.doneBtn{font-family:inherit;cursor:pointer;border:1.5px dashed var(--accent);background:var(--card);
+  color:var(--accent);border-radius:999px;padding:9px 18px;font-size:.78rem;font-weight:700;
+  display:inline-flex;align-items:center;gap:7px;transition:all .25s}
+.doneBtn:active{transform:scale(.96)}
+.doneBtn.on{background:var(--accent);color:#fff;border-style:solid}
+.tutor{background:var(--tutor-soft);border:1px solid var(--tutor-line);
+  border-left:5px solid var(--tutor);border-radius:10px;padding:11px 11px;margin:10px 0 2px}
+.tutor .th{font-weight:700;color:var(--tutor);font-size:.84rem;margin-bottom:6px;
+  display:flex;align-items:center;gap:6px}
+.tutor p{margin:0 0 8px;font-size:.82rem}
+.tsec{background:var(--card);border:1px solid var(--tutor-line);border-radius:8px;
+  padding:8px 9px;margin-top:7px;font-size:.79rem}
+.tsec b.lb{display:block;color:var(--tutor);font-size:.74rem;margin-bottom:3px}
+.tsec ul{margin:4px 0 0;padding-left:17px}
+.tsec li{margin:2px 0}
+.tsec p{font-size:.79rem}
+.mem{background:var(--warn-soft);border:1px dashed var(--warn);border-radius:7px;
+  padding:6px 8px;margin-top:6px;font-size:.78rem;font-weight:600;color:var(--ink)}
+.formula{background:var(--code);border:1px solid var(--line);border-left:4px solid var(--accent);
+  border-radius:8px;padding:9px 10px;margin:9px 0;font-size:.8rem;line-height:1.85;
+  word-break:break-word;overflow-wrap:anywhere}
+.formula .t{font-weight:700;color:var(--accent);display:block;font-size:.7rem;margin-bottom:3px}
+.ex{background:var(--accent-soft);border:1px solid var(--line);border-radius:8px;padding:10px;margin:10px 0}
+.ex .h{font-weight:700;font-size:.78rem;color:var(--accent);margin-bottom:5px;display:flex;gap:6px;align-items:center}
+.tip{background:var(--warn-soft);border-left:4px solid var(--warn);border-radius:0 8px 8px 0;
+  padding:9px 10px;margin:10px 0;font-size:.8rem}
+.tip .h{font-weight:700;color:var(--warn);display:block;margin-bottom:3px;font-size:.76rem}
+.alert{background:var(--danger-soft);border-left:4px solid var(--danger);border-radius:0 8px 8px 0;
+  padding:9px 10px;margin:10px 0;font-size:.8rem}
+.alert .h{font-weight:700;color:var(--danger);display:block;margin-bottom:3px;font-size:.76rem}
+.kv{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px dashed var(--line);font-size:.78rem}
+.kv:last-child{border-bottom:0}
+.kv span:first-child{word-break:break-word}
+.kv span:last-child{font-weight:700;white-space:nowrap}
+.tw{margin:10px 0;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+table{border-collapse:collapse;width:100%;table-layout:fixed;font-size:.62rem}
+th,td{padding:4px 4px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;
+  word-break:break-word;overflow-wrap:anywhere;white-space:normal;line-height:1.4}
+th{background:var(--brand-soft);color:var(--brand);font-weight:700}
+tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right}
+.toc a{display:flex;gap:7px;align-items:flex-start;padding:8px 3px;border-bottom:1px solid var(--line);
+  color:var(--ink);text-decoration:none;font-size:.78rem;line-height:1.5}
+.toc a:last-child{border-bottom:0}
+.toc .n{color:var(--brand);font-weight:700;min-width:46px;font-size:.7rem;padding-top:2px;flex-shrink:0}
+.toc .ch{background:var(--brand-soft);font-weight:700}
+details{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:9px 10px;margin:8px 0}
+details[open]{border-color:var(--brand)}
+summary{cursor:pointer;font-weight:600;font-size:.8rem;list-style:none;display:flex;gap:7px}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"Q";background:var(--brand);color:#fff;border-radius:5px;
+  min-width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:.62rem;margin-top:2px}
+details .ans{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);font-size:.78rem;color:var(--ink-soft)}
+.exhead{display:flex;align-items:center;gap:6px;font-weight:700;font-size:.8rem;color:var(--brand);
+  margin:16px 0 8px;padding-top:10px;border-top:1px dashed var(--line)}
+.exbadge{background:var(--brand-soft);color:var(--brand);border-radius:6px;padding:2px 7px;font-size:.65rem}
+.exq summary{font-size:.78rem}
+#toast{position:fixed;left:8px;right:8px;bottom:10px;max-width:700px;margin:0 auto;
+  background:var(--card);border:1px solid var(--brand);border-radius:12px;padding:11px 12px;
+  box-shadow:0 10px 30px rgba(9,20,45,.22);z-index:70;display:none}
+#toast.show{display:block;animation:up .28s ease}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+#toast .tt{font-weight:700;font-size:.82rem;margin-bottom:2px}
+#toast .ts{font-size:.7rem;color:var(--muted);margin-bottom:9px}
+#toast .row{display:flex;gap:7px}
+#toast button{flex:1;border:0;border-radius:8px;padding:8px;font-weight:700;font-size:.76rem;
+  font-family:inherit;cursor:pointer}
+#goBtn{background:var(--brand);color:#fff}
+#noBtn{background:var(--code);color:var(--ink-soft)}
+#prog{position:fixed;left:8px;bottom:10px;background:var(--card);border:1px solid var(--line);
+  color:var(--ink-soft);border-radius:999px;padding:5px 10px;font-size:.66rem;font-weight:700;
+  z-index:60;box-shadow:0 3px 12px rgba(9,20,45,.12)}
+#top{position:fixed;right:8px;bottom:8px;width:38px;height:38px;border-radius:50%;
+  background:var(--brand);color:#fff;border:0;font-size:1rem;z-index:60;display:none;
+  box-shadow:0 5px 16px rgba(29,78,216,.4);cursor:pointer}
+#top.show{display:block}
+footer{text-align:center;color:var(--muted);font-size:.68rem;margin-top:24px;padding:0 10px}
+@media(max-width:340px){ table{font-size:.58rem} th,td{padding:3px} }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="tag">CISA LEVEL II · หลักสูตรที่ 3</span>
+    <h1>การวิเคราะห์งบการเงินขั้นสูง<br>บทที่ 6 – 7</h1>
+    <p>แมปตรง 1:1 กับ LOS ทางการ 12 ข้อ · พร้อมกล่องติวเตอร์ และแบบฝึกหัดจากคลังข้อสอบจริง</p>
+    <div class="tools">
+      <span class="tbtn" id="losStat">อ่านแล้ว 0/12 LOS</span>
+      <button class="tbtn" id="themeBtn">🌙 โหมดมืด</button>
+      <button class="tbtn" id="fsDown">ก−</button>
+      <button class="tbtn" id="fsUp">ก+</button>
+      <button class="tbtn" id="clearBtn">↺ ล้างตำแหน่งอ่าน</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<section>
+  <h2>สารบัญ (เรียงตาม LOS ทางการ)</h2>
+  <div class="card toc">
+    <a class="ch" href="#ch6"><span class="n">บทที่ 6</span><span>การวิเคราะห์กำไรต่อหุ้นปรับลด</span></a>
+    <a href="#F0"><span class="n">ปูพื้น</span><span>พื้นฐาน Basic EPS และ WANOS <span class="small">(ไม่ใช่ LOS ทางการ แต่ต้องรู้ก่อน)</span></span></a>
+    <a href="#L61"><span class="n">LOS 6.1</span><span>จำแนกและเปรียบเทียบโครงสร้างเงินทุนแบบง่ายและแบบซับซ้อน</span></a>
+    <a href="#L62"><span class="n">LOS 6.2</span><span>จำแนกหลักทรัพย์ที่ปรับลดและที่ไม่ปรับลด (ปรับเพิ่ม) กำไรต่อหุ้น</span></a>
+    <a href="#L63"><span class="n">LOS 6.3</span><span>คำนวณ EPS ปรับลด: หุ้นกู้แปลงสภาพ &amp; หุ้นบุริมสิทธิแปลงสภาพ</span></a>
+    <a href="#L64"><span class="n">LOS 6.4</span><span>คำนวณ EPS ปรับลด: stock options และ warrants</span></a>
+    <a href="#L65"><span class="n">LOS 6.5</span><span>อธิบายผลกระทบของหลักทรัพย์แปลงสภาพและสิทธิซื้อหุ้นต่อ EPS</span></a>
+    <a href="#L66"><span class="n">LOS 6.6</span><span>อธิบายแนวคิดการปรับเพิ่มกำไรต่อหุ้น (Antidilution)</span></a>
+    <a href="#L67"><span class="n">LOS 6.7</span><span>เปรียบเทียบข้อกำหนดการรายงาน EPS ของทั้งสองโครงสร้าง</span></a>
+    <a class="ch" href="#ch7"><span class="n">บทที่ 7</span><span>กรณีศึกษาการวิเคราะห์งบการเงิน</span></a>
+    <a href="#L71"><span class="n">LOS 7.1</span><span>อธิบายเทคนิคการวิเคราะห์งบการเงินแต่ละขั้นตอน</span></a>
+    <a href="#L72"><span class="n">LOS 7.2</span><span>วิเคราะห์และอธิบายความแตกต่างของงบการเงินในกรณีต่าง ๆ</span></a>
+    <a href="#L73"><span class="n">LOS 7.3</span><span>ระบุทางเลือกทางบัญชีและผลกระทบต่อคุณภาพรายงานและอัตราส่วน</span></a>
+    <a href="#L74"><span class="n">LOS 7.4</span><span>ผลกระทบของการปรับปรุงงบ 3 งบต่อสถานะการเงินและอัตราส่วน</span></a>
+    <a href="#L75"><span class="n">LOS 7.5</span><span>ประยุกต์ใช้เทคนิคการวิเคราะห์ในแต่ละกรณีศึกษา</span></a>
+    <a href="#quiz"><span class="n">ทบทวน</span><span>แบบฝึกหัดจับประเด็น + เฉลย</span></a>
+  </div>
+</section>
+
+<div class="chapter-head" id="ch6">
+  <div class="no">CHAPTER 6</div>
+  <h2>การวิเคราะห์กำไรต่อหุ้นปรับลด</h2>
+  <div class="los">
+    <b>📌 วัตถุประสงค์การเรียนรู้ (LOS) ทางการ — บทที่ 6</b>
+    <ol>
+      <li>จำแนกและเปรียบเทียบความแตกต่างระหว่างโครงสร้างเงินทุนแบบง่าย (simple capital structure) และโครงสร้างเงินทุนแบบซับซ้อน (complex capital structure) เพื่อนำไปใช้ในการคำนวณกำไรต่อหุ้น</li>
+      <li>จำแนกความแตกต่างระหว่างหลักทรัพย์ที่ปรับลดและหลักทรัพย์ที่ไม่ปรับลด (ปรับเพิ่ม) กำไรต่อหุ้น</li>
+      <li>คำนวณกำไรต่อหุ้นปรับลดในกรณีมีหุ้นกู้แปลงสภาพและกรณีมีหุ้นบุริมสิทธิแปลงสภาพ</li>
+      <li>คำนวณกำไรต่อหุ้นปรับลดในกรณีมีสิทธิที่จะซื้อหุ้น (stock options) และ/หรือใบสำคัญแสดงสิทธิที่จะซื้อหุ้น (warrants)</li>
+      <li>อธิบายผลกระทบของหลักทรัพย์แปลงสภาพและสิทธิในการซื้อหุ้นสามัญที่มีต่อกำไรต่อหุ้น</li>
+      <li>อธิบายแนวคิดการปรับเพิ่มกำไรต่อหุ้น</li>
+      <li>เปรียบเทียบข้อกำหนดของการรายงานกำไรต่อหุ้นในกิจการที่มีโครงสร้างเงินทุนแบบง่ายและกิจการที่มีโครงสร้างเงินทุนแบบซับซ้อน</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ============ ปูพื้นฐาน (ไม่ใช่ LOS) ============ -->
+<div class="losblk base" id="F0" data-los="F0">
+  <div class="losTag"><span class="mark">ปูพื้น</span> พื้นฐานที่ต้องมีก่อนเข้า LOS — กำไรต่อหุ้นขั้นพื้นฐานและจำนวนหุ้นถัวเฉลี่ยถ่วงน้ำหนัก</div>
+
+  <div class="tutor">
+    <div class="th">🎓 ติวเตอร์สรุปให้</div>
+    <p><b>หมายเหตุความถูกต้อง:</b> หัวข้อนี้ <b>ไม่ใช่ LOS ทางการ</b> ของบทที่ 6 แต่เป็นทักษะพื้นฐานที่ LOS 6.3 / 6.4 / 6.6 ใช้ต่อยอดทั้งหมด ถ้าตัวส่วนผิดตั้งแต่ต้น คำตอบของทุก LOS ที่เหลือจะผิดตามทันที จึงแยกไว้เป็นบล็อกปูพื้น</p>
+    <p>หัวใจมีคำถามเดียว: <b>“หุ้นตัวนี้อยู่กับบริษัทมากี่เดือน?”</b> หุ้นที่ออกเดือน พ.ย. ได้ใช้เงินแค่ 2 เดือน จะให้ไปหารกำไรทั้งปีก็ไม่ยุติธรรม จึงต้อง<b>ถ่วงน้ำหนักตามเวลา</b></p>
+    <p>แต่มี<b>ข้อยกเว้นใหญ่</b> คือ <b>หุ้นปันผลกับแตกหุ้น</b> — สองอย่างนี้<b>ไม่มีเงินเข้าบริษัทเลย</b> แค่เอากรรไกรหั่นหุ้นเดิมให้ย่อยลง ความมั่งคั่งของผู้ถือหุ้นไม่เปลี่ยน จึงต้อง<b>ปรับย้อนหลังทั้งงวด</b> เสมือนมีหุ้นจำนวนใหม่มาตั้งแต่วันที่ 1 ม.ค.</p>
+    <div class="tsec">
+      <b class="lb">🧠 หลักการจำ</b>
+      <div class="mem">“มีเงินเข้า = ถ่วงน้ำหนัก · ไม่มีเงินเข้า = ย้อนหลังทั้งงวด”</div>
+      <ul>
+        <li>ออกหุ้นเพิ่มทุน / ซื้อหุ้นคืน / ออกหุ้นแลกกิจการ ⇒ <b>เงินขยับ ⇒ ถ่วงน้ำหนัก</b></li>
+        <li>หุ้นปันผล / แตกหุ้น / รวมหุ้น ⇒ <b>เงินไม่ขยับ ⇒ คูณย้อนหลังหมด</b></li>
+        <li>ตัวเศษท่องว่า <b>“หักคนนอก (NCI) แล้วหักพี่ใหญ่บุริมสิทธิ ที่เหลือถึงเป็นของเรา”</b></li>
+        <li>บุริมสิทธิ <b>สะสม = หักเสมอ</b> · <b>ไม่สะสม = หักเฉพาะที่ประกาศจ่าย</b></li>
+      </ul>
+    </div>
+    <div class="tsec">
+      <b class="lb">🎯 เก็งข้อสอบ</b>
+      <ul>
+        <li>ใส่เหตุการณ์<b>ผสม</b>ในปีเดียว เช่น ออกหุ้นเดือน เม.ย. + ซื้อหุ้นคืนเดือน ส.ค. + แตกหุ้นเดือน ต.ค. เพื่อดูว่ารู้ไหมว่าตัวไหนถ่วงน้ำหนัก ตัวไหนย้อนหลัง</li>
+        <li>ใส่ <b>หุ้นบุริมสิทธิชนิดสะสมที่ยังไม่ประกาศจ่าย</b> แล้วดูว่าหักหรือไม่ (ต้องหัก!)</li>
+        <li>ให้ <b>กำไรสุทธิรวม</b> ที่มี NCI ปนอยู่ แล้วดูว่าหัก NCI ออกไหม</li>
+      </ul>
+    </div>
+    <div class="tsec">
+      <b class="lb">⚡ เทคนิคทำข้อสอบ</b>
+      <ul>
+        <li><b>วาดไทม์ไลน์ 12 ช่อง</b> ก่อนเสมอ แล้วเขียนจำนวนหุ้นบนแต่ละช่วง</li>
+        <li><b>เช็กผลรวมเดือนต้องได้ 12 พอดี</b> ถ้าไม่ครบ = ตัดช่วงผิด</li>
+        <li>ถ้ามีแตกหุ้น ให้<b>คูณตัวคูณเข้าไปในทุกช่วงก่อนวันแตกหุ้น</b> แล้วค่อยถ่วงน้ำหนัก</li>
+        <li>ทำตัวเศษให้เสร็จก่อน แล้วค่อยลงมือตัวส่วน จะได้ไม่ลืมหักปันผลบุริมสิทธิ</li>
+      </ul>
+    </div>
+  </div>
+
+<section>
+  <h2>กำไรต่อหุ้นขั้นพื้นฐาน (Basic EPS)</h2>
+  <div class="card">
+    <div class="formula"><span class="t">สูตรหลัก</span>
+      Basic EPS = กำไร(ขาดทุน)ส่วนที่เป็นของผู้ถือหุ้นสามัญ ÷ จำนวนหุ้นสามัญถัวเฉลี่ยถ่วงน้ำหนัก
+    </div>
+    <h4>ตัวเศษ — ต้องกรองอะไรออกบ้าง</h4>
+    <div class="formula">
+      กำไรสุทธิรวม<br>
+      − ส่วนที่เป็นของส่วนได้เสียที่ไม่มีอำนาจควบคุม (NCI)<br>
+      − เงินปันผลหุ้นบุริมสิทธิ<br>
+      = <b>กำไรส่วนที่เป็นของผู้ถือหุ้นสามัญของบริษัทใหญ่</b>
+    </div>
+    <div class="tw"><table>
+      <tr><th>ประเภทหุ้นบุริมสิทธิ</th><th>วิธีหักเงินปันผล</th></tr>
+      <tr><td><b>ชนิดสะสม</b> (Cumulative)</td><td>หักปันผลของงวดนั้น <b>ไม่ว่าจะประกาศจ่ายหรือไม่</b> เพราะสิทธิเกิดขึ้นแล้ว</td></tr>
+      <tr><td><b>ชนิดไม่สะสม</b> (Non-cumulative)</td><td>หัก<b>เฉพาะส่วนที่ประกาศจ่าย</b>ในงวดนั้น</td></tr>
+    </table></div>
+    <div class="ex"><div class="h">✏️ ตัวอย่างเข้าใจง่าย</div>
+      บริษัท ก. กำไรสุทธิ 12,000,000 บาท มีหุ้นบุริมสิทธิชนิดสะสมที่ต้องจ่ายปันผลปีละ 2,000,000 บาท แต่ปีนี้<b>ยังไม่ประกาศจ่าย</b><br><br>
+      ▸ เพราะเป็นชนิดสะสม ⇒ ต้องหักออกอยู่ดี<br>
+      ▸ กำไรส่วนของหุ้นสามัญ = 12,000,000 − 2,000,000 = <b>10,000,000 บาท</b><br>
+      ▸ หากมีหุ้นสามัญถัวเฉลี่ย 5,000,000 หุ้น ⇒ Basic EPS = <b>2.00 บาท/หุ้น</b>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>จำนวนหุ้นสามัญถัวเฉลี่ยถ่วงน้ำหนัก (WANOS)</h2>
+  <div class="card">
+    <p><b>หลักคิด:</b> หุ้นที่เพิ่งออกกลางปี ยังไม่ได้ช่วยสร้างกำไรมาทั้งปี จึงนับได้แค่ตามสัดส่วนเวลาที่มีหุ้นนั้นอยู่จริง</p>
+    <div class="formula"><span class="t">สูตร</span>
+      WANOS = Σ (จำนวนหุ้นแต่ละช่วง × จำนวนเดือนที่มีอยู่ ÷ 12)
+    </div>
+    <div class="tw"><table>
+      <tr><th>เหตุการณ์</th><th>วิธีปฏิบัติ</th><th>เหตุผล</th></tr>
+      <tr><td>ออกหุ้นใหม่รับเงินสด</td><td>ถ่วงน้ำหนักตามเวลา</td><td>มีเงินสดเข้าเฉพาะช่วงที่เหลือ</td></tr>
+      <tr><td>ซื้อหุ้นคืน (Treasury)</td><td>หักออกตามเวลา</td><td>เงินสดไหลออกช่วงนั้น</td></tr>
+      <tr><td>ออกหุ้นแลกกิจการ (รวมธุรกิจ)</td><td>ถ่วงน้ำหนักจากวันซื้อ</td><td>กำไรของกิจการที่ซื้อรวมเข้ามาตั้งแต่วันนั้น</td></tr>
+      <tr><td><b>หุ้นปันผล / แตกหุ้น</b></td><td><b>ปรับย้อนหลังทั้งงวด</b></td><td>ไม่มีเงินสดเข้า สัดส่วนความเป็นเจ้าของไม่เปลี่ยน</td></tr>
+    </table></div>
+
+    <div class="ex"><div class="h">✏️ ตัวอย่างที่ 6-1 (จากเอกสาร) — ออกหุ้นเพิ่มระหว่างปี</div>
+      กำไรสำหรับปี 500,000 บาท และมีการเปลี่ยนแปลงหุ้นดังนี้
+      <div class="kv"><span>1 ม.ค. — หุ้นต้นงวด</span><span>100,000 หุ้น</span></div>
+      <div class="kv"><span>1 เม.ย. — ออกเพิ่ม 50,000 (รวม)</span><span>150,000 หุ้น</span></div>
+      <div class="kv"><span>1 พ.ย. — ออกเพิ่ม 30,000 (รวม)</span><span>180,000 หุ้น</span></div>
+      <br><b>คำนวณ WANOS</b>
+      <div class="formula">
+        (100,000 × 3/12) = 25,000<br>
+        (150,000 × 7/12) = 87,500<br>
+        (180,000 × 2/12) = 30,000<br>
+        <b>รวม = 142,500 หุ้น</b>
+      </div>
+      <b>Basic EPS = 500,000 ÷ 142,500 = 3.51 บาท/หุ้น</b>
+      <p class="small" style="margin-top:8px">เคล็ดลับ: ตัดช่วงเวลาเป็นท่อน ๆ ตามวันที่เกิดเหตุการณ์ แล้วคูณสัดส่วนเดือน — จำนวนเดือนทุกท่อนรวมกันต้องได้ 12 เสมอ (3+7+2 = 12 ✓)</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>หุ้นปันผลและการแตกหุ้น (ปรับย้อนหลัง)</h2>
+  <div class="card">
+    <p>หุ้นปันผลและการแตกหุ้น <b>ไม่ทำให้เงินทุนเพิ่ม</b> เพียงหั่นเค้กก้อนเดิมเป็นชิ้นเล็กลง ดังนั้นมาตรฐานกำหนดให้ปรับจำนวนหุ้น <b>เสมือนว่าเกิดขึ้นตั้งแต่วันเริ่มต้นของงวดแรกสุดที่นำเสนอ</b> เพื่อให้ EPS เปรียบเทียบข้ามปีได้</p>
+    <div class="tip"><span class="h">ตัวคูณปรับย้อนหลัง</span>
+      หุ้นปันผล 50% ⇒ คูณ 1.50 · หุ้นปันผล 10% ⇒ คูณ 1.10 · แตกหุ้น 1 : 3 (1 หุ้นเป็น 3 หุ้น) ⇒ คูณ 3 · รวมหุ้น 2 : 1 ⇒ คูณ 0.5<br>
+      <b>คูณเฉพาะช่วงเวลา “ก่อน” วันที่เกิดเหตุการณ์</b> (ช่วงหลังมีจำนวนหุ้นใหม่อยู่แล้ว)
+    </div>
+
+    <div class="ex"><div class="h">✏️ ตัวอย่างที่ 6-2 (จากเอกสาร) — จ่ายหุ้นปันผล 50%</div>
+      <div class="formula">
+        (100,000 × 1.5 × 2/12) = 25,000<br>
+        (120,000 × 1.5 × 3/12) = 45,000<br>
+        (180,000 × 5/12) &nbsp;&nbsp;&nbsp;&nbsp;= 75,000<br>
+        (210,000 × 2/12) &nbsp;&nbsp;&nbsp;&nbsp;= 35,000<br>
+        <b>WANOS = 180,000 หุ้น</b>
+      </div>
+      สังเกตว่า 2 ช่วงแรก (ก่อนจ่ายหุ้นปันผล) ถูกคูณ 1.5 ส่วน 2 ช่วงหลังไม่ต้องคูณ เพราะจำนวนหุ้นสะท้อนหุ้นปันผลแล้ว
+    </div>
+
+    <div class="ex"><div class="h">✏️ ตัวอย่างที่ 6-3 (จากเอกสาร) — หุ้นซื้อคืน + แตกหุ้น 1 : 3</div>
+      <div class="kv"><span>กำไรสุทธิ</span><span>820,000 บาท</span></div>
+      <div class="kv"><span>หัก ปันผลบุริมสิทธิ (100,000 หุ้น × 1 บาท)</span><span>(100,000) บาท</span></div>
+      <div class="kv"><span>กำไรส่วนของหุ้นสามัญ</span><span>720,000 บาท</span></div>
+      <div class="kv"><span>WANOS หลังปรับแตกหุ้น × 3</span><span>480,000 หุ้น</span></div>
+      <br><b>Basic EPS = 720,000 ÷ 480,000 = 1.50 บาท/หุ้น</b>
+      <p class="small" style="margin-top:8px">จุดสำคัญ 2 ชั้นในข้อนี้: (1) หักปันผลบุริมสิทธิออกจากตัวเศษก่อน (2) แตกหุ้นต้องปรับย้อนหลังทั้งงวด ไม่ถ่วงน้ำหนักตามเวลา</p>
+    </div>
+  </div>
+</section>
+
+  <div class="exhead">📝 แบบฝึกหัดจากคลังข้อสอบจริง <span class="exbadge">4 ข้อ</span></div>
+
+  <details class="exq">
+    <summary>บริษัทมีกำไรสุทธิจำนวน 1,200,000 บาท มีจำนวนหุ้นสามัญ ณ สิ้นปี ทั้งหมด 50,000 หุ้น และมีจำนวนหุ้นสามัญถัวเฉลี่ยถ่วงน้ำหนักทั้งหมด 40,000 หุ้น กำไรต่อหุ้นขั้นพื้นฐาน (Basic EPS) เท่ากับเท่าใด<br>1) 13.33 บาทต่อหุ้น &nbsp; 2) 24 บาทต่อหุ้น &nbsp; 3) 26.67 บาทต่อหุ้น &nbsp; 4) 30 บาทต่อหุ้น</summary>
+    <div class="ans">
+      <b>เฉลย: ข้อ 4) 30 บาทต่อหุ้น</b><br>
+      Basic EPS = 1,200,000 ÷ 40,000 = 30 บาท/หุ้น<br>
+      <span class="small">ข้อควรระวัง: ต้องใช้จำนวนหุ้น<b>ถัวเฉลี่ยถ่วงน้ำหนัก (40,000)</b> หารกำไรสุทธิ ไม่ใช่จำนวนหุ้น ณ สิ้นปี (50,000) ซึ่งเป็นตัวหลอกที่ให้คำตอบ 24 บาท</span>
+    </div>
+  </details>
+
+  <details class="exq">
+    <summary>ตัวเลือกใดไม่ใช่องค์ประกอบของการคำนวณกำไรต่อหุ้น (EPS)<br>1) กำไรสุทธิประจำงวด &nbsp; 2) จำนวนหุ้นสามัญที่ยังไม่ได้ออกจำหน่าย &nbsp; 3) เงินปันผลของหุ้นบุริมสิทธิ &nbsp; 4) จำนวนถัวเฉลี่ยถ่วงน้ำหนักของหุ้นสามัญ</summary>
+    <div class="ans">
+      <b>เฉลย: ข้อ 2) จำนวนหุ้นสามัญที่ยังไม่ได้ออกจำหน่าย</b><br>
+      หุ้นที่ยังไม่ได้ออกจำหน่ายไม่มีผู้ถือ จึงไม่นำมานับในตัวส่วนของ EPS — ใช้เฉพาะหุ้นที่ออกจำหน่ายแล้วและมีผู้ถือจริงเท่านั้น
+    </div>
+  </details>
+
+  <details class="exq">
+    <summary>ณ วันที่ 1 มกราคม 25X1 บริษัท ริมธาร จำกัด มีกำไรสุทธิ 4,840 บาท กิจการจ่ายเงินปันผลให้ผู้ถือหุ้นบุริมสิทธิ 500 บาท กิจการมีหุ้นสามัญที่ถือโดยผู้ถือหุ้นจำนวน 2,000 หุ้น รายการที่เกี่ยวข้องกับหุ้นสามัญมีดังนี้: วันที่ 1 เมษายน 25X1 ซื้อหุ้นสามัญกลับคืนมาโดยจ่ายชำระเงินสด 720 หุ้น · วันที่ 1 ตุลาคม 25X1 ออกหุ้นสามัญใหม่โดยเรียกชำระเป็นเงินสด 360 หุ้น · วันที่ 1 ธันวาคม 25X1 แตกหุ้นโดย 1 หุ้นเดิมแตกเป็น 2 หุ้นใหม่ กำไรต่อหุ้นขั้นพื้นฐานมีจำนวนเท่าใด<br>1) 1.40 บาท/หุ้น &nbsp; 2) 1.56 บาท/หุ้น &nbsp; 3) 2.80 บาท/หุ้น &nbsp; 4) 3.12 บาท/หุ้น</summary>
+    <div class="ans">
+      <b>เฉลย: ข้อ 1) 1.40 บาท/หุ้น</b><br>
+      ตัวเศษ: 4,840 − 500 (ปันผลบุริมสิทธิ) = 4,340 บาท<br><br>
+      ตัวส่วน (คูณ 2 ย้อนหลังทุกช่วงเพราะแตกหุ้น 1 ธ.ค.):<br>
+      (2,000 × 2 × 3/12) = 1,000<br>
+      (1,280 × 2 × 6/12) = 1,280 <span class="small">(2,000−720 ซื้อคืน เม.ย.)</span><br>
+      (1,640 × 2 × 2/12) = 547 <span class="small">(1,280+360 ออกใหม่ ต.ค.)</span><br>
+      (3,280 × 1/12) = 273 <span class="small">(หลังแตกหุ้น 1 ธ.ค. ไม่ต้องคูณซ้ำ)</span><br>
+      รวม WANOS ≈ 3,100 หุ้น<br>
+      <b>Basic EPS = 4,340 ÷ 3,100 ≈ 1.40 บาท/หุ้น</b>
+    </div>
+  </details>
+
+  <details class="exq">
+    <summary>เมื่อบริษัท ก จำกัด (มหาชน) ซื้อหุ้นคืน (share repurchase) เพื่อวัตถุประสงค์ในการบริหารทางการเงิน ตัวเลือกใดดังต่อไปนี้เป็นข้อสรุปที่ถูกต้อง<br>1) สินทรัพย์ของกิจการจะลดลง &nbsp; 2) หนี้สินของกิจการจะลดลง &nbsp; 3) ส่วนของผู้ถือหุ้นของกิจการจะลดลง &nbsp; 4) ถูกเฉพาะข้อ 1) และ 3)</summary>
+    <div class="ans">
+      <b>เฉลย: ข้อ 4) ถูกเฉพาะข้อ 1) และ 3)</b><br>
+      ซื้อหุ้นคืนจ่ายด้วยเงินสด ⇒ <b>เงินสด (สินทรัพย์) ลดลง</b> และบันทึกเป็น “หุ้นทุนซื้อคืน” ซึ่งหักจาก<b>ส่วนของผู้ถือหุ้น</b> ⇒ ลดลงเช่นกัน ส่วน<b>หนี้สินไม่เกี่ยวข้อง</b>กับรายการนี้เลย
+    </div>
+  </details>
+
+  <div class="doneWrap"><button class="doneBtn" data-for="F0">✓ อ่านจบส่วนปูพื้นแล้ว</button></div>
+</div>
+
+<!-- ============ LOS 6.1 ============ -->
+<div class="losblk" id="L61" data-los="L61" data-main="1">
+  <div class="losTag"><span class="mark">LOS 6.1</span> จำแนกและเปรียบเทียบความแตกต่างระหว่างโครงสร้างเงินทุนแบบง่าย (simple capital structure) และโครงสร้างเงินทุนแบบซับซ้อน (complex capital structure) เพื่อนำไปใช้ในการคำนวณกำไรต่อหุ้น</div>
+
+  <div class="tutor">
+    <div class="th">🎓 ติวเตอร์สรุปให้</div>
+    <p>ลองนึกภาพ<b>พิซซ่า 1 ถาด</b> = กำไรทั้งบริษัท ส่วน<b>จำนวนชิ้น</b> = จำนวนหุ้น ถ้าบริษัทมีแค่หุ้นสามัญ จำนวนชิ้นจะคงที่ หั่นยังไงก็เท่านั้น เรียกว่า <b>โครงสร้างเงินทุนแบบง่าย</b></p>
+    <p>แต่ถ้าบริษัทเคยแจก “คูปองแลกพิซซ่า” ไว้ (หุ้นกู้แปลงสภาพ, ESOP, วอร์แรนต์) วันไหนคนถือคูปองมาขอแลก ถาดเดิมต้องหั่นเพิ่มเป็นชิ้นเล็กลง ⇒ <b>โครงสร้างเงินทุนแบบซับซ้อน</b> และต้องบอกนักลงทุนล่วงหน้าว่า “ถ้าทุกคนมาแลกหมด ชิ้นของคุณจะเล็กแค่ไหน” นั่นคือ <b>Diluted EPS</b></p>
+    <p>ประโยคสำคัญของ LOS นี้คือท้ายประโยค: <b>“เพื่อนำไปใช้ในการคำนวณกำไรต่อหุ้น”</b> — แปลว่าการจำแนกโครงสร้างไม่ใช่เรื่องวิชาการลอย ๆ แต่คือ<b>สวิตช์ตัวแรกที่ตัดสินว่าเราต้องคำนวณ 1 ค่าหรือ 2 ค่า</b></p>
+    <div class="tsec">
+      <b class="lb">🧠 หลักการจำ</b>
+      <div class="mem">มี “คูปองแลกหุ้น” แม้แค่ 1 ใบ = ซับซ้อนทันที = ต้องโชว์ 2 บรรทัดเสมอ</div>
+      <ul>
+        <li><b>ง่าย</b> = หุ้นสามัญ + บุริมสิทธิ<b>ไม่</b>แปลงสภาพ ⇒ รายงาน <b>1 บรรทัด</b></li>
+        <li><b>ซับซ้อน</b> = มีอะไรก็ตามที่แปลงเป็นหุ้นสามัญได้ ⇒ รายงาน <b>2 บรรทัด</b></li>
+        <li>รายชื่อ “ตัวทำให้ซับซ้อน” ท่องว่า <b>กู้แปลง–บุริมแปลง–ออปชัน–วอร์แรนต์–ESOP–หุ้นมีเงื่อนไข</b></li>
+      </ul>
+    </div>
+    <div class="tsec">
+      <b class="lb">🎯 เก็งข้อสอบ</b>
+      <ul>
+        <li>โจทย์แบบ “ข้อใดต่อไปนี้<b>ไม่</b>ทำให้เป็นโครงสร้างซับซ้อน” — คำตอบคือ <b>หุ้นบุริมสิทธิชนิดไม่แปลงสภาพ</b> (ตัวหลอกยอดฮิต)</li>
+        <li>โจทย์ถาม “บริษัทมีหุ้นกู้แปลงสภาพแต่คำนวณแล้วเป็น Antidilutive ต้องแสดง Diluted EPS หรือไม่” — ตอบ <b>ต้องแสดง</b> และค่าจะ<b>เท่ากับ Basic EPS</b></li>
+        <li>ให้รายการหลักทรัพย์ 4–5 รายการ แล้วให้ระบุว่าบริษัทมีโครงสร้างแบบใด</li>
+      </ul>
+    </div>
+    <div class="tsec">
+      <b class="lb">⚡ เทคนิคทำข้อสอบ</b>
+      <p style="margin:0">อ่านโจทย์แล้ว<b>ไฮไลต์คำว่า “แปลงสภาพ / options / warrants / ESOP”</b> ทันที ถ้าเจอ ให้เตรียมช่องคำนวณ 2 ช่อง (Basic / Diluted) ไว้เลย จะได้ไม่ลืมตอนเวลากระชั้น</p>
+    </div>
+  </div>
+
+<section>
+  <h2>ทำไมกำไรต่อหุ้นจึงสำคัญ</h2>
+  <div class="card">
+    <p>กำไรต่อหุ้น (EPS) คือ <b>สะพานเชื่อมระหว่างงบกำไรขาดทุนกับราคาหุ้น</b> เพราะนักลงทุนไม่ได้ซื้อ “กำไรทั้งบริษัท” แต่ซื้อ “กำไรต่อ 1 หุ้นที่ตนถือ” อัตราส่วนยอดนิยมอย่าง P/E, PEG, Earnings Yield ล้วนใช้ EPS เป็นฐาน</p>
+    <h4>ประเด็นที่นักวิเคราะห์ต้องระวัง</h4>
+    <ul>
+      <li><b>EPS โตได้จาก 2 ทาง</b> — ตัวเศษโต (กำไรเพิ่มจริง) หรือตัวส่วนหด (ซื้อหุ้นคืน) ซึ่งคุณภาพต่างกันมาก</li>
+      <li><b>EPS ถูกเจือจางได้</b> — บริษัทที่มี ESOP/หุ้นกู้แปลงสภาพจำนวนมาก กำไรที่ผู้ถือหุ้นเดิมได้รับจะถูกแบ่งไปให้ผู้ถือตราสารเหล่านั้น</li>
+      <li>มาตรฐานจึงบังคับให้รายงาน <b>2 ตัวเลขคู่กันเสมอ</b> คือ Basic EPS (ภาพปัจจุบัน) และ Diluted EPS (ภาพเลวร้ายที่สุดหากแปลงสภาพหมด)</li>
+    </ul>
+    <div class="tip"><span class="h">แก่นของบทนี้</span>
+      Basic EPS = ความจริงวันนี้ · Diluted EPS = ความจริงหากทุกคนใช้สิทธิ · และเราจะ<b>ไม่เอาตราสารที่ทำให้ EPS ดูดีขึ้นมาคำนวณ</b> (หลักความระมัดระวัง)
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>โครงสร้างเงินทุนแบบง่าย vs แบบซับซ้อน</h2>
+  <div class="card">
+    <div class="tw"><table>
+      <tr><th>หัวข้อ</th><th>Simple Capital Structure</th><th>Complex Capital Structure</th></tr>
+      <tr><td><b>องค์ประกอบ</b></td><td>หุ้นสามัญ + หุ้นบุริมสิทธิ<b>ชนิดไม่แปลงสภาพ</b>เท่านั้น</td><td>มีหลักทรัพย์ที่อาจเปลี่ยนเป็นหุ้นสามัญได้ เช่น หุ้นกู้แปลงสภาพ หุ้นบุริมสิทธิแปลงสภาพ Stock Options, Warrants, ESOP, หุ้นที่ออกโดยมีเงื่อนไข</td></tr>
+      <tr><td><b>ต้องรายงาน</b></td><td>Basic EPS อย่างเดียว</td><td>Basic EPS <b>และ</b> Diluted EPS</td></tr>
+      <tr><td><b>เหตุผล</b></td><td>ไม่มีอะไรมาเจือจางจำนวนหุ้นได้</td><td>จำนวนหุ้นอาจเพิ่มขึ้นในอนาคต ทำให้ EPS ลดลง</td></tr>
+    </table></div>
+    <div class="alert"><span class="h">ข้อสอบชอบหลอก</span>
+      บริษัทมีหุ้นกู้แปลงสภาพ = โครงสร้างซับซ้อนแน่นอน <b>แม้ผลคำนวณออกมาเป็น Antidilutive</b> ก็ยังต้องแสดง Diluted EPS ในงบ (ซึ่งจะเท่ากับ Basic EPS พอดี)
+    </div>
+  </div>
+</section>
+
+  <div class="exhead">📝 แบบฝึกหัดจากคลังข้อสอบจริง <span class="exbadge">2 ข้อ</span></div>
+
+  <details class="exq">
+    <summary>ตัวเลือกใดดังต่อไปนี้ไม่ใช่องค์ประกอบของโครงสร้างทุนแบบซับซ้อน (complex capital structure)<br>1) หุ้นสามัญ &nbsp; 2) หุ้นบุริมสิทธิ &nbsp; 3) ตราสารอื่นที่อาจเปลี่ยนเป็นหุ้นสามัญ &nbsp; 4) ตั๋วเงินรับ</summary>
+    <div class="ans">
+      <b>เฉลย: ข้อ 4) ตั๋วเงินรับ</b><br>
+      ตั๋วเงินรับเป็น<b>สินทรัพย์ทางการเงิน</b>ของกิจการ ไม่ใช่ตราสารที่สามารถแปลงเป็นหุ้นสามัญได้ จึงไม่เกี่ยวข้องกับโครงสร้างเงินทุนซับซ้อนเลย — ส่วนตัวเลือกอื่นล้วนเป็นองค์ประกอบที่อาจปรากฏในโครงสร้างทุน
+    </div>
+  </details>
+
+  <details class="exq">
+    <summary>ตราสารใดต่อไปนี้ ไม่ใช่ ตราสารที่อาจเปลี่ยนเป็นหุ้นสามัญ<br>
+1) หุ้นปันผล<br>
+2) ใบสำคัญแสดงสิทธิที่จะซื้อหุ้น<br>
+3) สิทธิที่จะเลือกซื้อหุ้น<br>
+4) หุ้นกู้แปลงสภาพ</summary>
+    <div class="ans">
+      <b>เฉลย: ข้อ 1) หุ้นปันผล</b><br>
+      หุ้นปันผลเป็น<b>หุ้นสามัญ</b>ที่กิจการออกให้ผู้ถือหุ้นโดยตรง ไม่ใช่ตราสารที่ “อาจ” เปลี่ยนเป็นหุ้นสามัญในอนาคต เพราะมันเป็นหุ้นสามัญอยู่แล้วตั้งแต่ต้น — ต่างจากใบสำคัญแสดงสิทธิ สิทธิที่จะเลือกซื้อหุ้น และหุ้นกู้แปลงสภาพ ซึ่งล้วนเป็นตราสารที่ยังไม่ใช่หุ้นสามัญแต่มีสิทธิแปลงเป็นหุ้นสามัญได้ในอนาคต
+    </div>
+  </details>
+
+  <div class="doneWrap"><button class="doneBtn" data-for="L61">✓ อ่านจบ LOS 6.1 แล้ว</button></div>
+</div>
+
+<!-- ============ LOS 6.2 ============ -->
+<div class="losblk" id="L62" data-los="L62" data-main="1">
+  <div class="losTag"><span class="mark">LOS 6.2</span> จำแนกความแตกต่างระหว่างหลักทรัพย์ที่ปรับลดและหลักทรัพย์ที่ไม่ปรับลด (ปรับเพิ่ม) กำไรต่อหุ้น</div>
+
+  <div class="tutor">
+    <div class="th">🎓 ติวเตอร์สรุปให้</div>
+    <p>LOS นี้คือ <b>“ด่านคัดตัว”</b> ก่อนจะลงมือคำนวณจริงใน LOS 6.3 และ 6.4 — เราต้องรู้ก่อนว่าตราสารแต่ละตัว<b>ควรถูกนับหรือควรถูกโยนทิ้ง</b></p>
+    <p>เครื่องมือตัดสินมีตัวเดียวคือ <b>Incremental EPS</b> หรือ “ผลกระทบส่วนเพิ่มต่อหุ้น” — ถามว่าถ้าเอาตราสารตัวนี้เข้ามา มันพากำไรมาเพิ่มเท่าไร และพาหุ้นมาเพิ่มเท่าไร แล้วหารกัน</p>
+    <p>วิธีอ่านผลง่ายมาก: <b>ถ้าตัวเลขที่ได้ต่ำกว่า Basic EPS = มันมาฉุด EPS ลง = Dilutive = เอาเข้า</b> แต่<b>ถ้าสูงกว่า Basic EPS = มันมาดัน EPS ขึ้น = Antidilutive = ตัดทิ้ง</b> เปรียบเหมือนรับคนเข้าทีมบาสเกตบอล ถ้าคนใหม่เตี้ยกว่าค่าเฉลี่ยทีม ค่าเฉลี่ยจะลด ถ้าสูงกว่าค่าเฉลี่ย ค่าเฉลี่ยจะเพิ่ม</p>
+    <div class="tsec">
+      <b class="lb">🧠 หลักการจำ</b>
+      <div class="mem">Incremental EPS = Δตัวเศษ ÷ Δตัวส่วน &nbsp;⇒&nbsp; <b>ต่ำกว่า Basic = เอาเข้า · สูงกว่า Basic = ตัดทิ้ง</b></div>
+      <ul>
+        <li><b>Dilutive (ปรับลด)</b> = ทำให้ <b>กำไรต่อหุ้นลดลง</b> หรือ <b>ขาดทุนต่อหุ้นเพิ่มขึ้น</b></li>
+        <li><b>Antidilutive (ปรับเพิ่ม)</b> = ทำให้ <b>กำไรต่อหุ้นเพิ่มขึ้น</b> หรือ <b>ขาดทุนต่อหุ้นลดลง</b></li>
+        <li>Options/Warrants ที่ <b>In the money ⇒ Dilutive เสมอ 100%</b></li>
+        <li>Options/Warrants ที่ <b>Out/At the money ⇒ Antidilutive เสมอ</b></li>
+        <li><b>ปีที่ขาดทุน ⇒ ทุกตัวเป็น Antidilutive หมด</b></li>
+      </ul>
+    </div>
+    <div class="tsec">
+      <b class="lb">🎯 เก็งข้อสอบ</b>
+      <ul>
+        <li>ให้ตราสาร 3–4 ชุด แล้วถามว่า <b>ชุดใดเป็น Antidilutive</b> — ต้องคำนวณ Incremental EPS ของแต่ละชุดแล้วเทียบกับ Basic EPS</li>
+        <li>ถามเชิงนิยาม: “Antidilutive security หมายถึงข้อใด” ⇒ ตัวเลือกหลอกมักเขียนว่า “ทำให้ EPS ลดลง” ซึ่งผิด</li>
+        <li>ถามว่าตราสาร Antidilutive ต้องจัดการอย่างไร ⇒ <b>ไม่นำมารวมคำนวณ แต่ต้องเปิดเผยในหมายเหตุ</b></li>
+        <li>ให้ Warrants ที่ราคาใช้สิทธิสูงกว่าราคาตลาด แล้วถามว่าเป็นประเภทใด ⇒ <b>Antidilutive</b></li>
+      </ul>
+    </div>
+    <div class="tsec">
+      <b class="lb">⚡ เทคนิคทำข้อสอบ</b>
+      <ul>
+        <li>คำนวณ <b>Basic EPS ก่อนเสมอ</b> เพราะเป็นเส้นวัดเปรียบเทียบของทุกตราสาร</li>
+        <li>ทำ<b>คอลัมน์ Incremental EPS</b> ของทุกตราสารไว้ก่อน แล้วค่อยตัดสินทีเดียวพร้อมกัน — เร็วกว่าการไล่รวมทีละตัว</li>
+        <li>ตราสารที่มี Δตัวเศษ = 0 (Options) ให้<b>ตีค่าเป็น 0 ทันที</b> ไม่ต้องคำนวณ</li>
+        <li>เห็นคำว่า “ขาดทุนสุทธิ” เมื่อไร ให้ตอบได้เลยว่าทุกตัว Antidilutive โดยไม่ต้องคำนวณสักตัว</li>
+      </ul>
+    </div>
+  </div>
+
+<section>
+  <h2>นิยาม: หลักทรัพย์ปรับลด vs หลักทรัพย์ปรับเพิ่ม</h2>
+  <div class="card">
+    <div class="tw"><table>
+      <tr><th>ประเด็น</th><th>หลักทรัพย์ปรับลด (Dilutive)</th><th>หลักทรัพย์ปรับเพิ่ม (Antidilutive)</th></tr>
+      <tr><td><b>ผลต่อ EPS</b></td><td>กำไรต่อหุ้น<b>ลดลง</b></td><td>กำไรต่อหุ้น<b>เพิ่มขึ้น</b></td></tr>
+      <tr><td><b>ผลต่อ LPS (กรณีขาดทุน)</b></td><td>ขาดทุนต่อหุ้น<b>เพิ่มขึ้น</b></td><td>ขาดทุนต่อหุ้น<b>ลดลง</b></td></tr>
+      <tr><td><b>การปฏิบัติ</b></td><td><b>นำมารวม</b>ในการคำนวณ Diluted EPS</td><td><b>ห้ามนำมารวม</b> แต่ต้อง<b>เปิดเผยในหมายเหตุ</b></td></tr>
+      <tr><td><b>เหตุผล</b></td><td>สะท้อนภาพเลวร้ายที่สุดที่ผู้ถือหุ้นเดิมจะเจอ</td><td>หากรวมจะทำให้งบดูดีเกินจริง ขัดหลักความระมัดระวัง</td></tr>
+    </table></div>
+    <div class="formula"><span class="t">เครื่องมือตัดสิน — Incremental EPS</span>
+      Incremental EPS = การเปลี่ยนแปลงของตัวเศษ ÷ การเปลี่ยนแปลงของตัวส่วน<br><br>
+      <b>Incremental EPS &lt; Basic EPS</b> ⇒ Dilutive ⇒ นำมารวม<br>
+      <b>Incremental EPS &gt; Basic EPS</b> ⇒ Antidilutive ⇒ ตัดทิ้ง
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>ตารางจำแนกรายตราสาร</h2>
+  <div class="card">
+    <div class="tw"><table>
+      <tr><th>ตราสาร</th><th class="num">Δ ตัวเศษ</th><th class="num">Δ ตัวส่วน</th><th>Incremental EPS</th><th>เงื่อนไขที่เป็น Dilutive</th></tr>
+      <tr><td>หุ้นกู้แปลงสภาพ</td><td class="num">ดอกเบี้ย × (1−t)</td><td class="num">หุ้นจากการแปลง</td><td>ดอกเบี้ยหลังภาษี ÷ หุ้นที่แปลง</td><td>เมื่อค่าที่ได้ <b>ต่ำกว่า</b> Basic EPS</td></tr>
+      <tr><td>หุ้นบุริมสิทธิแปลงสภาพ</td><td class="num">ปันผลบุริมสิทธิ</td><td class="num">หุ้นจากการแปลง</td><td>ปันผล ÷ หุ้นที่แปลง</td><td>เมื่อค่าที่ได้ <b>ต่ำกว่า</b> Basic EPS</td></tr>
+      <tr><td>Options / Warrants</td><td class="num"><b>0</b></td><td class="num">หุ้นเพิ่มสุทธิ</td><td><b>0 เสมอ</b></td><td>เมื่อ <b>In the money</b> (ตลาด &gt; ใช้สิทธิ)</td></tr>
+    </table></div>
+    <div class="ex"><div class="h">✏️ ตัวอย่างการจำแนก — ตัดสินทีละตัว</div>
+      กำหนดให้ <b>Basic EPS = 2.50 บาท</b>
+      <div class="tw"><table>
+        <tr><th>ตราสาร</th><th class="num">Δ กำไร</th><th class="num">Δ หุ้น</th><th class="num">Incremental EPS</th><th>ผลการจำแนก</th></tr>
+        <tr><td>Options (In the money)</td><td class="num">0</td><td class="num">40,000</td><td class="num">0.00</td><td><b>Dilutive ✓</b></td></tr>
+        <tr><td>หุ้นกู้แปลงสภาพ</td><td class="num">560,000</td><td class="num">400,000</td><td class="num">1.40</td><td><b>Dilutive ✓</b> (1.40 &lt; 2.50)</td></tr>
+        <tr><td>หุ้นบุริมสิทธิแปลงสภาพ</td><td class="num">900,000</td><td class="num">300,000</td><td class="num">3.00</td><td><b>Antidilutive ✗</b> (3.00 &gt; 2.50)</td></tr>
+      </table></div>
+      <b>สรุป:</b> นำเข้าคำนวณเฉพาะ 2 ตัวแรก ส่วนหุ้นบุริมสิทธิแปลงสภาพให้<b>ตัดออกแต่เปิดเผยในหมายเหตุ</b>
+    </div>
+    <div class="alert"><span class="h">ข้อควรจำที่แยกสองตัวนี้ออกจากกัน</span>
+      <b>Dilutive ≠ แปลงสภาพได้</b> — ตราสารแปลงสภาพทุกตัวทำให้โครงสร้างเป็นแบบซับซ้อน (LOS 6.1) แต่<b>ไม่ใช่ทุกตัวจะเป็น Dilutive</b> ต้องผ่านการทดสอบด้วย Incremental EPS ก่อนเสมอ
+    </div>
+  </div>
+</section>
+
+  <div class="exhead">📝 แบบฝึกหัดจากคลังข้อสอบจริง <span class="exbadge">1 ข้อ</span></div>
+
+  <details class="exq">
+    <summary>ตราสารที่อาจเปลี่ยนเป็นหุ้นสามัญ (potential ordinary shares) จะนำมาคำนวณกำไรต่อหุ้นประเภทใด<br>
+1) กำไรต่อหุ้นขั้นพื้นฐาน<br>
+2) กำไรต่อหุ้นปรับลดก็ต่อเมื่อมีการใช้สิทธิเกิดขึ้นจริง<br>
+3) กำไรต่อหุ้นปรับลดเฉพาะตราสารที่ปรับลดกำไรต่อหุ้น<br>
+4) กำไรต่อหุ้นขั้นพื้นฐานและกำไรต่อหุ้นปรับลด</summary>
+    <div class="ans">
+      <b>เฉลย: ข้อ 3) กำไรต่อหุ้นปรับลดเฉพาะตราสารที่ปรับลดกำไรต่อหุ้น</b><br>
+      ตราสารที่อาจเปลี่ยนเป็นหุ้นสามัญจะถูกนำมาคำนวณกำไรต่อหุ้นปรับลดก็ต่อเมื่อผ่านการทดสอบว่าเป็น Dilutive (ทำให้ EPS ลดลง) เท่านั้น สำหรับตราสารที่เป็น Antidilutive (ทำให้ EPS เพิ่มขึ้น) จะ<b>ไม่ถูกนำมาคำนวณ</b>เลย
+    </div>
+  </details>
+
+  <div class="doneWrap"><button class="doneBtn" data-for="L62">✓ อ่านจบ LOS 6.2 แล้ว</button></div>
+</div>
+
+<!-- ============ LOS 6.3 ============ -->
+<div class="losblk" id="L63" data-los="L63" data-main="1">
+  <div class="losTag"><span class="mark">LOS 6.3</span> คำนวณกำไรต่อหุ้นปรับลดในกรณีมีหุ้นกู้แปลงสภาพและกรณีมีหุ้นบุริมสิทธิแปลงสภาพ</div>
+
+  <div class="tutor">
+    <div class="th">🎓 ติวเตอร์สรุปให้</div>
+    <p>วิธี <b>If-converted</b> แปลตรงตัวว่า “ถ้ามันแปลงไปแล้วล่ะ?” เราจึงต้องย้อนกลับไปลบร่องรอยของการเป็นหนี้/เป็นบุริมสิทธิออกจากงบ</p>
+    <p><b>หุ้นกู้แปลงสภาพ:</b> ถ้าแปลงไปแล้ว บริษัทก็<b>ไม่ต้องจ่ายดอกเบี้ย</b> ⇒ กำไรเพิ่มขึ้น แต่เพราะดอกเบี้ยเคยช่วย<b>ประหยัดภาษี</b> พอไม่มีดอกเบี้ยก็ต้องเสียภาษีเพิ่ม ⇒ บวกกลับได้แค่ <b>ดอกเบี้ย × (1 − t)</b></p>
+    <p><b>หุ้นบุริมสิทธิแปลงสภาพ:</b> ถ้าแปลงไปแล้ว ก็<b>ไม่ต้องจ่ายปันผลบุริมสิทธิ</b> ⇒ บวกกลับ<b>เต็มจำนวน</b> เพราะปันผลจ่ายจากกำไรหลังภาษีอยู่แล้ว รัฐไม่เกี่ยว</p>
+    <div class="tsec">
+      <b class="lb">🧠 หลักการจำ</b>
+      <div class="mem">“ดอกเบี้ยลดภาษีได้ ⇒ ต้องคูณ (1−t) · ปันผลลดภาษีไม่ได้ ⇒ บวกเต็ม”</div>
+      <ul>
+        <li>ท่องสั้น ๆ ว่า <b>“หนี้มีเกราะภาษี ทุนไม่มีเกราะภาษี”</b></li>
+        <li>ทั้งสองตัว<b>กระทบทั้งตัวเศษและตัวส่วน</b> ต่างจาก Options ที่กระทบแค่ตัวส่วน</li>
+        <li>สมมติแปลง <b>ณ ต้นงวด</b> เสมอ เว้นแต่ตราสารออกระหว่างงวด ⇒ สมมติแปลง ณ วันที่ออก และ<b>ถ่วงน้ำหนักตามเวลาที่มีตราสารอยู่จริง</b></li>
+      </ul>
+    </div>
+    <div class="tsec">
+      <b class="lb">🎯 เก็งข้อสอบ</b>
+      <ul>
+        <li>ให้ <b>ดอกเบี้ยเต็มปี</b> แต่ตราสารออกกลางปี แล้วดูว่าเรา<b>คำนวณดอกเบี้ยเฉพาะช่วงที่มีตราสารอยู่จริง</b>ก่อนคูณ (1−t) หรือไม่ — เป็นกับดักสำคัญที่สุดของบทนี้</li>
+        <li>สลับกลับด้าน: ให้ <b>ดอกเบี้ยหลังภาษี</b> มา แล้วถามหาดอกเบี้ยก่อนภาษี ⇒ หารด้วย (1−t)</li>
+        <li>ให้หุ้นบุริมสิทธิแปลงสภาพ แล้วดูว่าเรา<b>เผลอคูณ (1−t)</b> หรือไม่ (กับดักกลับข้าง)</li>
+        <li>ให้คำนวณครบวงจร: Basic ⇒ Diluted ⇒ ถามว่า Dilutive หรือไม่</li>
+      </ul>
+    </div>
+    <div class="tsec">
+      <b class="lb">⚡ เทคนิคทำข้อสอบ</b>
+      <ul>
+        <li>เขียนเป็น <b>ตาราง 2 คอลัมน์ (ตัวเศษ / ตัวส่วน)</b> แล้วไล่เติมทีละตราสาร จะไม่หลงบรรทัด</li>
+        <li>ถ้าตราสารออกระหว่างปี ให้ถามตัวเองก่อนเสมอว่า <b>“ดอกเบี้ยคิดกี่เดือน”</b> ก่อนจะไปคูณภาษี</li>
+        <li>ทางลัดตัดสิน: ถ้า <b>Incremental EPS &lt; Basic EPS</b> ⇒ Dilutive นำมารวมได้</li>
+      </ul>
+    </div>
+  </div>
+
+<section>
+  <h2>หลักการกำไรต่อหุ้นปรับลด (Diluted EPS)</h2>
+  <div class="card">
+    <div class="formula"><span class="t">สูตรรวม</span>
+      Diluted EPS =<br>
+      (กำไรส่วนของผู้ถือหุ้นสามัญ + ผลกระทบหลังภาษีของตราสารที่ปรับลด)<br>
+      ÷ (WANOS + จำนวนหุ้นที่ต้องออกเพิ่มจากตราสารเหล่านั้น)
+    </div>
+    <h4>ข้อสมมติสำคัญ</h4>
+    <ul>
+      <li>สมมติว่าการแปลงสภาพหรือการใช้สิทธิเกิดขึ้น <b>ณ วันต้นงวด</b></li>
+      <li>ถ้าตราสารเพิ่งออกระหว่างงวด ให้สมมติว่าแปลงสภาพ <b>ณ วันที่ออกตราสาร</b> และถ่วงน้ำหนักตามเวลา</li>
+      <li>ถ้าตราสารถูกแปลงจริงระหว่างงวด ให้นับหุ้นจริงตั้งแต่วันแปลง และสมมติแปลงตั้งแต่ต้นงวดถึงวันแปลงสำหรับส่วนที่เหลือ</li>
+      <li>พิจารณา <b>เฉพาะตราสารที่ทำให้ EPS ลดลง</b> (Dilutive) เท่านั้น</li>
+    </ul>
+    <div class="tw"><table>
+      <tr><th>ตราสาร</th><th>ผลต่อตัวเศษ</th><th>ผลต่อตัวส่วน</th><th>วิธี</th></tr>
+      <tr><td>หุ้นกู้แปลงสภาพ</td><td>+ ดอกเบี้ย × (1 − ภาษี)</td><td>+ หุ้นจากการแปลง</td><td>If-converted</td></tr>
+      <tr><td>หุ้นบุริมสิทธิแปลงสภาพ</td><td>+ ปันผลบุริมสิทธิ (ไม่ปรับภาษี)</td><td>+ หุ้นจากการแปลง</td><td>If-converted</td></tr>
+      <tr><td>Options / Warrants</td><td><b>ไม่เปลี่ยน</b></td><td>+ หุ้นส่วนเพิ่มสุทธิ</td><td>Treasury stock</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<section>
+  <h2>กรณีที่ 1: หุ้นกู้แปลงสภาพ — วิธี If-converted</h2>
+  <div class="card">
+    <p><b>ตรรกะ:</b> ถ้าหุ้นกู้ถูกแปลงเป็นหุ้นสามัญตั้งแต่ต้นปี บริษัทจะ (1) ไม่ต้องจ่ายดอกเบี้ย ⇒ กำไรเพิ่มขึ้น แต่เพราะดอกเบี้ยเป็นค่าใช้จ่ายที่หักภาษีได้ จึงบวกกลับ<b>สุทธิจากภาษี</b> และ (2) มีหุ้นสามัญเพิ่มขึ้น</p>
+    <div class="formula"><span class="t">สูตร</span>
+      Diluted EPS = (กำไรส่วนหุ้นสามัญ + ดอกเบี้ยหุ้นกู้ × (1 − อัตราภาษี)) ÷ (WANOS + หุ้นที่เกิดจากการแปลงสภาพ)
+    </div>
+
+    <div class="ex"><div class="h">✏️ ตัวอย่างที่ 6-4 (จากเอกสาร) — หุ้นกู้แปลงสภาพ 2 ชุด</div>
+      กำไรสุทธิ 210,000 บาท · อัตราภาษี 40%
+      <div class="kv"><span>ดอกเบี้ยชุดที่ 1 หลังภาษี</span><span>36,000 บาท</span></div>
+      <div class="kv"><span>ดอกเบี้ยชุดที่ 2 หลังภาษี</span><span>45,000 บาท</span></div>
+      <div class="kv"><span>รวมบวกกลับตัวเศษ</span><span>81,000 บาท</span></div>
+      <div class="kv"><span><b>กำไรที่ปรับค่าแล้ว</b></span><span><b>291,000 บาท</b></span></div>
+      <br>
+      <div class="kv"><span>WANOS เดิม</span><span>100,000 หุ้น</span></div>
+      <div class="kv"><span>+ หุ้นจากหุ้นกู้ชุดที่ 1</span><span>20,000 หุ้น</span></div>
+      <div class="kv"><span>+ หุ้นจากหุ้นกู้ชุดที่ 2</span><span>22,500 หุ้น</span></div>
+      <div class="kv"><span><b>รวมตัวส่วน</b></span><span><b>142,500 หุ้น</b></span></div>
+      <br><b>Diluted EPS = 291,000 ÷ 142,500 = 2.04 บาท/หุ้น</b>
+      <p class="small" style="margin-top:8px"><b>ย้อนกลับหาดอกเบี้ยก่อนภาษี:</b> 36,000 ÷ (1 − 0.40) = 60,000 บาท และ 45,000 ÷ 0.60 = 75,000 บาท — ข้อสอบมักให้ดอกเบี้ย<b>ก่อน</b>ภาษีมา แล้วให้เราแปลงเอง อย่าลืมคูณ (1 − t)</p>
+    </div>
+
+    <div class="alert"><span class="h">กับดักที่พลาดบ่อยที่สุด</span>
+      ลืมคูณ (1 − อัตราภาษี) กับดอกเบี้ย → ตัวเศษสูงเกินจริง → Diluted EPS สูงเกินจริง (อาจสรุปผิดว่าเป็น Antidilutive)
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>กรณีที่ 2: หุ้นบุริมสิทธิแปลงสภาพ</h2>
+  <div class="card">
+    <p><b>ตรรกะ:</b> ถ้าหุ้นบุริมสิทธิถูกแปลงเป็นหุ้นสามัญ บริษัทจะไม่ต้องจ่ายเงินปันผลบุริมสิทธิ ⇒ กำไรส่วนที่เหลือให้ผู้ถือหุ้นสามัญเพิ่มขึ้น</p>
+    <div class="formula"><span class="t">สูตร</span>
+      Diluted EPS = (กำไรส่วนหุ้นสามัญ + เงินปันผลหุ้นบุริมสิทธิ) ÷ (WANOS + หุ้นจากการแปลงสภาพ)
+    </div>
+    <div class="tip"><span class="h">ทำไมไม่ปรับภาษี?</span>
+      เงินปันผลจ่ายจาก<b>กำไรหลังภาษี</b> ไม่ใช่ค่าใช้จ่ายทางภาษี จึงบวกกลับเต็มจำนวน — ต่างจากดอกเบี้ยหุ้นกู้ที่ต้องคูณ (1 − t)
+    </div>
+
+    <div class="ex"><div class="h">✏️ ตัวอย่างที่ 6-5 / 6-6 (จากเอกสาร)</div>
+      กำไรสุทธิ 35,000,000 บาท · หุ้นสามัญถัวเฉลี่ย 10,000,000 หุ้น<br>
+      หุ้นบุริมสิทธิแปลงสภาพ 400,000 หุ้น ปันผลหุ้นละ 10 บาท แปลงได้ 1 : 5
+      <h4 style="margin-top:10px">ขั้นที่ 1 — Basic EPS</h4>
+      <div class="formula">
+        ปันผลบุริมสิทธิ = 400,000 × 10 = 4,000,000 บาท<br>
+        กำไรส่วนหุ้นสามัญ = 35,000,000 − 4,000,000 = 31,000,000 บาท<br>
+        <b>Basic EPS = 31,000,000 ÷ 10,000,000 = 3.10 บาท/หุ้น</b>
+      </div>
+      <h4>ขั้นที่ 2 — Diluted EPS</h4>
+      <div class="formula">
+        ตัวเศษ: บวกกลับปันผล ⇒ 31,000,000 + 4,000,000 = 35,000,000 บาท<br>
+        ตัวส่วน: 400,000 × 5 = 2,000,000 หุ้น ⇒ 10,000,000 + 2,000,000 = 12,000,000 หุ้น<br>
+        <b>Diluted EPS = 35,000,000 ÷ 12,000,000 = 2.92 บาท/หุ้น</b>
+      </div>
+      <h4>ขั้นที่ 3 — ตรวจสอบ</h4>
+      2.92 &lt; 3.10 ⇒ <b>เป็น Dilutive</b> ⇒ นำมารายงานได้ ✓
+    </div>
+  </div>
+</section>
+
+  <div class="exhead">📝 แบบฝึกหัดจากคลังข้อสอบจริง <span class="exbadge">2 ข้อ</span></div>
+
+  <details class="exq">
+    <summary>ณ วันที่ 1 เมษายน 25X1 บริษัท ลายน้ำ จำกัด ออกจำหน่ายหุ้นกู้แปลงสภาพ ราคาตามมูลค่า 100,000 บาท อัตราดอกเบี้ย 10% ในปี 25X1 และสามารถแปลงสภาพเป็นหุ้นสามัญได้จำนวน 20,000 หุ้น อัตราภาษีเท่ากับ 20% ในปี 25X1 ยังไม่มีผู้ถือหุ้นกู้มาใช้สิทธิแปลงสภาพเป็นหุ้นสามัญ ในการคำนวณกำไรต่อหุ้นปรับลด กิจการต้องปรับปรุงกำไรสุทธิอย่างไร<br>1) ไม่ต้องปรับปรุง ในปี 25X1 เนื่องจากยังไม่มีการแปลงสภาพเป็นหุ้นสามัญ &nbsp; 2) บวกกลับด้วยดอกเบี้ยจ่าย 6,000 บาท &nbsp; 3) บวกกลับด้วยดอกเบี้ยจ่าย 8,000 บาท &nbsp; 4) บวกกลับด้วยดอกเบี้ยจ่าย 10,000 บาท</summary>
+    <div class="ans">
+      <b>เฉลย: ข้อ 2) บวกกลับด้วยดอกเบี้ยจ่าย 6,000 บาท</b><br>
+      หุ้นกู้ออกจำหน่าย 1 เมษายน ⇒ มีตราสารอยู่จริงเพียง <b>9 เดือน (เม.ย.–ธ.ค.)</b><br>
+      ดอกเบี้ยก่อนภาษีเฉพาะช่วงที่มีตราสารจริง = 100,000 × 10% × 9/12 = 7,500 บาท<br>
+      บวกกลับหลังภาษี = 7,500 × (1 − 20%) = <b>6,000 บาท</b><br>
+      <span class="small">กับดักของข้อนี้: แม้ยังไม่มีผู้ใช้สิทธิแปลงสภาพจริง แต่วิธี If-converted สมมติว่าแปลง<b>ตั้งแต่วันที่ออกตราสาร</b>เสมอ (ไม่ใช่ไม่ต้องปรับตามตัวเลือก 1) และต้องคิดดอกเบี้ยตามสัดส่วนเวลาที่มีตราสารอยู่จริงก่อนคูณ (1−t)</span>
+    </div>
+  </details>
+
+  <details class="exq">
+    <summary>ณ วันที่ 1 มกราคม 25X1 บริษัท รุ่งทรัพย์ จำกัด มีหุ้นสามัญที่ออกจำหน่ายและถือโดยผู้ถือหุ้น จำนวน 1,000 หุ้น มีกำไรสำหรับปี 4,000 บาท ในปี 25X1 กิจการไม่ได้มีการประกาศจ่ายเงินปันผลให้ผู้ถือหุ้น ข้อมูลที่เกี่ยวข้องกับหุ้นบุริมสิทธิแปลงสภาพมีดังนี้ หุ้นบุริมสิทธิชนิดไม่สะสมเงินปันผล ราคาตามมูลค่า 2,000 บาท จ่ายปันผลในอัตรา 4% · ณ วันที่ 1 มกราคม 25X1 กิจการออกจำหน่ายหุ้นบุริมสิทธิชนิดสะสมเงินปันผล ราคาตามมูลค่า 3,000 บาท จ่ายปันผลในอัตรา 4% · หุ้นบุริมสิทธิสามารถแปลงสภาพเป็นหุ้นสามัญ 300 หุ้น ในปีนี้ยังไม่มีการใช้สิทธิแปลงสภาพ กำไรต่อหุ้นปรับลดเท่ากับเท่าใด<br>
+1) 3.08 บาทต่อหุ้น<br>
+2) 3.17 บาทต่อหุ้น<br>
+3) 3.98 บาทต่อหุ้น<br>
+4) 4.00 บาทต่อหุ้น</summary>
+    <div class="ans">
+      <b>เฉลย: ข้อ 1) 3.08 บาทต่อหุ้น</b><br>
+      Basic EPS = 4,000 − (3,000 × 4%) = 3,880 บาท ÷ 1,000 หุ้น = 3.89 บาทต่อหุ้น<br>
+      <span class="small">(หักเฉพาะปันผลหุ้นบุริมสิทธิชนิด<b>สะสม</b> เพราะมีสิทธิรับแน่นอนแม้ไม่ประกาศจ่าย ส่วนชนิดไม่สะสมไม่ต้องหักเพราะไม่ได้ประกาศจ่าย)</span><br>
+      Diluted EPS = (3,880 + 120) ÷ (1,000 + 300) = 4,000 ÷ 1,300 = <b>3.08 บาทต่อหุ้น</b> (ปรับลดลงจาก 3.89 บาทต่อหุ้น ⇒ Dilutive)
+    </div>
+  </details>
+
+  <div class="doneWrap"><button class="doneBtn" data-for="L63">✓ อ่านจบ LOS 6.3 แล้ว</button></div>
+</div>
+
+<!-- ============ LOS 6.4 ============ -->
+<div class="losblk" id="L64" data-los="L64" data-main="1">
+  <div class="losTag"><span class="mark">LOS 6.4</span> คำนวณกำไรต่อหุ้นปรับลดในกรณีมีสิทธิที่จะซื้อหุ้น (stock options) และ/หรือใบสำคัญแสดงสิทธิที่จะซื้อหุ้น (warrants)</div>
+
+  <div class="tutor">
+    <div class="th">🎓 ติวเตอร์สรุปให้</div>
+    <p>Treasury Stock Method คิดเหมือน<b>ร้านที่ขายของถูกให้พนักงาน</b> — พนักงานเอาเงิน 30 บาทมาซื้อหุ้นที่ตลาดขาย 50 บาท บริษัทได้เงินมา 30 บาท แล้ว<b>สมมติว่าเอาเงินนั้นไปซื้อหุ้นคืนจากตลาดทันที</b> ได้คืนมา 0.6 หุ้น ⇒ สุทธิแล้วหุ้นเพิ่มขึ้นแค่ 0.4 หุ้น ไม่ใช่ 1 หุ้นเต็ม</p>
+    <p>นี่คือเหตุผลว่าทำไม Options จึง<b>ไม่กระทบตัวเศษเลย</b> เพราะไม่มีดอกเบี้ยหรือปันผลให้บวกกลับ มีแต่หุ้นเพิ่มขึ้นในตัวส่วนล้วน ๆ ⇒ <b>ถ้า In the money จะเป็น Dilutive เสมอ 100%</b></p>
+    <div class="tsec">
+      <b class="lb">🧠 หลักการจำ</b>
+      <div class="mem">หุ้นเพิ่มสุทธิ = จำนวนสิทธิ × (ตลาด − ใช้สิทธิ) ÷ ตลาด &nbsp;⇒&nbsp; จำว่า <b>“ส่วนต่างหารราคาตลาด”</b></div>
+      <ul>
+        <li><b>ตลาด &gt; ใช้สิทธิ</b> (In the money) ⇒ Dilutive ⇒ คำนวณ</li>
+        <li><b>ตลาด ≤ ใช้สิทธิ</b> (At/Out of the money) ⇒ Antidilutive ⇒ หุ้นเพิ่มสุทธิ = 0</li>
+        <li>ใช้ <b>ราคาตลาดถัวเฉลี่ยระหว่างงวด</b> ไม่ใช่ราคาปิด — จำว่า “เฉลี่ย ไม่ใช่ปิด”</li>
+        <li>Options ⇒ <b>ตัวเศษนิ่งสนิท</b> ขยับแค่ตัวส่วน</li>
+      </ul>
+    </div>
+    <div class="tsec">
+      <b class="lb">🎯 เก็งข้อสอบ</b>
+      <ul>
+        <li>ให้ทั้ง<b>ราคาปิดสิ้นงวด</b>และ<b>ราคาถัวเฉลี่ย</b>มาพร้อมกัน แล้วดูว่าเราหยิบตัวไหน (ต้องหยิบถัวเฉลี่ย)</li>
+        <li>ให้ Warrants ที่ <b>Out of the money</b> มา แล้วถามหาหุ้นเพิ่มสุทธิ ⇒ ตอบ <b>0</b> พร้อมเหตุผลว่าเป็น Antidilutive</li>
+        <li>ถามเชิงทฤษฎีว่า “Options กระทบตัวเศษอย่างไร” ⇒ ตอบ <b>ไม่กระทบ</b></li>
+        <li>โจทย์รวมที่มีทั้ง Options + หุ้นกู้แปลงสภาพ แล้วให้เรียงลำดับ ⇒ Options มักมาก่อนเพราะ Incremental EPS = 0</li>
+      </ul>
+    </div>
+    <div class="tsec">
+      <b class="lb">⚡ เทคนิคทำข้อสอบ</b>
+      <ul>
+        <li>ใช้<b>สูตรลัด</b>เสมอ เร็วกว่าการคำนวณ 3 ขั้นประมาณ 3 เท่า</li>
+        <li>เช็กก่อนลงมือว่า In หรือ Out of the money — ถ้า Out ก็ตอบ 0 ได้ใน 5 วินาที ไม่ต้องคำนวณ</li>
+        <li>ถ้าโจทย์บอก “สิทธิออกระหว่างงวด” อย่าลืมถ่วงน้ำหนักหุ้นเพิ่มสุทธิตามเดือนที่มีสิทธิอยู่</li>
+      </ul>
+    </div>
+  </div>
+
+<section>
+  <h2>สิทธิซื้อหุ้น / ใบสำคัญแสดงสิทธิ — Treasury Stock Method</h2>
+  <div class="card">
+    <p><b>ตรรกะ 3 ขั้น:</b> สมมติผู้ถือสิทธิใช้สิทธิซื้อหุ้นทั้งหมด → บริษัทได้เงินสดเข้ามา → สมมติว่านำเงินนั้นไป<b>ซื้อหุ้นคืนที่ราคาตลาดถัวเฉลี่ยระหว่างงวด</b> → ส่วนต่างที่เหลือคือหุ้นที่เพิ่มขึ้นสุทธิ</p>
+    <div class="formula"><span class="t">3 ขั้นตอน</span>
+      1) เงินที่ได้รับ = จำนวนสิทธิ × ราคาใช้สิทธิ<br>
+      2) หุ้นที่ซื้อคืนได้ = เงินที่ได้รับ ÷ ราคาตลาดถัวเฉลี่ย<br>
+      3) <b>หุ้นเพิ่มสุทธิ = จำนวนสิทธิ − หุ้นที่ซื้อคืนได้</b>
+    </div>
+    <div class="formula"><span class="t">สูตรลัด (ใช้ในห้องสอบ)</span>
+      หุ้นเพิ่มสุทธิ = จำนวนสิทธิ × (ราคาตลาด − ราคาใช้สิทธิ) ÷ ราคาตลาด
+    </div>
+
+    <div class="ex"><div class="h">✏️ ตัวอย่างที่ 6-7 (จากเอกสาร) — Stock Options</div>
+      สิทธิซื้อหุ้น 1,500 หน่วย · ราคาใช้สิทธิ 30 บาท · ราคาตลาดถัวเฉลี่ย 50 บาท
+      <div class="formula">
+        1) เงินที่ได้รับ = 1,500 × 30 = 45,000 บาท<br>
+        2) ซื้อหุ้นคืนได้ = 45,000 ÷ 50 = 900 หุ้น<br>
+        3) <b>หุ้นเพิ่มสุทธิ = 1,500 − 900 = 600 หุ้น</b>
+      </div>
+      ตรวจด้วยสูตรลัด: 1,500 × (50 − 30) ÷ 50 = 1,500 × 0.4 = <b>600 หุ้น ✓</b>
+      <p class="small" style="margin-top:8px">ให้บวก 600 หุ้นนี้เข้าไปในตัวส่วนของ Diluted EPS ส่วน<b>ตัวเศษไม่เปลี่ยนแปลง</b></p>
+    </div>
+
+    <div class="tw"><table>
+      <tr><th>สถานะสิทธิ</th><th>เงื่อนไข</th><th>ผล</th></tr>
+      <tr><td>In the money</td><td>ราคาตลาด &gt; ราคาใช้สิทธิ</td><td><b>Dilutive เสมอ</b> → นำมาคำนวณ</td></tr>
+      <tr><td>At / Out of the money</td><td>ราคาตลาด ≤ ราคาใช้สิทธิ</td><td><b>Antidilutive</b> → ไม่นำมาคำนวณ</td></tr>
+    </table></div>
+    <div class="tip"><span class="h">ใช้ราคาไหน?</span>
+      ใช้ <b>ราคาตลาดถัวเฉลี่ยระหว่างงวด</b> ไม่ใช่ราคาปิดสิ้นงวด — เพราะสะท้อนราคาที่บริษัทจะซื้อหุ้นคืนได้จริงตลอดปี (ข้อสอบชอบให้ราคาสิ้นงวดมาหลอก)
+    </div>
+  </div>
+</section>
+
+  <div class="doneWrap"><button class="doneBtn" data-for="L64">✓ อ่านจบ LOS 6.4 แล้ว</button></div>
+</div>
+
+<!-- ============ LOS 6.5 ============ -->
+<div class="losblk" id="L65" data-los="L65" data-main="1">
+  <div class="losTag"><span class="mark">LOS 6.5</span> อธิบายผลกระทบของหลักทรัพย์แปลงสภาพและสิทธิในการซื้อหุ้นสามัญที่มีต่อกำไรต่อหุ้น</div>
+
+  <div class="tutor">
+    <div class="th">🎓 ติวเตอร์สรุปให้</div>
+    <p>LOS 6.3 และ 6.4 สอน <b>“คำนวณยังไง”</b> ส่วน LOS 6.5 นี้ถามว่า <b>“แล้วมันแปลว่าอะไร”</b> — เป็นข้อเชิงอธิบาย ไม่ใช่เชิงคำนวณ จึงต้องตอบให้เป็นภาษานักวิเคราะห์</p>
+    <p>ภาพรวมของผลกระทบมี 2 ทาง: ตราสารแปลงสภาพ<b>ดันทั้งตัวเศษและตัวส่วน</b> (เพิ่มกำไรเพราะประหยัดดอกเบี้ย/ปันผล แต่เพิ่มหุ้นด้วย) ส่วน Options/Warrants <b>ดันตัวส่วนอย่างเดียว</b> ⇒ ผลลัพธ์สุทธิคือ <b>EPS ลดลงเสมอถ้าเป็น Dilutive</b></p>
+    <p>มุมที่ข้อสอบชอบถามคือ <b>“ช่องว่างระหว่าง Basic กับ Diluted”</b> — ยิ่งห่าง แปลว่าผู้ถือหุ้นเดิมเสี่ยงถูกเจือจางมาก เรียกว่ามี <b>dilution overhang</b> สูง ซึ่งกระทบการประเมินมูลค่าโดยตรง เพราะ P/E ที่คำนวณจาก Basic EPS จะ<b>ดูถูกกว่าความจริง</b></p>
+    <div class="tsec">
+      <b class="lb">🧠 หลักการจำ</b>
+      <div class="mem">“แปลงสภาพดันสองฝั่ง · ออปชันดันฝั่งเดียว · ผลสุทธิคือ EPS ลง”</div>
+      <ul>
+        <li>หุ้นกู้แปลงสภาพ ⇒ <b>กำไรเพิ่ม (ดอกเบี้ยหลังภาษี) + หุ้นเพิ่ม</b></li>
+        <li>หุ้นบุริมสิทธิแปลงสภาพ ⇒ <b>กำไรเพิ่ม (ปันผลเต็มจำนวน) + หุ้นเพิ่ม</b></li>
+        <li>Options/Warrants ⇒ <b>กำไรเท่าเดิม + หุ้นเพิ่มสุทธิ</b></li>
+        <li>ช่องว่าง Basic–Diluted <b>กว้าง = เสี่ยงเจือจางสูง</b> ⇒ ควรประเมินมูลค่าด้วย Diluted EPS</li>
+      </ul>
+    </div>
+    <div class="tsec">
+      <b class="lb">🎯 เก็งข้อสอบ</b>
+      <ul>
+        <li>ถามว่า “ผลของหุ้นกู้แปลงสภาพต่อตัวเศษและตัวส่วนคืออะไร” ⇒ ต้องตอบ<b>ทั้งสองฝั่ง</b> ไม่ใช่ฝั่งเดียว</li>
+        <li>ถามว่า Options กระทบตัวเศษอย่างไร ⇒ <b>ไม่กระทบ</b> (เป็นตัวเลือกหลอกที่พบบ่อย)</li>
+        <li>ให้ Basic EPS กับ Diluted EPS มา แล้วถามว่า<b>นักวิเคราะห์ควรใช้ตัวไหนคำนวณ P/E</b> ⇒ ใช้ Diluted เพื่อความระมัดระวัง</li>
+        <li>ถามถึงผลต่อ<b>สัดส่วนความเป็นเจ้าของ</b>ของผู้ถือหุ้นเดิม ⇒ ลดลงเมื่อมีการใช้สิทธิ</li>
+      </ul>
+    </div>
+    <div class="tsec">
+      <b class="lb">⚡ เทคนิคทำข้อสอบ</b>
+      <ul>
+        <li>ข้อเชิงอธิบายให้ตอบเป็นโครง <b>“ตัวเศษ → ตัวส่วน → ผลสุทธิต่อ EPS → นัยต่อผู้ถือหุ้น”</b> ครบ 4 ชั้นจะได้คะแนนเต็ม</li>
+        <li>อย่าตอบแค่ว่า “EPS ลดลง” ให้ระบุด้วยว่า<b>ลดเพราะตัวส่วนโตเร็วกว่าตัวเศษ</b></li>
+        <li>ถ้าโจทย์ถามเชิงเปรียบเทียบ ให้ชี้จุดต่างสำคัญ: <b>ภาษี</b> (หุ้นกู้ปรับ, บุริมสิทธิไม่ปรับ) และ <b>ตัวเศษ</b> (ออปชันไม่ขยับ)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<section>
+  <h2>สรุปผลกระทบรายตราสารต่อองค์ประกอบของ EPS</h2>
+  <div class="card">
+    <div class="tw"><table>
+      <tr><th>ตราสาร</th><th>ผลต่อตัวเศษ</th><th>ผลต่อตัวส่วน</th><th>ผลสุทธิต่อ EPS</th><th>ผลต่อผู้ถือหุ้นเดิม</th></tr>
+      <tr><td>หุ้นกู้แปลงสภาพ</td><td>เพิ่ม = ดอกเบี้ย × (1−t)</td><td>เพิ่ม = หุ้นจากการแปลง</td><td>ลดลง หากเป็น Dilutive</td><td>สัดส่วนความเป็นเจ้าของลดลง แต่หนี้สินบริษัทหายไป</td></tr>
+      <tr><td>หุ้นบุริมสิทธิแปลงสภาพ</td><td>เพิ่ม = ปันผลเต็มจำนวน</td><td>เพิ่ม = หุ้นจากการแปลง</td><td>ลดลง หากเป็น Dilutive</td><td>สัดส่วนลดลง แต่ไม่ต้องแบ่งปันผลให้บุริมสิทธิอีก</td></tr>
+      <tr><td>Stock Options / Warrants</td><td><b>ไม่เปลี่ยนแปลง</b></td><td>เพิ่ม = หุ้นเพิ่มสุทธิ</td><td>ลดลงเสมอเมื่อ In the money</td><td>ถูกเจือจางโดยตรงโดยไม่ได้รับผลตอบแทนชดเชย</td></tr>
+    </table></div>
+
+    <div class="ex"><div class="h">✏️ ตัวอย่างเชิงอธิบาย — อ่านช่องว่าง Basic vs Diluted</div>
+      บริษัท ก. Basic EPS 5.00 บาท · Diluted EPS 4.90 บาท ⇒ ห่างกัน <b>2%</b><br>
+      บริษัท ข. Basic EPS 5.00 บาท · Diluted EPS 3.75 บาท ⇒ ห่างกัน <b>25%</b>
+      <div class="formula">
+        หากราคาหุ้นทั้งสองบริษัทเท่ากันที่ 75 บาท:<br>
+        บริษัท ก. P/E (Diluted) = 75 ÷ 4.90 = <b>15.3 เท่า</b><br>
+        บริษัท ข. P/E (Diluted) = 75 ÷ 3.75 = <b>20.0 เท่า</b>
+      </div>
+      <b>อ่านผล:</b> ถ้าดูเฉพาะ Basic EPS ทั้งสองบริษัทมี P/E เท่ากันที่ 15 เท่า ดูน่าสนใจพอกัน แต่เมื่อมองผ่าน Diluted EPS บริษัท ข. <b>แพงกว่าถึง 30%</b> เพราะมี dilution overhang จาก ESOP/หุ้นกู้แปลงสภาพจำนวนมากรออยู่
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>มุมมองนักวิเคราะห์ &amp; กับดักข้อสอบ</h2>
+  <div class="card">
+    <h4>ใช้ EPS อย่างไรให้ถูกต้อง</h4>
+    <ul>
+      <li><b>ดูช่องว่าง Basic vs Diluted</b> — ถ้าห่างเกิน 5–10% แปลว่ามี “overhang” จาก ESOP / หุ้นกู้แปลงสภาพจำนวนมาก ผู้ถือหุ้นเดิมมีความเสี่ยงถูกเจือจาง</li>
+      <li><b>ใช้ Diluted EPS คำนวณ P/E</b> เพื่อความระมัดระวัง</li>
+      <li><b>แยก EPS ที่มาจากรายการไม่เกิดประจำ</b> เช่น กำไรจากการขายสินทรัพย์ กำไรจากการปรับมูลค่ายุติธรรม → คำนวณ Core EPS</li>
+      <li><b>ระวัง EPS โตจากการซื้อหุ้นคืน</b> — กำไรรวมอาจไม่โตเลย แต่ตัวส่วนหด</li>
+    </ul>
+    <div class="tw"><table>
+      <tr><th>สถานการณ์</th><th>สิ่งที่ต้องทำ</th><th>ข้อผิดพลาดที่พบบ่อย</th></tr>
+      <tr><td>ออกหุ้นเพิ่มทุนรับเงินสด</td><td>ถ่วงน้ำหนักตามเดือน</td><td>นับเต็มปี</td></tr>
+      <tr><td>หุ้นปันผล / แตกหุ้น</td><td>ปรับย้อนหลังทั้งงวด + งวดเปรียบเทียบ</td><td>ถ่วงน้ำหนักตามเวลา</td></tr>
+      <tr><td>หุ้นกู้แปลงสภาพ</td><td>บวกดอกเบี้ย<b>หลังภาษี</b></td><td>ลืมคูณ (1 − t)</td></tr>
+      <tr><td>หุ้นบุริมสิทธิแปลงสภาพ</td><td>บวกปันผล<b>เต็มจำนวน</b></td><td>เผลอคูณ (1 − t)</td></tr>
+      <tr><td>Options / Warrants</td><td>ตัวเศษไม่เปลี่ยน ใช้ราคาตลาด<b>ถัวเฉลี่ย</b></td><td>ใช้ราคาปิดสิ้นงวด</td></tr>
+      <tr><td>บริษัทขาดทุน</td><td>Diluted = Basic</td><td>ยังฝืนคำนวณ dilution</td></tr>
+      <tr><td>หุ้นบุริมสิทธิชนิดสะสม</td><td>หักปันผลแม้ไม่ประกาศจ่าย</td><td>ไม่หักเพราะยังไม่จ่าย</td></tr>
+    </table></div>
+  </div>
+</section>
+
+  <div class="doneWrap"><button class="doneBtn" data-for="L65">✓ อ่านจบ LOS 6.5 แล้ว</button></div>
+</div>
+
+<!-- ============ LOS 6.6 ============ -->
+<div class="losblk" id="L66" data-los="L66" data-main="1">
+  <div class="losTag"><span class="mark">LOS 6.6</span> อธิบายแนวคิดการปรับเพิ่มกำไรต่อหุ้น</div>
+
+  <div class="tutor">
+    <div class="th">🎓 ติวเตอร์สรุปให้</div>
+    <p>“แนวคิดการปรับเพิ่มกำไรต่อหุ้น” (Antidilution) ตั้งอยู่บน<b>หลักความระมัดระวัง (conservatism)</b> ข้อเดียว: งบการเงินต้องไม่แสดงภาพที่ดีเกินจริง</p>
+    <p>ลองคิดดู ถ้าเราปล่อยให้รวมตราสารที่ทำให้ EPS <b>สูงขึ้น</b> บริษัทก็จะเลือกออกตราสารประเภทนั้นเยอะ ๆ เพื่อให้ตัวเลข Diluted EPS ดูสวย ซึ่งผิดวัตถุประสงค์ของการรายงาน Diluted EPS ที่ต้องการแสดง<b>สถานการณ์เลวร้ายที่สุด</b> มาตรฐานจึงสั่งห้ามเด็ดขาด</p>
+    <p>ส่วนที่คนพลาดบ่อยคือ <b>“ลำดับการนำเข้า”</b> — ถ้าใส่ตราสารแบบสุ่ม อาจได้คำตอบที่ไม่ใช่ค่าต่ำสุด มาตรฐานจึงกำหนดให้<b>เรียงจาก Dilutive มากที่สุดไปน้อยที่สุด</b> แล้วทยอยใส่ จนกว่า EPS จะเริ่มเด้งขึ้น</p>
+    <p>และกฎทองที่ต้องจำขึ้นใจ: <b>ปีที่บริษัทขาดทุน ⇒ ทุกตราสารเป็น Antidilutive หมด ⇒ Diluted EPS = Basic EPS</b> เพราะยิ่งหารด้วยหุ้นเยอะ ขาดทุนต่อหุ้นยิ่งดูน้อยลง</p>
+    <div class="tsec">
+      <b class="lb">🧠 หลักการจำ</b>
+      <div class="mem">“เรียงจากน้อยไปมาก ใส่ไปเรื่อย ๆ พอ EPS เด้งขึ้น = หยุด” · Diluted EPS ที่ถูกต้อง = <b>ค่าต่ำสุด</b></div>
+      <ul>
+        <li>Antidilutive ⇒ <b>ห้ามรวม แต่ต้องเปิดเผย</b> (ไม่ใช่ “ไม่ต้องทำอะไรเลย”)</li>
+        <li><b>ขาดทุน = ไม่เจือจาง</b> ⇒ Diluted EPS = Basic EPS เสมอ</li>
+        <li>เรียงลำดับด้วย <b>Incremental EPS จากต่ำไปสูง</b></li>
+        <li>Options ที่ In the money มี Incremental EPS = 0 ⇒ <b>เข้าคิวแรกเกือบทุกครั้ง</b></li>
+      </ul>
+    </div>
+    <div class="tsec">
+      <b class="lb">🎯 เก็งข้อสอบ</b>
+      <ul>
+        <li>ให้ตราสาร 3 ชุด แล้วถาม <b>Diluted EPS ที่ถูกต้อง</b> — คำตอบมักไม่ใช่กรณี “ใส่ครบทุกตัว” เพราะมี 1 ตัวเป็น Antidilutive ซ่อนอยู่</li>
+        <li>ให้บริษัท<b>ขาดทุน</b> พร้อมตราสารแปลงสภาพเพียบ แล้วถาม Diluted EPS ⇒ ตอบเท่ากับ Basic</li>
+        <li>ถามเชิงแนวคิด: “เหตุใดจึงห้ามรวมตราสารปรับเพิ่ม” ⇒ ตอบ <b>หลักความระมัดระวัง / ป้องกันการแสดงผลดีเกินจริง</b></li>
+        <li>ถามว่าควรเรียงลำดับอย่างไร ⇒ <b>จาก Dilutive มากที่สุดไปน้อยที่สุด</b></li>
+      </ul>
+    </div>
+    <div class="tsec">
+      <b class="lb">⚡ เทคนิคทำข้อสอบ</b>
+      <ul>
+        <li>ทำ<b>ตารางสะสม 4 คอลัมน์</b>: ตัวเศษสะสม / ตัวส่วนสะสม / EPS / ตัดสิน — ไล่ลงทีละแถว ชัดเจนและตรวจย้อนง่าย</li>
+        <li>ถ้าเวลาไม่พอ ให้คำนวณ Incremental EPS ของทุกตัวก่อน แล้ว<b>ตัดตัวที่สูงกว่า Basic EPS ทิ้งทันที</b> โดยไม่ต้องไล่รวม</li>
+        <li>ระวังปัดเศษ — ข้อสอบมักให้ตัวเลือกที่ต่างกันแค่ทศนิยมที่ 2 ให้เก็บทศนิยมไว้ 3-4 ตำแหน่งจนถึงขั้นสุดท้าย</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<section>
+  <h2>ตราสารปรับเพิ่ม (Antidilutive) &amp; การจัดลำดับ</h2>
+  <div class="card">
+    <h4>นิยาม</h4>
+    <p><b>Antidilutive</b> = ตราสารที่เมื่อนำมารวมแล้วทำให้ <b>กำไรต่อหุ้นเพิ่มขึ้น</b> หรือ <b>ขาดทุนต่อหุ้นลดลง</b> ⇒ ตามมาตรฐาน<b>ห้ามนำมารวม</b>ในการคำนวณ Diluted EPS แต่ต้อง<b>เปิดเผยในหมายเหตุ</b>ว่ามีตราสารใดที่ถูกตัดออกบ้าง</p>
+    <div class="alert"><span class="h">กรณีพิเศษ: ปีที่ขาดทุนสุทธิ</span>
+      เมื่อบริษัทมี<b>ขาดทุน</b> การเพิ่มจำนวนหุ้นจะทำให้ “ขาดทุนต่อหุ้น” ดูน้อยลง ⇒ ตราสารทุกตัวกลายเป็น Antidilutive ⇒ <b>Diluted EPS = Basic EPS</b> เสมอ
+    </div>
+
+    <h4>วิธีจัดลำดับเมื่อมีตราสารหลายชุด</h4>
+    <p>ตามเอกสาร: ให้พิจารณาแต่ละชุด<b>แยกกัน</b> แล้วเรียงลำดับจากชุดที่ทำให้ EPS <b>ปรับลดมากที่สุดไปน้อยที่สุด</b> จากนั้นทยอยรวมทีละชุด</p>
+    <div class="formula"><span class="t">ผลกระทบส่วนเพิ่มต่อหุ้น (Incremental EPS)</span>
+      Incremental EPS = การเปลี่ยนแปลงของตัวเศษ ÷ การเปลี่ยนแปลงของตัวส่วน<br>
+      ค่ายิ่งต่ำ = ยิ่ง Dilutive มาก = ใส่เข้ามาก่อน
+    </div>
+
+    <div class="ex"><div class="h">✏️ ตัวอย่างสังเคราะห์ — เรียงลำดับตราสาร 3 ชุด</div>
+      กำไรส่วนหุ้นสามัญ 10,000,000 บาท · WANOS 4,000,000 หุ้น ⇒ <b>Basic EPS = 2.50 บาท</b>
+      <div class="tw"><table>
+        <tr><th>ชุด</th><th>รายละเอียด</th><th class="num">Δ กำไร</th><th class="num">Δ หุ้น</th><th class="num">Incremental EPS</th></tr>
+        <tr><td>A</td><td>Options 200,000 สิทธิ ใช้สิทธิ 40 บาท ตลาด 50 บาท</td><td class="num">0</td><td class="num">40,000</td><td class="num"><b>0.00</b></td></tr>
+        <tr><td>C</td><td>หุ้นกู้แปลงสภาพ ดอกเบี้ยหลังภาษี 560,000</td><td class="num">560,000</td><td class="num">400,000</td><td class="num"><b>1.40</b></td></tr>
+        <tr><td>B</td><td>หุ้นบุริมสิทธิแปลงสภาพ ปันผล 900,000</td><td class="num">900,000</td><td class="num">300,000</td><td class="num"><b>3.00</b></td></tr>
+      </table></div>
+      <b>ลำดับการใส่:</b> A (0.00) → C (1.40) → B (3.00)
+      <div class="tw"><table>
+        <tr><th>ขั้น</th><th class="num">ตัวเศษ</th><th class="num">ตัวส่วน</th><th class="num">EPS</th><th>สรุป</th></tr>
+        <tr><td>Basic</td><td class="num">10,000,000</td><td class="num">4,000,000</td><td class="num">2.500</td><td>—</td></tr>
+        <tr><td>+ A</td><td class="num">10,000,000</td><td class="num">4,040,000</td><td class="num">2.475</td><td>ลดลง ✓ Dilutive</td></tr>
+        <tr><td>+ C</td><td class="num">10,560,000</td><td class="num">4,440,000</td><td class="num"><b>2.378</b></td><td>ลดลง ✓ Dilutive</td></tr>
+        <tr><td>+ B</td><td class="num">11,460,000</td><td class="num">4,740,000</td><td class="num">2.418</td><td><b>เพิ่มขึ้น ✗ Antidilutive → ตัดออก</b></td></tr>
+      </table></div>
+      <b>คำตอบ: Diluted EPS = 2.38 บาท/หุ้น</b> (หยุดที่ชุด C, ไม่รวมชุด B)
+      <p class="small" style="margin-top:8px">เทคนิคจำ: เมื่อใส่แล้ว EPS <b>เริ่มเด้งขึ้น</b> ให้หยุดทันที ตัวที่เหลือทั้งหมดเป็น Antidilutive</p>
+    </div>
+  </div>
+</section>
+
+  <div class="exhead">📝 แบบฝึกหัดจากคลังข้อสอบจริง <span class="exbadge">1 ข้อ</span></div>
+
+  <details class="exq">
+    <summary>ณ วันที่ 1 มกราคม 25X1 บริษัท รวยแล้ว จำกัด มีหุ้นสามัญที่ออกจำหน่ายและถือโดยผู้ถือหุ้น จำนวน 1,000 หุ้น มีกำไรสำหรับปี 6,000 บาท ข้อมูลที่เกี่ยวข้องสำหรับตราสารที่อาจเปลี่ยนเป็นหุ้นสามัญ (potential ordinary share) มีดังนี้ สิทธิเลือกซื้อหุ้นสามัญ จำนวน 80 สิทธิ สิทธิ 1 สิทธิ สามารถใช้ซื้อหุ้นสามัญได้ 1 หุ้น ราคาที่ใช้สิทธิซื้อหุ้นละ 5 บาท ราคาตลาดถัวเฉลี่ยต่อหุ้นระหว่างปี 25X1 เป็น 8 บาท · ณ วันที่ 1 มกราคม 25X1 กิจการออกจำหน่ายหุ้นกู้แปลงสภาพ ราคาตามมูลค่า 5,000 บาท อัตราดอกเบี้ย 10% กิจการเสียภาษีเงินได้ในอัตรา 20% หุ้นกู้สามารถแปลงสภาพเป็นหุ้นสามัญ 150 หุ้น ในปีนี้ยังไม่มีการใช้สิทธิแปลงสภาพ กำไรต่อหุ้นปรับลดเท่ากับเท่าใด<br>
+1) 5.42 บาทต่อหุ้น<br>
+2) 5.50 บาทต่อหุ้น<br>
+3) 5.82 บาทต่อหุ้น<br>
+4) 6.00 บาทต่อหุ้น</summary>
+    <div class="ans">
+      <b>เฉลย: ข้อ 1) 5.42 บาทต่อหุ้น</b><br>
+      ต้องเรียงลำดับตราสารจาก Incremental EPS ต่ำสุดไปสูงสุดก่อนทยอยรวม:<br>
+      <b>ลำดับที่ 1 — สิทธิเลือกซื้อหุ้น:</b> ผลกระทบตัวเศษ = 0 (Options ไม่กระทบตัวเศษ) หุ้นเพิ่มสุทธิ = 80 × (8−5) ÷ 8 = 30 หุ้น ⇒ Incremental EPS = 0 ÷ 30 = 0.00<br>
+      <b>ลำดับที่ 2 — หุ้นกู้แปลงสภาพ:</b> ดอกเบี้ยหลังภาษี = (5,000 × 10%) × (1−20%) = 400 บาท หุ้นที่แปลง = 150 หุ้น ⇒ Incremental EPS = 400 ÷ 150 = 2.67<br><br>
+      ทยอยรวมตามลำดับ:<br>
+      + Options: Diluted EPS = 6,000 ÷ (1,000+30) = 6,000 ÷ 1,030 = 5.83 บาท (ลดลงจาก Basic EPS 6.00 ⇒ Dilutive)<br>
+      + หุ้นกู้แปลงสภาพ: Diluted EPS = (6,000+400) ÷ (1,000+30+150) = 6,400 ÷ 1,180 = <b>5.42 บาทต่อหุ้น</b> (ลดลงต่อเนื่อง ⇒ Dilutive)<br>
+      <span class="small">คำตอบสุดท้ายคือ Diluted EPS ที่ต่ำที่สุดหลังรวมตราสารที่เป็น Dilutive ทั้งหมดตามลำดับ</span>
+    </div>
+  </details>
+
+  <div class="doneWrap"><button class="doneBtn" data-for="L66">✓ อ่านจบ LOS 6.6 แล้ว</button></div>
+</div>
+
+<!-- ============ LOS 6.7 ============ -->
+<div class="losblk" id="L67" data-los="L67" data-main="1">
+  <div class="losTag"><span class="mark">LOS 6.7</span> เปรียบเทียบข้อกำหนดของการรายงานกำไรต่อหุ้นในกิจการที่มีโครงสร้างเงินทุนแบบง่ายและกิจการที่มีโครงสร้างเงินทุนแบบซับซ้อน</div>
+
+  <div class="tutor">
+    <div class="th">🎓 ติวเตอร์สรุปให้</div>
+    <p>LOS 6.1 ให้เรา<b>จำแนก</b>ว่าโครงสร้างเป็นแบบไหน ส่วน LOS 6.7 นี้ถามต่อว่า <b>“แล้วแต่ละแบบต้องรายงานอะไรบ้าง”</b> — เป็นข้อปิดท้ายบทที่รวบยอดเรื่องการนำเสนอและการเปิดเผยข้อมูล</p>
+    <p>จำง่าย ๆ ว่า <b>โครงสร้างง่าย = 1 บรรทัด · โครงสร้างซับซ้อน = 2 บรรทัด</b> และทั้งสองแบบต้องแสดง<b>บนหน้างบกำไรขาดทุน</b> (ไม่ใช่ซ่อนในหมายเหตุ) สำหรับ<b>ทุกงวดที่นำเสนอ</b> รวมถึงงวดเปรียบเทียบของปีก่อนด้วย</p>
+    <p>จุดที่ข้อสอบชอบลึกคือ <b>กรณีมีการดำเนินงานที่ยกเลิก</b> — ต้องแยก EPS ของส่วนที่ดำเนินงานต่อเนื่องกับส่วนที่ยกเลิกออกจากกัน และ<b>กรณีแตกหุ้นหลังวันสิ้นงวดแต่ก่อนอนุมัติงบ</b> ซึ่งต้องปรับย้อนหลังทุกงวดแล้วเปิดเผยข้อเท็จจริงนี้</p>
+    <div class="tsec">
+      <b class="lb">🧠 หลักการจำ</b>
+      <div class="mem">“ง่าย 1 บรรทัด · ซับซ้อน 2 บรรทัด · ทั้งคู่ต้องอยู่หน้างบ และครบทุกงวด”</div>
+      <ul>
+        <li>ต้องแสดง<b>แม้เป็นค่าติดลบ</b> (ขาดทุนต่อหุ้น)</li>
+        <li>มีการดำเนินงานยกเลิก ⇒ <b>แยกบรรทัดต่อเนื่อง / ยกเลิก</b></li>
+        <li>หมายเหตุต้องมี: <b>ตัวเศษ · ตัวส่วน · การกระทบยอด · รายการ Antidilutive ที่ตัดออก</b></li>
+        <li>หุ้นปันผล/แตกหุ้นหลังสิ้นงวดก่อนอนุมัติงบ ⇒ <b>ปรับย้อนหลังทุกงวด + เปิดเผย</b></li>
+      </ul>
+    </div>
+    <div class="tsec">
+      <b class="lb">🎯 เก็งข้อสอบ</b>
+      <ul>
+        <li>“กิจการที่มีโครงสร้างแบบง่ายต้องรายงานอะไร” ⇒ <b>Basic EPS อย่างเดียว</b></li>
+        <li>“บริษัทซับซ้อนแต่ตราสารทั้งหมดเป็น Antidilutive ต้องแสดงกี่บรรทัด” ⇒ <b>2 บรรทัด</b> โดยค่าเท่ากัน</li>
+        <li>ถามเรื่อง<b>การดำเนินงานที่ยกเลิก</b> ⇒ ต้องแสดง EPS แยกส่วน</li>
+        <li>ถามว่าแสดง Basic/Diluted EPS ไว้ที่ใด ⇒ <b>บรรทัดสุดท้ายในงบกำไรขาดทุนเบ็ดเสร็จ</b> ไม่ใช่ในหมายเหตุหรืองบแสดงฐานะการเงิน</li>
+        <li>เหตุการณ์หลังรอบระยะเวลารายงาน (แตกหุ้น) ⇒ ปรับย้อนหลัง ไม่ใช่รับรู้ในงวดถัดไป</li>
+      </ul>
+    </div>
+    <div class="tsec">
+      <b class="lb">⚡ เทคนิคทำข้อสอบ</b>
+      <ul>
+        <li>ข้อเปรียบเทียบให้ตอบเป็น<b>ตาราง 3 แถว</b>: ต้องรายงานอะไร / แสดงที่ไหน / เปิดเผยเพิ่มอะไร</li>
+        <li>ระวังตัวเลือกที่เขียนว่า “แสดงในหมายเหตุประกอบงบ” สำหรับตัว EPS เอง ⇒ <b>ผิด ต้องอยู่หน้างบ</b></li>
+        <li>คำว่า “ทุกงวดที่นำเสนอ” เป็นคีย์เวิร์ดที่มักเป็นคำตอบที่ถูก</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<section>
+  <h2>ตารางเปรียบเทียบข้อกำหนดการรายงาน</h2>
+  <div class="card">
+    <div class="tw"><table>
+      <tr><th>ข้อกำหนด</th><th>โครงสร้างเงินทุนแบบง่าย</th><th>โครงสร้างเงินทุนแบบซับซ้อน</th></tr>
+      <tr><td><b>ตัวเลขที่ต้องรายงาน</b></td><td>Basic EPS เท่านั้น</td><td>Basic EPS <b>และ</b> Diluted EPS</td></tr>
+      <tr><td><b>แสดงที่ใด</b></td><td colspan="2" style="text-align:center"><b>บนหน้างบกำไรขาดทุน</b> (ทั้งสองกรณี)</td></tr>
+      <tr><td><b>งวดที่ต้องแสดง</b></td><td colspan="2" style="text-align:center"><b>ทุกงวดที่นำเสนอ</b> รวมงวดเปรียบเทียบ</td></tr>
+      <tr><td><b>กรณีขาดทุน</b></td><td>แสดงขาดทุนต่อหุ้น (ค่าติดลบ)</td><td>แสดง 2 บรรทัด โดย <b>Diluted = Basic</b></td></tr>
+      <tr><td><b>การดำเนินงานที่ยกเลิก</b></td><td colspan="2" style="text-align:center">แยกแสดง EPS ของส่วนต่อเนื่องและส่วนที่ยกเลิก</td></tr>
+      <tr><td><b>เปิดเผยในหมายเหตุ</b></td><td>ตัวเศษ ตัวส่วน และการกระทบยอด</td><td>เพิ่ม <b>รายการตราสาร Antidilutive ที่ถูกตัดออก</b></td></tr>
+      <tr><td><b>ตราสารที่ทำให้เข้าข่าย</b></td><td>ไม่มีตราสารแปลงสภาพใด ๆ</td><td>หุ้นกู้แปลงสภาพ, บุริมสิทธิแปลงสภาพ, options, warrants, ESOP, หุ้นมีเงื่อนไข</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<section>
+  <h2>การแสดงรายการและการเปิดเผยข้อมูล</h2>
+  <div class="card">
+    <ul>
+      <li>แสดง <b>Basic EPS และ Diluted EPS บนหน้างบกำไรขาดทุน</b> สำหรับ<b>ทุกงวดที่นำเสนอ</b> (รวมงวดเปรียบเทียบ)</li>
+      <li>ต้องแสดง<b>แม้เป็นจำนวนติดลบ</b> (ขาดทุนต่อหุ้น)</li>
+      <li>หากมี<b>การดำเนินงานที่ยกเลิก</b> ต้องแสดง EPS ของส่วนที่ดำเนินงานต่อเนื่องและส่วนที่ยกเลิกแยกกัน</li>
+      <li>เปิดเผยในหมายเหตุ: ตัวเศษ, ตัวส่วน, การกระทบยอดจากกำไรสุทธิถึงกำไรส่วนหุ้นสามัญ และ<b>รายการตราสาร Antidilutive ที่ถูกตัดออก</b></li>
+      <li>หากเกิดหุ้นปันผล/แตกหุ้น<b>หลังวันสิ้นงวดแต่ก่อนอนุมัติงบ</b> ให้ปรับ EPS ทุกงวดที่นำเสนอย้อนหลัง และเปิดเผยข้อเท็จจริงนี้</li>
+    </ul>
+  </div>
+</section>
+
+  <div class="exhead">📝 แบบฝึกหัดจากคลังข้อสอบจริง <span class="exbadge">1 ข้อ</span></div>
+
+  <details class="exq">
+    <summary>กิจการแสดงกำไรต่อหุ้นขั้นพื้นฐานและกำไรต่อหุ้นปรับลดตามตัวเลือกใด<br>1) แสดงไว้ภายใต้ส่วนของผู้ถือหุ้นในงบแสดงฐานะการเงิน &nbsp; 2) แสดงไว้ในรายงานประจำปี &nbsp; 3) แสดงไว้บรรทัดสุดท้ายในงบกำไรขาดทุนเบ็ดเสร็จ &nbsp; 4) ไม่ต้องแสดงรายการเพียงแต่ให้เปิดเผยข้อมูลในหมายเหตุประกอบงบการเงิน</summary>
+    <div class="ans">
+      <b>เฉลย: ข้อ 3) แสดงไว้บรรทัดสุดท้ายในงบกำไรขาดทุนเบ็ดเสร็จ</b><br>
+      EPS ทั้ง Basic และ Diluted ต้องปรากฏ<b>บนหน้างบกำไรขาดทุนเบ็ดเสร็จโดยตรง</b> ไม่ใช่แค่เปิดเผยในหมายเหตุ และไม่ใช่รายการในงบแสดงฐานะการเงินหรือรายงานประจำปี
+    </div>
+  </details>
+
+  <div class="doneWrap"><button class="doneBtn" data-for="L67">✓ อ่านจบ LOS 6.7 แล้ว</button></div>
+</div>
