@@ -1073,3 +1073,623 @@ footer{text-align:center;color:var(--muted);font-size:.68rem;margin-top:24px;pad
 
   <div class="doneWrap"><button class="doneBtn" data-for="L67">✓ อ่านจบ LOS 6.7 แล้ว</button></div>
 </div>
+<div class="chapter-head" id="ch7">
+  <div class="no">CHAPTER 7</div>
+  <h2>กรณีศึกษาการวิเคราะห์งบการเงิน</h2>
+  <div class="los">
+    <b>📌 วัตถุประสงค์การเรียนรู้ (LOS) ทางการ — บทที่ 7</b>
+    <ol start="1">
+      <li>อธิบายเทคนิคการวิเคราะห์งบการเงินในแต่ละขั้นตอน</li>
+      <li>วิเคราะห์และอธิบายความแตกต่างของงบการเงินในกรณีต่าง ๆ</li>
+      <li>ระบุทางเลือกทางบัญชีที่กิจการอาจเลือกใช้ และผลกระทบต่อคุณภาพของรายงานทางการเงินและอัตราส่วนทางการเงิน</li>
+      <li>อธิบายผลกระทบของการปรับปรุงงบการเงินทั้ง 3 งบที่มีต่อสถานะทางการเงินและอัตราส่วนทางการเงิน</li>
+      <li>ประยุกต์ใช้เทคนิคการวิเคราะห์งบการเงินในแต่ละกรณีศึกษา</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ============ LOS 7.1 ============ -->
+<div class="losblk" id="L71" data-los="L71" data-main="1">
+  <div class="losTag"><span class="mark">LOS 7.1</span> อธิบายเทคนิคการวิเคราะห์งบการเงินในแต่ละขั้นตอน</div>
+
+  <div class="tutor">
+    <div class="th">🎓 ติวเตอร์สรุปให้</div>
+    <p>นึกภาพหมอตรวจคนไข้ — ก่อนจะวินิจฉัยอะไรได้ ต้องมี<b>ขั้นตอนที่เป็นระบบ</b> ไม่ใช่สุ่มดูอาการมั่ว ๆ การวิเคราะห์งบการเงินก็เหมือนกัน มี <b>5 ขั้นตอนมาตรฐาน</b>: กำหนดวัตถุประสงค์ → รวบรวมข้อมูล → ปรับปรุงข้อมูลให้เทียบกันได้ → วิเคราะห์และแปลความหมาย → สรุปผลและให้ข้อเสนอแนะ</p>
+    <p>ส่วน<b>เทคนิค</b>ที่ใช้ในขั้นตอนที่ 4 มีหลายเครื่องมือ แต่ตัวที่ข้อสอบชอบถามลึกที่สุดคือ <b>DuPont Analysis</b> เพราะมันแยก ROE ออกเป็นชิ้น ๆ ทำให้เห็นว่า “ความสวยของ ROE” มาจากไหนกันแน่ — มาจากการทำกำไรจริง หรือมาจากการกู้เงินมาป้ายสี</p>
+    <p>เทคนิคอื่นที่ต้องรู้คู่กัน: <b>Common-size</b> (ตัดขนาดบริษัทออกเพื่อเทียบกันข้ามบริษัท), <b>Trend/Index analysis</b> (ดูทิศทางระยะยาว), การวิเคราะห์<b>กระแสเงินสด</b> (เช็กคุณภาพกำไรผ่าน Accruals), และการวิเคราะห์<b>ส่วนงาน (Segment)</b> เพื่อดูความเสี่ยงกระจุกตัว</p>
+    <div class="tsec">
+      <b class="lb">🧠 หลักการจำ</b>
+      <div class="mem">5 ขั้นตอน ท่องว่า “วัตถุประสงค์ → รวบรวม → ปรับปรุง → วิเคราะห์ → สรุป”</div>
+      <ul>
+        <li>DuPont 3 ส่วน = <b>มาร์จิ้น × หมุนสินทรัพย์ × เลเวอเรจ</b></li>
+        <li>DuPont 5 ส่วน = <b>ภาระภาษี × ภาระดอกเบี้ย × มาร์จิ้นดำเนินงาน × หมุนสินทรัพย์ × เลเวอเรจ</b></li>
+        <li>อัตราส่วน<b>ประสิทธิภาพดำเนินงาน</b> (operating efficiency) เน้นที่ <b>การหมุนของสินทรัพย์</b> เป็นหลัก ไม่ใช่เรื่องนโยบายจ่ายเงินปันผล</li>
+        <li>อัตราการจ่ายเงินปันผล (Dividend Payout) เป็นอัตราส่วน<b>นโยบายทางการเงิน</b> ไม่ใช่ประสิทธิภาพดำเนินงาน</li>
+      </ul>
+    </div>
+    <div class="tsec">
+      <b class="lb">🎯 เก็งข้อสอบ</b>
+      <ul>
+        <li>ให้ตัวเลข 5–6 ตัว แล้วให้คำนวณ DuPont 5 ส่วนครบทุกช่อง และตรวจผลให้ตรงกับ ROE ปกติ</li>
+        <li>ถามว่า “อัตราส่วนใดไม่ใช่อัตราส่วนประสิทธิภาพดำเนินงาน” — ตัวหลอกมักเป็นอัตราส่วนที่ดูคล้ายแต่จัดอยู่คนละหมวด เช่น อัตราการจ่ายเงินปันผล</li>
+        <li>ถามลำดับขั้นตอนการวิเคราะห์ว่าขั้นใดมาก่อนมาหลัง</li>
+      </ul>
+    </div>
+    <div class="tsec">
+      <b class="lb">⚡ เทคนิคทำข้อสอบ</b>
+      <ul>
+        <li>เจอ DuPont ให้ไล่คำนวณทีละช่องจากซ้ายไปขวา แล้ว<b>คูณรวมตรวจทาน</b>กับ ROE ปกติ (NI ÷ Equity) เสมอ เพื่อจับว่าใส่ตัวเลขผิดช่องหรือไม่</li>
+        <li>จำหมวดอัตราส่วนให้แม่น: สภาพคล่อง / ประสิทธิภาพดำเนินงาน / โครงสร้างเงินทุน / ความสามารถทำกำไร / มูลค่าตลาด — Dividend Payout อยู่หมวดนโยบายทางการเงิน/มูลค่าตลาด ไม่ใช่ประสิทธิภาพ</li>
+      </ul>
+    </div>
+  </div>
+
+<section>
+  <h2>5 ขั้นตอนการวิเคราะห์งบการเงิน</h2>
+  <div class="card">
+    <div class="tw"><table>
+      <tr><th>ขั้นตอน</th><th>รายละเอียด</th></tr>
+      <tr><td><b>1. กำหนดวัตถุประสงค์</b></td><td>วิเคราะห์เพื่ออะไร เช่น ให้สินเชื่อ ลงทุนซื้อหุ้น หรือควบรวมกิจการ</td></tr>
+      <tr><td><b>2. รวบรวมข้อมูล</b></td><td>งบการเงิน หมายเหตุ รายงานผู้สอบบัญชี ข้อมูลอุตสาหกรรม</td></tr>
+      <tr><td><b>3. ปรับปรุงข้อมูล</b></td><td>ปรับให้เปรียบเทียบกันได้ เช่น ตัดรายการไม่เกิดประจำ ปรับวิธีบัญชีให้เป็นมาตรฐานเดียวกัน</td></tr>
+      <tr><td><b>4. วิเคราะห์และแปลความหมาย</b></td><td>ใช้เทคนิคต่าง ๆ เช่น Common-size, Trend, DuPont, กระแสเงินสด, Segment</td></tr>
+      <tr><td><b>5. สรุปผลและให้ข้อเสนอแนะ</b></td><td>สรุปเป็นรายงาน พร้อมข้อเสนอแนะเชิงตัดสินใจ</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<section>
+  <h2>DuPont Analysis — แยกชิ้นส่วนของ ROE</h2>
+  <div class="card">
+    <div class="formula"><span class="t">DuPont 3 ส่วน</span>
+      ROE = (กำไรสุทธิ ÷ ยอดขาย) × (ยอดขาย ÷ สินทรัพย์รวม) × (สินทรัพย์รวม ÷ ส่วนของผู้ถือหุ้น)<br>
+      = อัตรากำไรสุทธิ × อัตราหมุนเวียนสินทรัพย์ × ตัวคูณส่วนของผู้ถือหุ้น
+    </div>
+    <div class="formula"><span class="t">DuPont 5 ส่วน</span>
+      ROE = (NI÷EBT) × (EBT÷EBIT) × (EBIT÷ยอดขาย) × (ยอดขาย÷สินทรัพย์รวม) × (สินทรัพย์รวม÷ส่วนของผู้ถือหุ้น)<br>
+      = ภาระภาษี × ภาระดอกเบี้ย × อัตรากำไรดำเนินงาน × อัตราหมุนเวียนสินทรัพย์ × ตัวคูณส่วนของผู้ถือหุ้น
+    </div>
+
+    <div class="ex"><div class="h">✏️ ตัวอย่าง — DuPont 5 ส่วน</div>
+      กำไรสุทธิ 120 · EBT 150 · EBIT 200 · ยอดขาย 2,000 · สินทรัพย์รวม 1,600 · ส่วนของผู้ถือหุ้น 800
+      <div class="tw"><table>
+        <tr><th>องค์ประกอบ</th><th>คำนวณ</th><th class="num">ค่าที่ได้</th></tr>
+        <tr><td>ภาระภาษี</td><td>120 ÷ 150</td><td class="num">0.80</td></tr>
+        <tr><td>ภาระดอกเบี้ย</td><td>150 ÷ 200</td><td class="num">0.75</td></tr>
+        <tr><td>อัตรากำไรดำเนินงาน</td><td>200 ÷ 2,000</td><td class="num">0.10</td></tr>
+        <tr><td>อัตราหมุนเวียนสินทรัพย์</td><td>2,000 ÷ 1,600</td><td class="num">1.25 เท่า</td></tr>
+        <tr><td>ตัวคูณส่วนของผู้ถือหุ้น</td><td>1,600 ÷ 800</td><td class="num">2.00 เท่า</td></tr>
+      </table></div>
+      <b>ROE = 0.80 × 0.75 × 0.10 × 1.25 × 2.00 = 0.15 (15%)</b><br>
+      ตรวจทาน: 120 ÷ 800 = 15% ✓
+      <p class="small" style="margin-top:8px"><b>อ่านผล:</b> ROE 15% ดูดี แต่ตัวคูณส่วนของผู้ถือหุ้นสูงถึง 2.00 เท่า แปลว่าส่วนหนึ่งของ ROE มาจาก<b>การก่อหนี้</b> ไม่ใช่ความสามารถทำกำไรหรือประสิทธิภาพสินทรัพย์ล้วน ๆ หากดอกเบี้ยขาขึ้น ภาระดอกเบี้ยจะฉุด ROE ลงทันที</p>
+    </div>
+  </div>
+</section>
+
+  <div class="exhead">📝 แบบฝึกหัดจากคลังข้อสอบจริง <span class="exbadge">1 ข้อ</span></div>
+
+  <details class="exq">
+    <summary>อัตราส่วนใดต่อไปนี้ ไม่ใช่ อัตราส่วนที่แสดงประสิทธิภาพในการดำเนินงาน<br>
+1) อัตราผลตอบแทนจากสินทรัพย์<br>
+2) อัตราการหมุนของสินทรัพย์<br>
+3) อัตราการหมุนของสินทรัพย์ถาวร<br>
+4) อัตราการจ่ายเงินปันผล</summary>
+    <div class="ans">
+      <b>เฉลย: ข้อ 4) อัตราการจ่ายเงินปันผล</b><br>
+      อัตราการจ่ายเงินปันผล (Dividend Payout Ratio) เป็นอัตราส่วนที่สะท้อน<b>นโยบายทางการเงิน</b>ของกิจการว่าจ่ายปันผลเท่าไรเทียบกับกำไร ไม่ได้บอกถึง<b>ประสิทธิภาพในการใช้สินทรัพย์</b>แต่อย่างใด ต่างจากตัวเลือกอื่นซึ่งล้วนวัดว่ากิจการใช้สินทรัพย์สร้างผลตอบแทน/ยอดขายได้ดีเพียงใด
+    </div>
+  </details>
+
+  <div class="doneWrap"><button class="doneBtn" data-for="L71">✓ อ่านจบ LOS 7.1 แล้ว</button></div>
+</div>
+
+<!-- ============ LOS 7.2 ============ -->
+<div class="losblk" id="L72" data-los="L72" data-main="1">
+  <div class="losTag"><span class="mark">LOS 7.2</span> วิเคราะห์และอธิบายความแตกต่างของงบการเงินในกรณีต่าง ๆ</div>
+
+  <div class="tutor">
+    <div class="th">🎓 ติวเตอร์สรุปให้</div>
+    <p>งบการเงินไม่ได้หน้าตาเหมือนกันหมด — <b>โครงสร้างสินทรัพย์หลัก</b>จะเปลี่ยนไปตามประเภทธุรกิจ ผู้ผลิตจะเน้นที่ดิน-อาคาร-เครื่องจักรและสินค้าคงเหลือ ธุรกิจให้เช่าจะเน้นอสังหาริมทรัพย์เพื่อการลงทุน ส่วนธนาคารจะเน้นเงินให้สินเชื่อสุทธิ</p>
+    <p>อีกประเด็นที่ชอบออกสอบคือ <b>งบรวม vs งบเฉพาะกิจการ</b> ของบริษัทโฮลดิ้ง — งบเฉพาะกิจการมักมีแค่ “เงินปันผลรับ” เป็นรายได้หลัก ซึ่งไม่สะท้อนผลประกอบการจริงของกลุ่ม จึงต้องดู<b>งบการเงินรวม</b>เสมอเมื่อวิเคราะห์กลุ่มบริษัท</p>
+    <p>ธนาคารมีกติกาพิเศษ: <b>ห้ามใช้ Current Ratio และ Inventory Turnover</b> เพราะธนาคารไม่แบ่งสินทรัพย์/หนี้สินเป็นหมุนเวียน-ไม่หมุนเวียน และไม่มีสินค้าคงเหลือ</p>
+    <div class="tsec">
+      <b class="lb">🧠 หลักการจำ</b>
+      <div class="mem">“ผู้ผลิต=เครื่องจักร+สต็อก · ให้เช่า=อสังหาฯลงทุน · ธนาคาร=สินเชื่อสุทธิ (ห้าม Current Ratio/Inventory Turnover)”</div>
+      <ul>
+        <li>โฮลดิ้ง ⇒ ดู<b>งบรวม</b> ไม่ใช่งบเฉพาะกิจการ</li>
+        <li>D/E ของแต่ละอุตสาหกรรมต่างกันมาก: ผู้ผลิต 0.5–1.5 · ให้เช่า 1–2.5 · ธนาคาร 10–15 (ปกติ ไม่ใช่สัญญาณอันตราย)</li>
+      </ul>
+    </div>
+    <div class="tsec">
+      <b class="lb">🎯 เก็งข้อสอบ</b>
+      <ul>
+        <li>ให้รายการในงบของธุรกิจหนึ่ง แล้วถามว่ารายการใดไม่ควรปรากฏตามประเภทธุรกิจที่ระบุ</li>
+        <li>ถามว่าทำไมงบเฉพาะกิจการของโฮลดิ้งจึงขาดทุนทั้งที่กลุ่มมีกำไร</li>
+        <li>ถามว่าธนาคารที่มี D/E 12 เท่า ถือว่าผิดปกติหรือไม่ ⇒ ไม่ผิดปกติ เป็นเรื่องปกติของธุรกิจธนาคาร</li>
+      </ul>
+    </div>
+    <div class="tsec">
+      <b class="lb">⚡ เทคนิคทำข้อสอบ</b>
+      <p style="margin:0">เจอโจทย์เปรียบเทียบงบข้ามอุตสาหกรรม ให้ถามตัวเองก่อนว่า <b>“สินทรัพย์หลักของธุรกิจนี้คืออะไร”</b> แล้วเช็กว่ารายการที่โจทย์ให้มาสอดคล้องกับสินทรัพย์หลักนั้นหรือไม่</p>
+    </div>
+  </div>
+</div>
+
+<section>
+  <h2>ความแตกต่างของงบการเงินตามประเภทธุรกิจ</h2>
+  <div class="card">
+    <div class="tw"><table>
+      <tr><th>ประเภทธุรกิจ</th><th>สินทรัพย์หลัก</th><th>ข้อควรระวัง</th><th>D/E ทั่วไป</th></tr>
+      <tr><td>ผู้ผลิต</td><td>ที่ดิน อาคาร อุปกรณ์ · สินค้าคงเหลือ</td><td>ต้นทุนคงที่สูง กระทบ Operating Leverage</td><td class="num">0.5–1.5</td></tr>
+      <tr><td>ธุรกิจให้เช่า</td><td>อสังหาริมทรัพย์เพื่อการลงทุน</td><td>ต้องไม่ปนกับ “อสังหาฯ พัฒนาเพื่อขาย” ซึ่งเป็นสินค้าคงเหลือ</td><td class="num">1–2.5</td></tr>
+      <tr><td>ธนาคาร</td><td>เงินให้สินเชื่อสุทธิ</td><td>ห้ามใช้ Current Ratio, Inventory Turnover · ไม่แบ่งหมุนเวียน/ไม่หมุนเวียน</td><td class="num">10–15</td></tr>
+    </table></div>
+    <div class="tip"><span class="h">งบรวม vs งบเฉพาะกิจการ</span>
+      บริษัทโฮลดิ้งที่ถือหุ้นในบริษัทย่อย งบเฉพาะกิจการจะมีรายได้หลักเป็น<b>เงินปันผลรับ</b> ซึ่งขึ้นอยู่กับนโยบายจ่ายปันผลของบริษัทย่อยในปีนั้น ไม่ได้สะท้อนผลดำเนินงานจริง ⇒ นักวิเคราะห์ต้องใช้<b>งบการเงินรวม</b>เป็นหลักเสมอ
+    </div>
+  </div>
+</section>
+
+  <div class="doneWrap"><button class="doneBtn" data-for="L72">✓ อ่านจบ LOS 7.2 แล้ว</button></div>
+</div>
+
+<!-- ============ LOS 7.3 ============ -->
+<div class="losblk" id="L73" data-los="L73" data-main="1">
+  <div class="losTag"><span class="mark">LOS 7.3</span> ระบุทางเลือกทางบัญชีที่กิจการอาจเลือกใช้ และผลกระทบต่อคุณภาพของรายงานทางการเงินและอัตราส่วนทางการเงิน</div>
+
+  <div class="tutor">
+    <div class="th">🎓 ติวเตอร์สรุปให้</div>
+    <p>บัญชีไม่ได้มีคำตอบเดียวเสมอไป — กิจการเลือกวิธีบันทึกได้หลายแบบ แต่ละแบบให้ “หน้าตา” ของงบที่ต่างกัน แม้ธุรกิจจริงจะเหมือนกันทุกประการ นี่คือจุดที่นักวิเคราะห์ต้องจับสังเกตให้ได้</p>
+    <p>ตัวอย่างคลาสสิก: <b>ค่าเสื่อมราคาเส้นตรง</b> vs <b>ลดลงทวีคูณ</b> — วิธีเส้นตรงให้กำไรต้นปีสูงกว่า ส่วนการ<b>บันทึกต้นทุนเป็นสินทรัพย์ (Capitalize)</b> แทนที่จะรับรู้เป็นค่าใช้จ่ายทันที จะทำให้<b>กำไรสูงขึ้น และ CFO สูงขึ้น</b> (เพราะย้ายรายจ่ายไปอยู่ CFI แทน)</p>
+    <p>สัญญาณเตือนคุณภาพกำไร (Red Flags) ที่ต้องจำขึ้นใจ: <b>CFO โตช้ากว่ากำไรสุทธิ</b>, <b>ลูกหนี้/สต็อกโตเร็วกว่ารายได้</b>, และ<b>พึ่งพารายการไม่เกิดประจำ</b> — ทั้งสามอย่างนี้บอกว่ากำไรที่เห็นอาจไม่ใช่กำไรที่ "เก็บเงินได้จริง"</p>
+    <p>ส่วน <b>KAM (Key Audit Matters)</b> คือ “แผนที่ความเสี่ยง” ที่ผู้สอบบัญชีชี้ไว้ในรายงานว่าจุดไหนใช้ดุลยพินิจสูงสุด เช่น การด้อยค่าสินทรัพย์ การประเมินมูลค่ายุติธรรม หรือการตั้งสำรอง ECL ของธนาคาร — เป็นจุดที่นักวิเคราะห์ควรให้ความสนใจเป็นพิเศษ</p>
+    <div class="tsec">
+      <b class="lb">🧠 หลักการจำ</b>
+      <div class="mem">“Capitalize ⇒ กำไร↑ CFO↑ แต่ CFI ติดลบมากขึ้น” · “CFO โตช้ากว่า NI + ลูกหนี้/สต็อกโตเร็วกว่ารายได้ = Red Flag”</div>
+      <ul>
+        <li>KAM = จุดที่ผู้สอบบัญชีใช้ดุลยพินิจสูงสุด ไม่ใช่ข้อผิดพลาดที่พบ</li>
+        <li>Fair Value Model ในอสังหาฯ เพื่อการลงทุน อาจทำให้มีกำไรทางบัญชีที่<b>ยังไม่เป็นเงินสด</b></li>
+      </ul>
+    </div>
+    <div class="tsec">
+      <b class="lb">🎯 เก็งข้อสอบ</b>
+      <ul>
+        <li>ถามว่าการ Capitalize ต้นทุนส่งผลต่อ CFO และ CFI อย่างไร</li>
+        <li>ถามว่าสัญญาณใดคือ Red Flag ด้านคุณภาพกำไร จากรายการตัวเลขที่ให้มา</li>
+        <li>ถามว่า KAM คืออะไร และสะท้อนอะไรในงบการเงิน</li>
+      </ul>
+    </div>
+    <div class="tsec">
+      <b class="lb">⚡ เทคนิคทำข้อสอบ</b>
+      <p style="margin:0">เจอโจทย์เปรียบเทียบ 2 บริษัทที่ ROE/กำไรเท่ากัน ให้สงสัยไว้ก่อนว่าอาจใช้<b>ทางเลือกบัญชีต่างกัน</b> แล้วไล่เช็ก CFO เทียบกับกำไรสุทธิเป็นอันดับแรก</p>
+    </div>
+  </div>
+</div>
+
+<section>
+  <h2>ทางเลือกทางบัญชีและผลกระทบ</h2>
+  <div class="card">
+    <div class="tw"><table>
+      <tr><th>ทางเลือกบัญชี</th><th>ผลกระทบ</th></tr>
+      <tr><td>ค่าเสื่อมราคาเส้นตรง vs ลดลงทวีคูณ</td><td>เส้นตรงให้กำไรช่วงต้นสูงกว่าลดลงทวีคูณ</td></tr>
+      <tr><td>บันทึกต้นทุนเป็นสินทรัพย์ (Capitalize)</td><td>กำไรสูงขึ้น, CFO สูงขึ้น, แต่ CFI ติดลบมากขึ้น</td></tr>
+      <tr><td>Fair Value Model (อสังหาฯ เพื่อการลงทุน)</td><td>อาจมีกำไรที่ยังไม่เกิดขึ้นจริงเป็นเงินสด</td></tr>
+    </table></div>
+    <div class="alert"><span class="h">สัญญาณเตือนคุณภาพกำไร (Red Flags)</span>
+      <ul style="margin:4px 0 0">
+        <li>CFO โตช้ากว่ากำไรสุทธิอย่างต่อเนื่อง</li>
+        <li>ลูกหนี้หรือสินค้าคงเหลือโตเร็วกว่ารายได้</li>
+        <li>กำไรพึ่งพารายการไม่เกิดประจำ (กำไรจากการปรับมูลค่า/ขายสินทรัพย์)</li>
+      </ul>
+    </div>
+    <div class="tip"><span class="h">KAM (Key Audit Matters)</span>
+      คือจุดที่ผู้สอบบัญชีเห็นว่า<b>เสี่ยงและใช้ดุลยพินิจสูงที่สุด</b>ในการตรวจสอบ เช่น การด้อยค่าสินทรัพย์ มูลค่ายุติธรรม หรือการตั้งสำรอง ECL ของธนาคาร — เปรียบเสมือนแผนที่บอกนักวิเคราะห์ว่าควรเพ่งความสนใจไปที่จุดใดเป็นพิเศษ
+    </div>
+  </div>
+</section>
+
+  <div class="doneWrap"><button class="doneBtn" data-for="L73">✓ อ่านจบ LOS 7.3 แล้ว</button></div>
+</div>
+
+<!-- ============ LOS 7.4 ============ -->
+<div class="losblk" id="L74" data-los="L74" data-main="1">
+  <div class="losTag"><span class="mark">LOS 7.4</span> อธิบายผลกระทบของการปรับปรุงงบการเงินทั้ง 3 งบที่มีต่อสถานะทางการเงินและอัตราส่วนทางการเงิน</div>
+
+  <div class="tutor">
+    <div class="th">🎓 ติวเตอร์สรุปให้</div>
+    <p>LOS นี้คือขั้นตอนที่ 3 ของ LOS 7.1 (ปรับปรุงข้อมูล) มาขยายความแบบลึก — เป้าหมายคือทำให้ตัวเลขงบการเงิน<b>เปรียบเทียบกันได้</b> และหา <b>“กำไรหลัก” (Core Earnings)</b> ที่สะท้อนความสามารถทำกำไรที่ยั่งยืนจริง ๆ</p>
+    <p>สูตรง่าย ๆ ของกำไรหลัก: <b>กำไรสุทธิ − กำไรพิเศษที่ไม่เกิดประจำ + ค่าใช้จ่ายพิเศษที่ไม่เกิดประจำ</b> พูดง่าย ๆ คือ ตัดของแปลกปลอมออกทั้งสองทาง</p>
+    <p>การปรับปรุงกระทบ<b>ทั้ง 3 งบพร้อมกัน</b>เสมอ: นำหนี้สินสัญญาเช่าที่ซ่อนอยู่นอกงบดุลเข้ามา ⇒ <b>D/E สูงขึ้น, ROA ต่ำลง, Interest Coverage ลดลง</b> ส่วนการตัดกำไรพิเศษออกจากงบกำไรขาดทุน ⇒ <b>Net Margin และ ROE ต่ำลง แต่ภาพกำไรยั่งยืนขึ้น</b> และถ้าปรับรายการที่เคยอยู่ CFI กลับมาเป็น CFO ⇒ กระทบ FCF และสัดส่วน CFO/NI โดยตรง</p>
+    <div class="tsec">
+      <b class="lb">🧠 หลักการจำ</b>
+      <div class="mem">“ปรับงบดุล → D/E, ROA ขยับ · ปรับกำไรขาดทุน → Margin, ROE ขยับ · ปรับกระแสเงินสด → FCF, CFO/NI ขยับ”</div>
+      <ul>
+        <li>กำไรหลัก = กำไรสุทธิ − กำไรพิเศษ + ค่าใช้จ่ายพิเศษ</li>
+        <li>เพิ่มหนี้สินสัญญาเช่าเข้างบ ⇒ D/E <b>เพิ่ม</b>, ROA <b>ลด</b>, Interest Coverage <b>ลด</b></li>
+      </ul>
+    </div>
+    <div class="tsec">
+      <b class="lb">🎯 เก็งข้อสอบ</b>
+      <ul>
+        <li>ให้กำไรสุทธิและรายการพิเศษ แล้วให้คำนวณกำไรหลัก</li>
+        <li>ถามว่าการนำหนี้สินสัญญาเช่าเข้างบกระทบอัตราส่วนใดบ้าง และทิศทางเป็นอย่างไร</li>
+        <li>ถามว่าทำไมการตัดกำไรพิเศษออกจึงทำให้ ROE ดูแย่ลงแต่กลับ “น่าเชื่อถือมากขึ้น”</li>
+      </ul>
+    </div>
+    <div class="tsec">
+      <b class="lb">⚡ เทคนิคทำข้อสอบ</b>
+      <p style="margin:0">เจอโจทย์ปรับปรุงงบ ให้ไล่เช็กทีละงบ (ฐานะการเงิน → กำไรขาดทุน → กระแสเงินสด) ว่าตัวเลขไหนขยับ แล้วจึงไล่คำนวณอัตราส่วนที่เกี่ยวข้องทีละตัว อย่าข้ามขั้นตอน</p>
+    </div>
+  </div>
+</div>
+
+<section>
+  <h2>การปรับปรุงงบการเงินเพื่อหา Core Earnings</h2>
+  <div class="card">
+    <div class="formula"><span class="t">สูตรกำไรหลัก</span>
+      กำไรหลัก (Core Earnings) = กำไรสุทธิ − รายการกำไรพิเศษที่ไม่เกิดประจำ + ค่าใช้จ่ายพิเศษที่ไม่เกิดประจำ
+    </div>
+    <div class="tw"><table>
+      <tr><th>งบที่ปรับ</th><th>ตัวอย่างการปรับ</th><th>ผลต่ออัตราส่วน</th></tr>
+      <tr><td>งบแสดงฐานะการเงิน</td><td>นำหนี้สินสัญญาเช่าเข้างบ</td><td>D/E สูงขึ้น · ROA ต่ำลง · Interest Coverage ลดลง</td></tr>
+      <tr><td>งบกำไรขาดทุน</td><td>ตัดกำไรจากการตีราคาทรัพย์สิน/รายการพิเศษออก</td><td>Net Margin และ ROE ต่ำลง แต่ภาพกำไรยั่งยืนขึ้น</td></tr>
+      <tr><td>งบกระแสเงินสด</td><td>ย้ายรายการที่เคยบันทึกเป็น CFI กลับมาเป็น CFO</td><td>FCF และคุณภาพกำไร (CFO/NI) เปลี่ยนไป</td></tr>
+    </table></div>
+  </div>
+</section>
+
+  <div class="doneWrap"><button class="doneBtn" data-for="L74">✓ อ่านจบ LOS 7.4 แล้ว</button></div>
+</div>
+
+<!-- ============ LOS 7.5 ============ -->
+<div class="losblk" id="L75" data-los="L75" data-main="1">
+  <div class="losTag"><span class="mark">LOS 7.5</span> ประยุกต์ใช้เทคนิคการวิเคราะห์งบการเงินในแต่ละกรณีศึกษา</div>
+
+  <div class="tutor">
+    <div class="th">🎓 ติวเตอร์สรุปให้</div>
+    <p>LOS สุดท้ายนี้คือการเอาทุกอย่างจาก 7.1–7.4 มาใช้จริงกับ 3 กรณีศึกษาตัวแทน 3 อุตสาหกรรม: <b>TIIM</b> (ผู้ผลิตชิ้นส่วนรถยนต์), <b>Paddy</b> (อสังหาริมทรัพย์ให้เช่า), และ <b>Metropolitan Bank</b> (ธนาคารพาณิชย์)</p>
+    <p><b>TIIM</b> เป็นบริษัทโฮลดิ้งที่ต้องดู<b>งบรวม</b>เท่านั้น มี Operating Leverage สูงเพราะต้นทุนคงที่เยอะ ความเสี่ยงหลักคือ<b>อัตราแลกเปลี่ยน</b> (มีบริษัทย่อยต่างประเทศ) และ<b>การเปลี่ยนผ่านสู่ EV</b> ที่อาจทำให้ชิ้นส่วนเครื่องยนต์สันดาปด้อยค่า</p>
+    <p><b>Paddy</b> เน้นดู <b>Occupancy Rate, NOI, RevPAR</b> และต้องระวังว่าอาคารให้เช่าต้องบันทึกเป็น<b>อสังหาริมทรัพย์เพื่อการลงทุน</b> ไม่ใช่สินค้าคงเหลือ</p>
+    <p><b>Metropolitan Bank</b> คือหัวใจของ LOS นี้ — ต้องรู้ตัวชี้วัดเฉพาะธนาคาร: <b>NIM, NPL Ratio, Coverage Ratio, Credit Cost, LDR, CAR/CET1, Cost to Income</b> และต้องแยกแยะว่าปัจจัยใดกระทบธนาคารโดยตรง (การกระจุกตัวของสินเชื่อ, ความผันผวนดอกเบี้ย, นโยบายประกันเงินฝาก) กับปัจจัยที่เป็นแค่ภาพรวมเศรษฐกิจทั่วไปแต่ไม่กระทบโดยตรง (เช่น อัตราเงินเฟ้อ, อัตราการว่างงาน)</p>
+    <div class="tsec">
+      <b class="lb">🧠 หลักการจำ</b>
+      <div class="mem">TIIM=FX+EV risk · Paddy=Occupancy/NOI/RevPAR · Bank=NIM/NPL/Coverage/LDR/CAR</div>
+      <ul>
+        <li>ธนาคาร: D/E 10–15 เท่า = <b>ปกติ ไม่ใช่สัญญาณอันตราย</b></li>
+        <li>ธนาคาร: ห้ามใช้ Current Ratio, Inventory Turnover</li>
+        <li>ปัจจัยเศรษฐกิจมหภาคทั่วไป (เงินเฟ้อ, การว่างงาน) <b>ไม่ใช่</b>ปัจจัยเสี่ยงเฉพาะเจาะจงที่สุดของธนาคาร เมื่อเทียบกับปัจจัยเฉพาะธุรกิจ เช่น การกระจุกตัวของสินเชื่อ หรือนโยบายประกันเงินฝาก</li>
+      </ul>
+    </div>
+    <div class="tsec">
+      <b class="lb">🎯 เก็งข้อสอบ</b>
+      <ul>
+        <li>ถามว่าตัวเลขใด “สำคัญน้อยที่สุด” ในการวิเคราะห์ธนาคาร เทียบกับตัวชี้วัดเฉพาะธุรกิจอื่น ๆ</li>
+        <li>ถามว่าปัจจัยใด “ไม่ใช่” ปัจจัยเสี่ยงสำคัญของธนาคารพาณิชย์</li>
+        <li>ให้ตัวเลขการเงินของ TIIM/Paddy/Bank แล้วถามว่าควรใช้อัตราส่วนใดวิเคราะห์</li>
+      </ul>
+    </div>
+    <div class="tsec">
+      <b class="lb">⚡ เทคนิคทำข้อสอบ</b>
+      <p style="margin:0">เจอโจทย์ถามหา “ปัจจัยที่ไม่เกี่ยว/สำคัญน้อยที่สุด” ให้แยกก่อนว่าตัวเลือกไหนเป็น<b>ปัจจัยเศรษฐกิจมหภาคทั่วไป</b> (กระทบทุกธุรกิจเท่า ๆ กัน ไม่เฉพาะเจาะจง) กับตัวเลือกไหนเป็น<b>ปัจจัยเฉพาะธุรกิจนั้น ๆ โดยตรง</b> — คำตอบมักเป็นตัวที่กว้างเกินไปจนไม่เฉพาะเจาะจง</p>
+    </div>
+  </div>
+
+<section>
+  <h2>กรณีศึกษา 1 — TIIM (ผู้ผลิตชิ้นส่วนรถยนต์)</h2>
+  <div class="card">
+    <ul>
+      <li><b>โครงสร้างธุรกิจ:</b> บริษัทโฮลดิ้งถือหุ้นในกลุ่มผู้ผลิตชิ้นส่วนรถยนต์ (ACM Business) ในไทย มาเลเซีย อินโดนีเซีย ⇒ ต้องใช้<b>งบการเงินรวม</b>เท่านั้น เพราะงบเฉพาะกิจการมีแค่เงินปันผลรับ</li>
+      <li><b>โครงสร้างต้นทุน:</b> ต้นทุนคงที่สูง (ค่าเสื่อมราคาเครื่องจักร) ⇒ <b>Operating Leverage สูง</b> รายได้ลดลงไม่ได้แปลว่าต้นทุนลดตามสัดส่วนเดียวกันเสมอไป</li>
+      <li><b>อัตราส่วนที่ควรเน้น:</b> GPM/OPM, Fixed Asset Turnover, DIO/DSO, D/E, Interest Coverage, Net Debt/EBITDA, CAPEX÷CFO, FCF</li>
+      <li><b>ความเสี่ยงเฉพาะ:</b> พึ่งพาลูกค้า OEM รายใหญ่ไม่กี่ราย, ความเสี่ยงจากการเปลี่ยนผ่านสู่ EV (ชิ้นส่วนเครื่องยนต์สันดาปอาจด้อยค่า), ความเสี่ยงอัตราแลกเปลี่ยนจากบริษัทย่อยต่างประเทศ, ความเสี่ยงอัตราดอกเบี้ย</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>กรณีศึกษา 2 — Paddy (อสังหาริมทรัพย์ให้เช่า)</h2>
+  <div class="card">
+    <ul>
+      <li><b>ตัวชี้วัดหลัก:</b> Occupancy Rate (อัตราการเช่าพื้นที่), NOI (Net Operating Income), RevPAR (สำหรับส่วนโรงแรม)</li>
+      <li><b>การจัดประเภทสินทรัพย์:</b> อาคารให้เช่าต้องบันทึกเป็น <b>“อสังหาริมทรัพย์เพื่อการลงทุน”</b> ไม่ใช่ “อสังหาริมทรัพย์พัฒนาเพื่อขาย” ซึ่งเป็นสินค้าคงเหลือของผู้พัฒนาโครงการ</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>กรณีศึกษา 3 — Metropolitan Bank (ธนาคารพาณิชย์)</h2>
+  <div class="card">
+    <div class="tw"><table>
+      <tr><th>ตัวชี้วัด</th><th>สูตร / ความหมาย</th></tr>
+      <tr><td><b>NIM</b></td><td>รายได้ดอกเบี้ยสุทธิ ÷ สินทรัพย์ที่ก่อให้เกิดรายได้ดอกเบี้ยเฉลี่ย</td></tr>
+      <tr><td><b>NPL Ratio</b></td><td>สินเชื่อด้อยคุณภาพ ÷ สินเชื่อรวม</td></tr>
+      <tr><td><b>Coverage Ratio</b></td><td>ค่าเผื่อผลขาดทุนด้านเครดิต ÷ NPL (ยิ่งสูงยิ่งปลอดภัย)</td></tr>
+      <tr><td><b>Credit Cost</b></td><td>ค่าใช้จ่าย ECL ÷ สินเชื่อเฉลี่ย</td></tr>
+      <tr><td><b>LDR</b></td><td>สินเชื่อ ÷ เงินฝาก (ต่ำกว่า 100% แปลว่ายังมีกระสุนปล่อยกู้เพิ่มได้)</td></tr>
+      <tr><td><b>CAR / CET1</b></td><td>เงินกองทุน ÷ สินทรัพย์เสี่ยง (ตามเกณฑ์ ธปท./Basel)</td></tr>
+      <tr><td><b>Cost to Income</b></td><td>ค่าใช้จ่ายดำเนินงาน ÷ รายได้รวม</td></tr>
+    </table></div>
+    <div class="tip"><span class="h">ข้อควรระวังเฉพาะธนาคาร</span>
+      สินทรัพย์หลักคือ<b>เงินให้สินเชื่อสุทธิ</b> หนี้สินหลักคือ<b>เงินรับฝาก</b> ⇒ <b>ห้ามใช้ Current Ratio และ Inventory Turnover</b> เพราะไม่แบ่งหมวดหมุนเวียน/ไม่หมุนเวียน และไม่มีสินค้าคงเหลือ · D/E ระดับ 10–15 เท่าเป็น<b>เรื่องปกติ</b>ของธุรกิจธนาคาร ไม่ใช่สัญญาณฐานะการเงินอ่อนแอ
+    </div>
+    <div class="alert"><span class="h">ความเสี่ยงที่ต้องติดตาม</span>
+      การเพิ่มขึ้นของ NPL, หนี้ที่ปรับโครงสร้างแล้วกลับมาเป็น NPL ซ้ำ (Re-entry), ความผันผวนของอัตราดอกเบี้ย, การกระจุกตัวของสินเชื่อ, และกฎเกณฑ์กำกับดูแล/นโยบายรัฐเกี่ยวกับการประกันเงินฝาก
+    </div>
+  </div>
+</section>
+
+  <div class="exhead">📝 แบบฝึกหัดจากคลังข้อสอบจริง <span class="exbadge">2 ข้อ</span></div>
+
+  <details class="exq">
+    <summary>ในการวิเคราะห์งบการเงินของธนาคารพาณิชย์ ตัวเลขทางการเงินใดต่อไปนี้อาจเป็นตัวเลขทางการเงินที่สำคัญน้อยที่สุดที่ต้องนำมาพิจารณา<br>
+1) การเติบโตของสินเชื่อ<br>
+2) อัตราเงินเฟ้อ<br>
+3) ส่วนต่างอัตราดอกเบี้ยสุทธิ<br>
+4) ค่าใช้จ่ายหนี้สูญและหนี้สงสัยจะสูญ</summary>
+    <div class="ans">
+      <b>เฉลย: ข้อ 2) อัตราเงินเฟ้อ</b><br>
+      อัตราเงินเฟ้อเป็นปัจจัยเศรษฐกิจมหภาคที่กระทบทุกธุรกิจในวงกว้าง ไม่ได้ส่งผลกระทบ<b>โดยตรง</b>ต่อการประเมินผลการดำเนินงานของธนาคารเท่ากับตัวเลขเฉพาะธุรกิจอีก 3 ตัวเลือก ซึ่งล้วนสะท้อนคุณภาพสินเชื่อและความสามารถทำกำไรจากธุรกิจหลักของธนาคารโดยตรง
+    </div>
+  </details>
+
+  <details class="exq">
+    <summary>ปัจจัยใดต่อไปนี้ ไม่ใช่ ปัจจัยเสี่ยงที่สำคัญในการดำเนินธุรกิจของธนาคารพาณิชย์<br>
+1) การกระจุกตัวของสินเชื่อ<br>
+2) อัตราการว่างงาน<br>
+3) ผลกระทบจากความผันผวนของอัตราดอกเบี้ย<br>
+4) นโยบายของรัฐบาลเกี่ยวกับการยกเลิก/เปลี่ยนแปลงการประกันเงินฝาก</summary>
+    <div class="ans">
+      <b>เฉลย: ข้อ 2) อัตราการว่างงาน</b><br>
+      อัตราการว่างงานเป็นตัวแปรเศรษฐกิจมหภาคทั่วไปที่ไม่ได้ถูกจัดเป็นปัจจัยเสี่ยง<b>เฉพาะเจาะจง</b>ของธุรกิจธนาคารเมื่อเทียบกับอีก 3 ตัวเลือก ซึ่งล้วนเป็นความเสี่ยงที่กระทบโครงสร้างธุรกิจธนาคารโดยตรง ได้แก่ ความเสี่ยงจากการกระจุกตัวของสินเชื่อ ความผันผวนของอัตราดอกเบี้ยต่อ NIM และการเปลี่ยนแปลงนโยบายประกันเงินฝากที่กระทบความเชื่อมั่นของผู้ฝากเงิน
+    </div>
+  </details>
+
+  <div class="doneWrap"><button class="doneBtn" data-for="L75">✓ อ่านจบ LOS 7.5 แล้ว</button></div>
+</div>
+
+<section id="quiz">
+  <h2>แบบฝึกหัดจับประเด็น + เฉลย</h2>
+  <div class="card" style="padding:12px 11px">
+    <details>
+      <summary>บริษัทมีกำไรสุทธิ 4,000,000 บาท หุ้นสามัญต้นปี 1,000,000 หุ้น และวันที่ 1 ก.ค. แตกหุ้น 1 : 2 — Basic EPS เท่าไร</summary>
+      <div class="ans">
+        แตกหุ้นต้องปรับ<b>ย้อนหลังทั้งงวด</b> ไม่ถ่วงน้ำหนักตามเวลา<br>
+        WANOS = 1,000,000 × 2 = 2,000,000 หุ้น<br>
+        <b>Basic EPS = 4,000,000 ÷ 2,000,000 = 2.00 บาท/หุ้น</b>
+      </div>
+    </details>
+    <details>
+      <summary>หุ้นกู้แปลงสภาพดอกเบี้ยจ่าย 1,000,000 บาท/ปี อัตราภาษี 20% แปลงเป็นหุ้นสามัญได้ 500,000 หุ้น — ต้องบวกกลับตัวเศษเท่าไร และ Incremental EPS เท่าไร</summary>
+      <div class="ans">
+        บวกกลับ = 1,000,000 × (1 − 0.20) = <b>800,000 บาท</b><br>
+        Incremental EPS = 800,000 ÷ 500,000 = <b>1.60 บาท/หุ้น</b>
+      </div>
+    </details>
+    <details>
+      <summary>Warrants 400,000 หน่วย ราคาใช้สิทธิ 25 บาท ราคาตลาดถัวเฉลี่ย 20 บาท — หุ้นเพิ่มสุทธิเท่าไร</summary>
+      <div class="ans">
+        ราคาตลาด (20) &lt; ราคาใช้สิทธิ (25) ⇒ <b>Out of the money = Antidilutive</b><br>
+        <b>หุ้นเพิ่มสุทธิ = 0</b>
+      </div>
+    </details>
+    <details>
+      <summary>บริษัทมีผลขาดทุนสุทธิ 5 ล้านบาท และมีหุ้นกู้แปลงสภาพ + Options จำนวนมาก — Diluted EPS คำนวณอย่างไร</summary>
+      <div class="ans">
+        เมื่อขาดทุน ⇒ ทุกตราสาร Antidilutive ⇒ <b>Diluted EPS = Basic EPS</b>
+      </div>
+    </details>
+    <details>
+      <summary>หุ้นบุริมสิทธิ<b>ชนิดสะสม</b> ต้องจ่ายปันผลปีละ 3 ล้านบาท แต่ปีนี้บริษัทไม่ประกาศจ่าย — ต้องหักออกจากตัวเศษหรือไม่</summary>
+      <div class="ans">
+        <b>ต้องหัก</b> — ชนิดสะสมมีสิทธิสะสมไว้รับในอนาคต
+      </div>
+    </details>
+    <details>
+      <summary>[LOS 6.2] Basic EPS = 4.00 บาท · หุ้นบุริมสิทธิแปลงสภาพจ่ายปันผล 1,200,000 บาท แปลงได้ 400,000 หุ้น — เป็น Dilutive หรือ Antidilutive</summary>
+      <div class="ans">
+        Incremental EPS = 1,200,000 ÷ 400,000 = <b>3.00 บาท</b> &lt; 4.00 ⇒ <b>Dilutive</b>
+      </div>
+    </details>
+    <details>
+      <summary>เห็นรายการ “อสังหาริมทรัพย์พัฒนาเพื่อขาย” ในงบของบริษัทที่บอกว่าทำธุรกิจ<b>ให้เช่าพื้นที่</b> — ควรตั้งข้อสังเกตอย่างไร</summary>
+      <div class="ans">
+        บริษัทให้เช่าพื้นที่ควรบันทึกอาคารเป็น <b>“อสังหาริมทรัพย์เพื่อการลงทุน”</b> ไม่ใช่สินค้าคงเหลือ ⇒ อาจมีธุรกิจพัฒนาเพื่อขายด้วย หรือจัดประเภทผิด
+      </div>
+    </details>
+    <details>
+      <summary>[LOS 7.2] บริษัทโฮลดิ้งแห่งหนึ่งแสดงงบเฉพาะกิจการที่มี “ขาดทุนสุทธิ” ทั้งที่กลุ่มบริษัทมีกำไรดี — อธิบายสาเหตุ</summary>
+      <div class="ans">
+        งบเฉพาะกิจการมีรายได้หลักเป็นเงินปันผลรับ ปีที่บริษัทย่อยไม่จ่ายปันผล แม่จะดูขาดทุน ⇒ ต้องวิเคราะห์จาก<b>งบการเงินรวม</b>
+      </div>
+    </details>
+    <details>
+      <summary>บริษัทกำไรสุทธิโต 25% ทุกปีติดต่อกัน 3 ปี แต่ CFO แทบไม่โต และลูกหนี้โต 60% — สรุปอย่างไร</summary>
+      <div class="ans">
+        เป็น <b>Red Flag ด้านคุณภาพกำไร</b> — กำไรรับรู้ทางบัญชีแต่ยังเก็บเงินไม่ได้
+      </div>
+    </details>
+    <details>
+      <summary>ROE ของบริษัท A = 18% และ B = 18% เท่ากัน — จะรู้ได้อย่างไรว่าใครมีคุณภาพดีกว่า</summary>
+      <div class="ans">
+        แยกด้วย <b>DuPont</b> — ตัวที่พึ่ง Equity Multiplier สูงคือตัวเสี่ยงกว่า
+      </div>
+    </details>
+  </div>
+</section>
+
+</div>
+
+<div id="toast">
+  <div class="tt">กลับไปอ่านต่อจากเดิมไหม?</div>
+  <div class="ts" id="toastSub"></div>
+  <div class="row">
+    <button id="goBtn">ไปต่อ</button>
+    <button id="noBtn">เริ่มใหม่</button>
+  </div>
+</div>
+<div id="prog">อ่านแล้ว 0%</div>
+<button id="top">↑</button>
+
+<footer>
+  CISA Level II · หลักสูตรที่ 3 — การวิเคราะห์งบการเงินขั้นสูง (บทที่ 6–7)<br>
+  จัดทำเพื่อการทบทวนและเตรียมสอบ
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var KEY = "cisa-fsa-ch67-v4";
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+
+  function load(){ try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch(e){ return {}; } }
+  function save(o){ try { localStorage.setItem(KEY, JSON.stringify(o)); } catch(e){} }
+
+  var st = load();
+  if (!st.read) st.read = {};
+
+  var themeBtn = document.getElementById("themeBtn");
+  function applyTheme(t){
+    document.documentElement.setAttribute("data-theme", t);
+    themeBtn.textContent = (t === "dark") ? "☀️ โหมดสว่าง" : "🌙 โหมดมืด";
+  }
+  applyTheme(st.theme || "light");
+  themeBtn.addEventListener("click", function(){
+    var cur = document.documentElement.getAttribute("data-theme");
+    var nxt = (cur === "dark") ? "light" : "dark";
+    applyTheme(nxt); st.theme = nxt; save(st);
+  });
+
+  var fs = st.fs || 14;
+  function applyFs(){
+    fs = Math.min(22, Math.max(13, fs));
+    document.documentElement.style.setProperty("--fs", fs + "px");
+    st.fs = fs; save(st);
+  }
+  applyFs();
+  document.getElementById("fsUp").addEventListener("click", function(){ fs += 1; applyFs(); });
+  document.getElementById("fsDown").addEventListener("click", function(){ fs -= 1; applyFs(); });
+
+  var blocks = Array.prototype.slice.call(document.querySelectorAll(".losblk"));
+  var mains  = blocks.filter(function(b){ return b.dataset.main === "1"; });
+  var statEl = document.getElementById("losStat");
+
+  function refreshStat(){
+    var n = 0;
+    mains.forEach(function(b){ if (st.read[b.dataset.los]) n++; });
+    statEl.textContent = "อ่านแล้ว " + n + "/" + mains.length + " LOS";
+  }
+  function paint(blk){
+    var id = blk.dataset.los;
+    var btn = blk.querySelector(".doneBtn");
+    var label = btn.getAttribute("data-label") || btn.textContent;
+    btn.setAttribute("data-label", label);
+    if (st.read[id]){
+      blk.classList.add("done");
+      btn.classList.add("on");
+      btn.textContent = "✔ อ่านแล้ว — แตะเพื่อยกเลิก";
+    } else {
+      blk.classList.remove("done");
+      btn.classList.remove("on");
+      btn.textContent = label;
+    }
+  }
+  blocks.forEach(function(blk){
+    paint(blk);
+    blk.querySelector(".doneBtn").addEventListener("click", function(){
+      var id = blk.dataset.los;
+      if (st.read[id]) delete st.read[id]; else st.read[id] = Date.now();
+      paint(blk); refreshStat(); save(st);
+    });
+  });
+  refreshStat();
+
+  var heads = Array.prototype.slice.call(document.querySelectorAll(".losTag, h2"));
+  function currentHeading(){
+    var y = window.scrollY + 90, name = "ส่วนต้นเอกสาร";
+    for (var i = 0; i < heads.length; i++){
+      if (heads[i].getBoundingClientRect().top + window.scrollY <= y){
+        name = heads[i].textContent.trim();
+        if (name.length > 46) name = name.slice(0,46) + "…";
+      }
+    }
+    return name;
+  }
+
+  var progEl = document.getElementById("prog");
+  var topBtn = document.getElementById("top");
+  var ticking = false, lastSave = 0;
+
+  function onScroll(){
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(function(){
+      var h = document.documentElement.scrollHeight - window.innerHeight;
+      var pct = h > 0 ? Math.min(100, Math.round(window.scrollY / h * 100)) : 0;
+      progEl.textContent = "อ่านแล้ว " + pct + "%";
+      if (window.scrollY > 600) topBtn.classList.add("show"); else topBtn.classList.remove("show");
+      var now = Date.now();
+      if (now - lastSave > 450){
+        lastSave = now;
+        st.y = Math.round(window.scrollY);
+        st.pct = pct;
+        st.head = currentHeading();
+        st.t = now;
+        save(st);
+      }
+      ticking = false;
+    });
+  }
+  window.addEventListener("scroll", onScroll, {passive:true});
+  window.addEventListener("resize", onScroll);
+  ["pagehide","visibilitychange","beforeunload"].forEach(function(ev){
+    window.addEventListener(ev, function(){
+      st.y = Math.round(window.scrollY); st.head = currentHeading(); st.t = Date.now(); save(st);
+    });
+  });
+
+  topBtn.addEventListener("click", function(){ window.scrollTo({top:0, behavior:"smooth"}); });
+
+  var toast = document.getElementById("toast");
+  var sub = document.getElementById("toastSub");
+
+  function ago(ts){
+    if (!ts) return "";
+    var d = Math.floor((Date.now() - ts) / 1000);
+    if (d < 60) return "เมื่อสักครู่";
+    if (d < 3600) return "เมื่อ " + Math.floor(d/60) + " นาทีที่แล้ว";
+    if (d < 86400) return "เมื่อ " + Math.floor(d/3600) + " ชั่วโมงที่แล้ว";
+    return "เมื่อ " + Math.floor(d/86400) + " วันก่อน";
+  }
+
+  window.addEventListener("load", function(){
+    onScroll();
+    if (st.y && st.y > 350){
+      sub.textContent = "ค้างไว้ที่ “" + (st.head || "เนื้อหา") + "” · " + (st.pct || 0) + "% · " + ago(st.t);
+      toast.classList.add("show");
+      var timer = setTimeout(function(){ toast.classList.remove("show"); }, 12000);
+      document.getElementById("goBtn").addEventListener("click", function(){
+        clearTimeout(timer); toast.classList.remove("show");
+        window.scrollTo({top: st.y, behavior:"smooth"});
+      });
+      document.getElementById("noBtn").addEventListener("click", function(){
+        clearTimeout(timer); toast.classList.remove("show");
+        window.scrollTo({top:0, behavior:"smooth"});
+      });
+    }
+  });
+
+  document.getElementById("clearBtn").addEventListener("click", function(){
+    var keep = {theme: st.theme, fs: st.fs, read: st.read};
+    st = keep; save(st);
+    toast.classList.remove("show");
+    window.scrollTo({top:0, behavior:"smooth"});
+    this.textContent = "✓ ล้างแล้ว";
+    var b = this;
+    setTimeout(function(){ b.textContent = "↺ ล้างตำแหน่งอ่าน"; }, 1800);
+  });
+})();
+</script>
+
+</body>
+</html>
