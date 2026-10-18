@@ -840,7 +840,6 @@ footer{text-align:center;color:var(--muted);font-size:.68rem;margin-top:24px;pad
       </ul>
     </div>
   </div>
-</div>
 
 <section>
   <h2>สรุปผลกระทบรายตราสารต่อองค์ประกอบของ EPS</h2>
@@ -929,7 +928,6 @@ footer{text-align:center;color:var(--muted);font-size:.68rem;margin-top:24px;pad
       </ul>
     </div>
   </div>
-</div>
 
 <section>
   <h2>ตราสารปรับเพิ่ม (Antidilutive) &amp; การจัดลำดับ</h2>
@@ -1030,7 +1028,6 @@ footer{text-align:center;color:var(--muted);font-size:.68rem;margin-top:24px;pad
       </ul>
     </div>
   </div>
-</div>
 
 <section>
   <h2>ตารางเปรียบเทียบข้อกำหนดการรายงาน</h2>
@@ -1214,7 +1211,6 @@ footer{text-align:center;color:var(--muted);font-size:.68rem;margin-top:24px;pad
       <p style="margin:0">เจอโจทย์เปรียบเทียบงบข้ามอุตสาหกรรม ให้ถามตัวเองก่อนว่า <b>“สินทรัพย์หลักของธุรกิจนี้คืออะไร”</b> แล้วเช็กว่ารายการที่โจทย์ให้มาสอดคล้องกับสินทรัพย์หลักนั้นหรือไม่</p>
     </div>
   </div>
-</div>
 
 <section>
   <h2>ความแตกต่างของงบการเงินตามประเภทธุรกิจ</h2>
@@ -1265,7 +1261,6 @@ footer{text-align:center;color:var(--muted);font-size:.68rem;margin-top:24px;pad
       <p style="margin:0">เจอโจทย์เปรียบเทียบ 2 บริษัทที่ ROE/กำไรเท่ากัน ให้สงสัยไว้ก่อนว่าอาจใช้<b>ทางเลือกบัญชีต่างกัน</b> แล้วไล่เช็ก CFO เทียบกับกำไรสุทธิเป็นอันดับแรก</p>
     </div>
   </div>
-</div>
 
 <section>
   <h2>ทางเลือกทางบัญชีและผลกระทบ</h2>
@@ -1322,7 +1317,6 @@ footer{text-align:center;color:var(--muted);font-size:.68rem;margin-top:24px;pad
       <p style="margin:0">เจอโจทย์ปรับปรุงงบ ให้ไล่เช็กทีละงบ (ฐานะการเงิน → กำไรขาดทุน → กระแสเงินสด) ว่าตัวเลขไหนขยับ แล้วจึงไล่คำนวณอัตราส่วนที่เกี่ยวข้องทีละตัว อย่าข้ามขั้นตอน</p>
     </div>
   </div>
-</div>
 
 <section>
   <h2>การปรับปรุงงบการเงินเพื่อหา Core Earnings</h2>
@@ -1539,7 +1533,7 @@ footer{text-align:center;color:var(--muted);font-size:.68rem;margin-top:24px;pad
 <script>
 (function(){
   "use strict";
-  var KEY = "cisa-fsa-ch67-v4";
+  var KEY = "cisa-fsa-ch67-v5";
   if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 
   function load(){ try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch(e){ return {}; } }
@@ -1582,6 +1576,7 @@ footer{text-align:center;color:var(--muted);font-size:.68rem;margin-top:24px;pad
   function paint(blk){
     var id = blk.dataset.los;
     var btn = blk.querySelector(".doneBtn");
+    if (!btn) return;
     var label = btn.getAttribute("data-label") || btn.textContent;
     btn.setAttribute("data-label", label);
     if (st.read[id]){
@@ -1596,7 +1591,9 @@ footer{text-align:center;color:var(--muted);font-size:.68rem;margin-top:24px;pad
   }
   blocks.forEach(function(blk){
     paint(blk);
-    blk.querySelector(".doneBtn").addEventListener("click", function(){
+    var btn = blk.querySelector(".doneBtn");
+    if (!btn) return;
+    btn.addEventListener("click", function(){
       var id = blk.dataset.los;
       if (st.read[id]) delete st.read[id]; else st.read[id] = Date.now();
       paint(blk); refreshStat(); save(st);
